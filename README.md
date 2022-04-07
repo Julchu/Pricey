@@ -1,6 +1,6 @@
 # Pricey
 
-Tracking historically lowest price of items we purchase on a recurring basis. 
+Tracking historically lowest price of items we purchase on a recurring basis.
 
 Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in different units.
 
@@ -8,42 +8,80 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 
 We'll be using TypeScript, NextJS, and Firebase/Firestore
 
-
-### Requirements
-In addition to NodeJS and TypeScript, we'll be using a few code quality tools for error checking/formatting code, such as ESLint, Prettier, and Lint-Staged
-
-
-
 To run the development server:
 
 ```zsh
-# NextJS uses Yarn over NPM by default
+# Go to a directory that you want the project added to
+# Ex: /Documents, where a folder called Pricey will be added
+git clone https://github.com/Julchu/Pricey.git
+cd Pricey
 
-# Yarn installs packages in parallel rather than one-by-one, like NPM does
-
-# Yarn's lockfile is a lot more sturdy than NPM's lockfile
-
-# 
+# Installing the React app
+yarn install
 yarn dev
+
+# A browser tab should open at localhost:3000
 ```
 
-## Testing
+## Requirements
 
-We're using ESLint to test for basic JavaScript and TypeScript errors. Configuring ESLint
-
-
-
-A basic pre-commit hook is configured in ```package.json``` to prevent anyone from making commits that don't pass basic ESLint
-
-# 
-
-# VSCode Extras
+In addition to NodeJS and TypeScript, we'll be using a few code quality tools for error checking/formatting code, such as ESLint, **Prettier**, and pre-commit
 
 ### Prettier (format on save)
 
-* In VSCode, install the extention Prettier
+- In VSCode, install the extention Prettier
+- Go to your VSCode JSON settings:
+  - Command Palette -> Preferences: Open Settings (JSON)
+- Add the following code to the JSON object
 
-# NextJS default ReadMe
+```json
+// settings.json
+{
+	...
+	"editor.tabSize": 2,
+
+	// Add this to enable autosave in VSCode with Prettier
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	...
+}
+```
+
+- Whenever you save a file, it'll run automatic formatting based on rules defined in `/.prettierrc.json`
+
+## Testing
+
+We're using ESLint to test for basic JavaScript and TypeScript errors
+
+You can run `lint` and `type-check` to check for basic project syntax errors
+
+```zsh
+# In root directory (/Pricey)
+yarn lint
+yarn type-check
+```
+
+Our project also will automatically run these commands whenever you're committing files. It'll also block commits if errors show up, with a basic pre-commit hook configured in `package.json`
+
+```json
+// package.json
+{
+	...
+	"pre-commit": [
+		"lint",
+		"type-check"
+	]
+	...
+}
+```
+
+## Why Yarn
+
+- NextJS uses Yarn over NPM by default
+- Yarn installs packages in parallel rather than one-by-one, like NPM does
+- Yarn's lockfile is a lot more sturdy than NPM's lockfile
+
+# NextJS starter README
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
