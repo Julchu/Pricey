@@ -10,7 +10,7 @@ We'll be using TypeScript, NextJS, and Firebase/Firestore
 
 
 ### Requirements
-In addition to NodeJS and TypeScript, we'll be using a few code quality tools for error checking/formatting code, such as ESLint, Prettier, Lint-Staged, and Husky
+In addition to NodeJS and TypeScript, we'll be using a few code quality tools for error checking/formatting code, such as ESLint, Prettier, and Lint-Staged
 
 
 
