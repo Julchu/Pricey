@@ -4,9 +4,14 @@ Tracking historically lowest price of items we purchase on a recurring basis.
 
 Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in different units.
 
+# TODO:
+
+- Add Firebase/Firestore
+- Deploy GH Pages
+
 # Setup
 
-We'll be using TypeScript, NextJS, and Firebase/Firestore
+We'll be using TypeScript, NextJS, Emotion, and Firebase/Firestore
 
 To run the development server:
 
@@ -81,14 +86,16 @@ Our project also will automatically run these commands whenever you're committin
 - Yarn installs packages in parallel rather than one-by-one, like NPM does
 - Yarn's lockfile is a lot more sturdy than NPM's lockfile
 
-# Basic NextJS layout:
+# Notes
+
+## Basic NextJS layout
 
 ### /components
 
 - For React components, structured as
   - DirectoryName
     - index.tsx
-    - styled.tsx
+    - styles.tsx
 - I'll create some template folders and files
 
 ### /pages:
@@ -100,6 +107,26 @@ Our project also will automatically run these commands whenever you're committin
       - index.tsx: localhost:3000/RouteName/SubRouteName
       - [templateIndex].tsx: localhost:3000/RouteName/SubRouteName/templateIndex
 
-### package.json
+### /package.json
 
-- project information, scripts, node module dependencies, pre-commit hooks, etc...
+- Project information, scripts, node module dependencies, pre-commit hooks, etc...
+- Dependencies: `yarn add <packageName>`
+  - Required for end user/host to install when building app
+  - Ex: NextJS/React, Emotion (styling)
+- Dev Dependencies: `yarn add <packageName> -D`
+  - Required for devs to install when building app
+  - Ex: linters, formatters
+
+## Basic Emotion styled components
+
+Base styled components can go into `/UI`, and each specific component's styles can either build unique styled components or inherit from one from `/UI`
+
+- Ex: `/components/UI/buttons.tsx`
+
+Syntax is similar to CSS but with camelCase instead of kebab-case
+
+- Ex: `fontSize` instead of `font-size`
+
+Every non-numeric value is a string in single quotes
+
+- Ex: `fontSize: '24px'`, `fontSize: 24`

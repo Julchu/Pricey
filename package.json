@@ -8,9 +8,13 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc"
+    "lint:fix": "next lint --fix '**/*.{ts,tsx}'",
+    "type-check": "tsc --noEmit",
+    "type-check:firebase": "tsc -p pkg/firebase/functions --skipLibCheck --noEmit"
   },
   "dependencies": {
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
     "next": "12.1.4",
     "react": "18.0.0",
     "react-dom": "18.0.0"
@@ -20,7 +24,7 @@
     "@types/react": "18.0.0",
     "@types/react-dom": "18.0.0",
     "@typescript-eslint/eslint-plugin": "^5.18.0",
-    "eslint": "8.12.0",
+    "eslint": "^8.12.0",
     "eslint-config-next": "12.1.4",
     "eslint-config-prettier": "^8.5.0",
     "pre-commit": "^1.2.2",
