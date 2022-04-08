@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { IconProps } from '.';
 
-const GitHubLogo: FC<IconProps> = ({ style, ...rest }) => {
+export const GithubLogo: FC<IconProps> = ({ style, ...rest }) => {
   return (
     <svg
       height="32"
@@ -21,5 +21,3 @@ const GitHubLogo: FC<IconProps> = ({ style, ...rest }) => {
     </svg>
   );
 };
-
-export default GitHubLogo;

@@ -10,7 +10,8 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix '**/*.{ts,tsx}'",
     "type-check": "tsc --noEmit",
-    "type-check:firebase": "tsc -p pkg/firebase/functions --skipLibCheck --noEmit"
+    "type-check:firebase": "tsc -p pkg/firebase/functions --skipLibCheck --noEmit",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -27,11 +28,16 @@
     "eslint": "^8.12.0",
     "eslint-config-next": "12.1.4",
     "eslint-config-prettier": "^8.5.0",
-    "pre-commit": "^1.2.2",
+    "husky": "^7.0.4",
+    "lint-staged": "^12.3.7",
     "typescript": "4.6.3"
   },
-  "pre-commit": [
-    "lint",
-    "type-check"
-  ]
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix"
+    ],
+    "*.{html,js}": [
+      "prettier --write"
+    ]
+  }
 }

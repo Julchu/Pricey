@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import GitHubLogo from '../components/Icons/Github';
+import { GithubLogo } from '../components/Icons/Github';
 import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
@@ -44,10 +44,10 @@ const Home: NextPage = () => {
             rel="noopener noreferrer"
           >
             Created by&nbsp;
-            <GitHubLogo onClick={() => router.push('https://github.com/julchu/')} />
-            <GitHubLogo onClick={() => router.push('https://github.com/jktoo/')} />
-            <GitHubLogo onClick={() => router.push('https://github.com/AliShahidGit/')} />
-            <GitHubLogo onClick={() => router.push('https://github.com/ChristineAu-Yeung/')} />
+            <GithubLogo onClick={() => router.push('https://github.com/julchu/')} />
+            <GithubLogo onClick={() => router.push('https://github.com/jktoo/')} />
+            <GithubLogo onClick={() => router.push('https://github.com/AliShahidGit/')} />
+            <GithubLogo onClick={() => router.push('https://github.com/ChristineAu-Yeung/')} />
           </a>
         </footer>
       </div>
