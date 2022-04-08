@@ -6,8 +6,9 @@ import styles from '../styles/Home.module.css';
 
 const Home: NextPage = () => {
   const router = useRouter();
+
   return (
-    <div style={{ height: '100vh' }}>
+    <>
       <Head>
         <title>Pricey</title>
         <meta name="description" content="Tracking overpriced shopping" />
@@ -51,7 +52,7 @@ const Home: NextPage = () => {
           </a>
         </footer>
       </div>
-    </div>
+    </>
   );
 };
 
