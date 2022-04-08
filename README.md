@@ -88,12 +88,17 @@ Our project also will automatically run these commands whenever you're committin
 - For React components, structured as
   - DirectoryName
     - index.tsx
-    - styles.tsx
+    - styled.tsx
 - I'll create some template folders and files
 
 ### /pages:
 
 - Files in this directory are treated as API routes instead of React pages
+  - RouteName
+    - index.tsx: localhost:3000/RouteName
+    - SubRouteName
+      - index.tsx: localhost:3000/RouteName/SubRouteName
+      - [templateIndex].tsx: localhost:3000/RouteName/SubRouteName/templateIndex
 
 ### package.json
 
