@@ -13,7 +13,9 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 
 ### NodeJS, npm, Yarn
 
-You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that you can run commands to download packages used to create React projects. The main package you'll need is a separate package manager called `Yarn`, which functions similarly (like a super layer) to `npm`
+You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that you can run commands to download packages used to create React projects.
+
+The main package you'll need is a separate package manager called `Yarn`, which functions similarly (like a super layer) to `npm`
 
 ```bash
 npm install --global yarn
@@ -70,19 +72,7 @@ yarn lint
 yarn type-check
 ```
 
-Our project also will automatically run these commands whenever you're committing files. It'll also block commits if errors show up, with a basic pre-commit hook configured in `package.json`
-
-```json
-// package.json
-{
-	...
-	"pre-commit": [
-		"lint",
-		"type-check"
-	]
-	...
-}
-```
+Our project also will automatically run these commands on staged files whenever you're committing them. It'll block the commits if errors are thrown, with our installation of Husky and Lint-Staged
 
 ## Why Yarn
 
@@ -92,7 +82,40 @@ Our project also will automatically run these commands whenever you're committin
 
 # Notes
 
-## Basic NextJS layout
+Projects can be split into
+
+- Front-end: React, Angular, Vue
+- Back-end: NodeJS, "servers", Firebase
+- Database: Firestore, MongoDB, Postgres
+
+Front-end: how things look from a user's standpoint, or how data is displayed
+
+Back-end: how data is sent to front-end, or how data is saved to database
+
+Database: where data is stored, or locations of non-string data (like files) that are kept in storage
+
+## Understanding React/NextJS
+
+Building React apps involves turning web pages into components (kinda like an HTML Iframe)
+
+Similar but opposite to PHP, where it's HTML structure with in-line code, React is code to structure HTML
+
+Imagine a Discord text-channel as a website: it can be split into multiple pieces:
+
+- Left side bar to view available servers
+- Left-mid area to view available channels
+- Main chat box w/ text input
+- Right side bar to view available users
+
+Each area can be a component, that can be a group of smaller components, which can be a group of smaller individual components/HTML elements
+
+Sometimes data must be able to appear in multiple components, or be manipulated within specific components and appear in other components.
+
+Data can be passed downwards to children pretty easily through `props`, tho cycling them back up and/or across is not as easy.
+
+If you understand `getters` and `setters`, we can also pass down `setter` functions that'll manipulate the top-level `state` data that is also being passed down to other neighbouring child components
+
+## NextJS Layout
 
 ### /components
 
@@ -116,7 +139,9 @@ Our project also will automatically run these commands whenever you're committin
 
 ### /package.json
 
-- Project information, scripts, node module dependencies, pre-commit hooks, etc...
+- Project information, node module dependencies, etc...
+- Scripts: commands and aliases to run commands
+  - Ex: type-check runs the TS compiler script `tsc` when you call it with `yarn type-check`
 - Dependencies: `yarn add <packageName>`
   - Required for end user/host to install when building app
   - Ex: NextJS/React, Emotion (styling)
@@ -126,7 +151,9 @@ Our project also will automatically run these commands whenever you're committin
 
 ## Basic Emotion styled components
 
-Base styled components can go into `/UI`, and each specific component's styles can either build unique styled components or inherit from one from `/UI`
+Emotion allows you to style components in a function/object format, similar to how we build normal React components
+
+Our base styled components will go into `/UI`, and each specific component's styles can either build unique styled components, or inherit from one in `/UI`
 
 - Ex: `/components/UI/buttons.tsx`
 
