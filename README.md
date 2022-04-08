@@ -96,7 +96,9 @@ Our project also will automatically run these commands whenever you're committin
   - DirectoryName
     - index.tsx
     - styles.tsx
-- I'll create some template folders and files
+- Template files:
+  - /components/Template: index/styles.tsx
+  - /pages/template: index.tsx
 
 ### /pages:
 
@@ -106,6 +108,7 @@ Our project also will automatically run these commands whenever you're committin
     - SubRouteName
       - index.tsx: localhost:3000/RouteName/SubRouteName
       - [templateIndex].tsx: localhost:3000/RouteName/SubRouteName/templateIndex
+- index.tsx files are the displayed components, so `/pages/index.tsx` will be the base `localhost:3000/` file
 
 ### /package.json
 
