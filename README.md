@@ -11,7 +11,15 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 
 # Setup
 
-We'll be using TypeScript, NextJS, Emotion, and Firebase/Firestore
+### NodeJS, npm, Yarn
+
+You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that you can run commands to download packages used to create React projects. The main package you'll need is a separate package manager called `Yarn`, which functions similarly (like a super layer) to `npm`
+
+```bash
+npm install --global yarn
+```
+
+You'll also need [git](https://git-scm.com/downloads) installed to copy the project into your local directory
 
 To run the development server:
 
@@ -27,10 +35,6 @@ yarn dev
 
 # A browser tab should open at localhost:3000
 ```
-
-## Requirements
-
-In addition to NodeJS and TypeScript, we'll be using a few code quality tools for error checking/formatting code, such as ESLint, **Prettier**, and pre-commit
 
 ### Prettier (format on save)
 
