@@ -1,8 +1,19 @@
-import '../styles/globals.css'
-import type { AppProps } from 'next/app'
+import '../styles/globals.css';
+import React, { ComponentType } from 'react';
+// import ThemeProvider from '../components/UI/ThemeProvider';
 
-function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
-}
+type Props = {
+  Component: ComponentType;
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
+  pageProps: any;
+};
 
-export default MyApp
+const App = ({ Component, pageProps }: Props): JSX.Element => {
+  return (
+    // <ThemeProvider>
+    // </ThemeProvider>
+    <Component {...pageProps} />
+  );
+};
+
+export default App;
