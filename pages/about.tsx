@@ -1,19 +1,19 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import Index from '../components/Index';
+import IndexPage from '../components/Index';
 
-const IndexPage: NextPage = () => {
+const AboutPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Pricey</title>
+        <title>About Pricey</title>
         <meta name="description" content="Tracking overpriced shopping" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Index />
+      <IndexPage />
     </>
   );
 };
 
-export default IndexPage;
+export default AboutPage;

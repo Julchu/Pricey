@@ -164,3 +164,13 @@ Syntax is similar to CSS but with camelCase instead of kebab-case
 Every non-numeric value is a string in single quotes
 
 - Ex: `fontSize: '24px'`, `fontSize: 24`
+
+## CSS Notes
+
+`display: 'flex'`: displays content relative to other content
+
+- Content will be displayed in order
+
+`position: 'fixed'`: positions content relative to browser
+
+- Ex: `bottom: '0px'`, will position content at bottom of browser regardless of any content, on top of the content displayed
