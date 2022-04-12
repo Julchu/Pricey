@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { openInNewTab } from '../../functions/openLink';
-import styles from '../../styles/Home.module.css';
 import { GithubLogo } from '../Icons/Github';
+import { Hyperlink } from '../UI/Buttons';
 import { Row } from '../UI/Structure';
 import { ProfileGrid, ProfilePicture, ProfileWrapper } from './styles';
 
@@ -43,7 +43,7 @@ const Profile: FC<GithubUser> = ({ name, link, imageSrc, alt, width, height }) =
       style={{ width, cursor: link ? 'pointer' : 'not-allowed' }}
       onClick={() => link && openInNewTab(link)}
     >
-      <Row style={{ backgroundColor: 'greenyellow' }}>
+      <Row>
         {imageSrc ? (
           <ProfilePicture src={imageSrc} alt={alt} width={width} height={height} />
         ) : (
@@ -51,7 +51,7 @@ const Profile: FC<GithubUser> = ({ name, link, imageSrc, alt, width, height }) =
         )}
       </Row>
       <Row>
-        <h3 style={{ margin: '10px auto 20px' }}>{name}</h3>
+        <h3 style={{ margin: '10px auto 20px', fontWeight: 'normal' }}>{name}</h3>
       </Row>
     </ProfileWrapper>
   );
@@ -62,8 +62,8 @@ const About: FC = () => {
   return (
     <>
       <Row style={{ justifyContent: 'center' }}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://github.com/julchu/Pricey">Pricey!</a>
+        <h1 style={{ fontSize: '4rem', lineHeight: '1.15px' }}>
+          Welcome to <Hyperlink href="https://github.com/julchu/Pricey">Pricey!</Hyperlink>
         </h1>
       </Row>
 
@@ -85,11 +85,10 @@ const About: FC = () => {
 
       {/* style={{ marginLeft: 'auto', marginRight: 'auto' }} */}
       <Row style={{ justifyContent: 'center' }}>Contributors</Row>
+
       {/* TODO: clean up redundent CSS for centering grid */}
       <div
         style={{
-          justifyContent: 'center',
-          backgroundColor: 'blue',
           paddingLeft: '100px',
           paddingRight: '100px',
         }}

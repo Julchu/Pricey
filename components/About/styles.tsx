@@ -12,13 +12,9 @@ export const ProfilePicture = styled(Image)<{
 
 export const ProfileGrid = styled.div({
   display: 'grid',
+  justifyItems: 'center',
 
   gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-
-  justifyContent: 'space-evenly',
-  justifyItems: 'center',
-  alignContent: 'space-evenly',
-  alignItems: 'center',
 
   /* This is better for small screens, once min() is better supported:
    * grid-template-columns: repeat(auto-fill, minmax(min(200px, 100%), 1fr));
