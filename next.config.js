@@ -11,4 +11,8 @@ const typeScript = {
   ignoreBuildErrors: false,
 };
 
-module.exports = { nextConfig, typeScript };
+const images = {
+  domains: ['avatars.githubusercontent.com'],
+};
+
+module.exports = { nextConfig, typeScript, images };

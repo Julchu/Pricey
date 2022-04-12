@@ -5,6 +5,7 @@ export const Wrapper = styled.div({
   width: '100vw',
   display: 'flex',
   flexDirection: 'column',
+  padding: '30px',
 });
 
 export const HeaderWrapper = styled.div({
@@ -14,10 +15,4 @@ export const HeaderWrapper = styled.div({
 
 export const InnerWrapper = styled.div({
   padding: '30px',
-});
-
-export const FooterWrapper = styled.div({
-  marginTop: 'auto',
-  marginLeft: 'auto',
-  marginRight: 'auto',
 });

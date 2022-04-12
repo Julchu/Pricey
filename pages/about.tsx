@@ -1,17 +1,20 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import IndexPage from '../components/Index';
+import About from '../components/About';
+import Layout from '../components/Layout';
 
 const AboutPage: NextPage = () => {
   return (
     <>
       <Head>
         <title>About Pricey</title>
-        <meta name="description" content="Tracking overpriced shopping" />
+        <meta name="description" content="About Us" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <IndexPage />
+      <Layout>
+        <About />
+      </Layout>
     </>
   );
 };

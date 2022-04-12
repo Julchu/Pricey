@@ -1,20 +1,18 @@
 import React, { FC, ReactNode } from 'react';
 import Footer from '../Footer';
-import Header from '../Header';
-import { FooterWrapper, HeaderWrapper, InnerWrapper, Wrapper } from './styles';
+import { InnerWrapper, Wrapper } from './styles';
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <Wrapper>
-      <HeaderWrapper>
+      {/* No Header */}
+      {/* <HeaderWrapper>
         <Header />
-      </HeaderWrapper>
+      </HeaderWrapper> */}
 
       <InnerWrapper>{children}</InnerWrapper>
 
-      <FooterWrapper>
-        <Footer />
-      </FooterWrapper>
+      <Footer />
     </Wrapper>
   );
 };

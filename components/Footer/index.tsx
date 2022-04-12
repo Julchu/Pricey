@@ -1,28 +1,19 @@
+import { useRouter } from 'next/router';
 import { FC } from 'react';
-import { GithubLogo } from '../Icons/Github';
-import { Row } from '../UI/Structure';
-import { Hyperlink } from './styles';
+import { Column, Row } from '../UI/Structure';
 
 const Footer: FC = () => {
+  const router = useRouter();
+
   return (
-    <Row style={{ height: '40px' }}>
-      <p style={{ marginTop: 'auto', marginBottom: 'auto' }}> Created by&nbsp; </p>
-      <Hyperlink target="_blank" rel="noopener noreferrer" href="https://github.com/julchu/">
-        <GithubLogo />
-      </Hyperlink>
-      <Hyperlink target="_blank" rel="noopener noreferrer" href="https://github.com/jktoo/">
-        <GithubLogo />
-      </Hyperlink>
-      <Hyperlink target="_blank" rel="noopener noreferrer" href="https://github.com/AliShahidGit/">
-        <GithubLogo />
-      </Hyperlink>
-      <Hyperlink
-        target="_blank"
-        rel="noopener noreferrer"
-        href="https://github.com/ChristineAu-Yeung/"
+    <Row style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto' }}>
+      <Column style={{ marginLeft: '0px', marginRight: 'auto' }}>Pricey</Column>
+      <Column
+        style={{ marginLeft: 'auto', marginRight: '0px' }}
+        onClick={() => router.push('/about')}
       >
-        <GithubLogo />
-      </Hyperlink>
+        About Us
+      </Column>
     </Row>
   );
 };
