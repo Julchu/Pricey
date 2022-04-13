@@ -1,24 +1,71 @@
-// // Import the functions you need from the SDKs you need
-// import { initializeApp } from 'firebase/app';
+// Import the functions you need from the SDKs you need
+import { initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
-// import { getFirestore } from 'firebase/firestore';
-// // TODO: Add SDKs for Firebase products that you want to use
-// // https://firebase.google.com/docs/web/setup#available-libraries
+import {
+  addDoc,
+  collection,
+  connectFirestoreEmulator,
+  DocumentData,
+  getDocs,
+  getFirestore,
+} from 'firebase/firestore';
+import getConfig from 'next/config';
 
-// // Your web app's Firebase configuration
-// // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-// const firebaseConfig = {
-//   apiKey: 'AIzaSyAQnEEr8qKxyr1CcMCsGmiIyCwJ--Yh2Ic',
-//   authDomain: 'thepriceyapp.firebaseapp.com',
-//   projectId: 'thepriceyapp',
-//   storageBucket: 'thepriceyapp.appspot.com',
-//   messagingSenderId: '70370061229',
-//   appId: '1:70370061229:web:72e5e026262ed76ce10f24',
-//   measurementId: 'G-8QX4QM8YYW',
-// };
+const { publicRuntimeConfig } = getConfig();
 
-// // Initialize Firebase
-// const app = initializeApp(firebaseConfig);
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Initialize Firebase
+const firebaseConfig = publicRuntimeConfig.firebaseConfig;
+const app = initializeApp(firebaseConfig);
+// app.firestore().useEmulator('localhost', 5003);
+
 // const analytics = getAnalytics(app);
-// const firestore = getFirestore(app);
-export {};
+const db = getFirestore(app);
+
+if (firebaseConfig.emulatorEnabled) {
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
+
+const testSetFirebase1 = async (): Promise<DocumentData[]> => {
+  const citiesCol = collection(db, 'cities');
+  const citySnapshot = await getDocs(citiesCol);
+  const cityList = citySnapshot.docs.map(doc => doc.data());
+  return cityList;
+};
+
+const testSetFirebase = async (): Promise<void> => {
+  try {
+    const docRef = await addDoc(collection(db, 'users'), {
+      first: 'Ada',
+      last: 'Lovelace',
+      born: 1815,
+    });
+    console.log('Document written with ID: ', docRef.id);
+  } catch (e) {
+    console.error('Error adding document: ', e);
+  }
+
+  try {
+    const docRef = await addDoc(collection(db, 'users'), {
+      first: 'Alan',
+      middle: 'Mathison',
+      last: 'Turing',
+      born: 1912,
+    });
+
+    console.log('Document written with ID: ', docRef.id);
+  } catch (e) {
+    console.error('Error adding document: ', e);
+  }
+};
+
+const testViewfirebase = async (): Promise<void> => {
+  const querySnapshot = await getDocs(collection(db, 'users'));
+  querySnapshot.forEach(doc => {
+    console.log(`${doc.id} => ${doc.data()}`);
+  });
+};
+
+export { testSetFirebase1, testSetFirebase, testViewfirebase };
