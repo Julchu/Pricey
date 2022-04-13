@@ -13,6 +13,8 @@ const typeScript = {
 
 const images = {
   domains: ['avatars.githubusercontent.com'],
+  loader: 'akamai',
+  path: '',
 };
 
 const firebaseConfig = {

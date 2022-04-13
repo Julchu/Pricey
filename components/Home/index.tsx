@@ -9,6 +9,7 @@ const Index: FC = () => {
       <form>
         <Hyperlink
           onClick={async () => {
+            // TODO: connect to Firestore
             await testSetFirebase();
           }}
         >
