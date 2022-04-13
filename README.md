@@ -31,7 +31,12 @@ To run the development server:
 git clone https://github.com/Julchu/Pricey.git
 cd Pricey
 
+# Installing Firebase/Firestore
+cd functions
+yarn install
+
 # Installing the React app
+cd ..
 yarn install
 yarn dev
 
