@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { IconProps } from '.';
+import { IconProps } from '../UI/Icons';
 
 export const GithubLogo: FC<IconProps> = ({ style, ...rest }) => {
   return (

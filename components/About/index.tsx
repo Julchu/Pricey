@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { openInNewTab } from '../../functions/openLink';
+import { openInNewTab } from '../../lib/openLink';
 import { GithubLogo } from '../Icons/Github';
 import { Hyperlink } from '../UI/Buttons';
 import { Row } from '../UI/Structure';
