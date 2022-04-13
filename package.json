@@ -10,12 +10,13 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix '**/*.{ts,tsx}'",
     "type-check": "tsc --noEmit",
-    "type-check:firebase": "tsc -p pkg/firebase/functions --skipLibCheck --noEmit",
+    "type-check:firebase": "tsc -p functions --skipLibCheck --noEmit",
     "prepare": "husky install"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
+    "firebase": "^9.6.10",
     "next": "12.1.4",
     "react": "18.0.0",
     "react-dom": "18.0.0"
