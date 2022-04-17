@@ -6,41 +6,66 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 
 # TODO:
 
-- Add Firebase/Firestore
-- Deploy GH Pages
+- [x] Add Firebase/Firestore
+- [x] Deploy GH Pages/Firebase Hosting
 
 # Setup
 
 ### NodeJS, npm, Yarn
 
-You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that you can run commands to download packages used to create React projects.
+- You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that you can run commands to download packages used to create React projects.
 
-The main package you'll need is a separate package manager called `Yarn`, which functions similarly (like a super layer) to `npm`
+- The main package you'll need is a separate package manager called `Yarn`, which functions similarly (like a super layer) to `npm`
 
 ```bash
 npm install --global yarn
 ```
 
-You'll also need [git](https://git-scm.com/downloads) installed to copy the project into your local directory
+### Firebase/Firestore emulator
 
-To run the development server:
+- You'll need Firebase installed globally
 
 ```zsh
-# Go to a directory that you want the project added to
-# Ex: /Documents, where a folder called Pricey will be added
+yarn global add firebase-tools
+```
+
+### Git
+
+- You'll need [git](https://git-scm.com/downloads) installed to copy the project into your local directory
+
+### Environment files
+
+- You'll need a copy of `.env.example` as your development environment, as well as a production environment when deploying to live
+
+```zsh
+# Copy and setup your environment
+cp .env.example .env.development
+```
+
+### Cloning and installing the app
+
+```zsh
+# Go to your preferred project directory
+# A folder called Pricey will be added
 git clone https://github.com/Julchu/Pricey.git
 cd Pricey
 
-# Installing Firebase/Firestore
-cd functions
-yarn install
-
 # Installing the React app
-cd ..
+# A browser tab should open at localhost:3000
 yarn install
 yarn dev
 
-# A browser tab should open at localhost:3000
+# Launching the Firebase/Firestore emulator
+firebase --project <projectId> emulators:start --only firestore
+
+# TODO: Installing Firebase functions
+cd functions
+yarn install
+
+# Deploying app to live:
+yarn export && firebase --project <projectId> deploy
+# Optional flag: --except functions
+
 ```
 
 ### Prettier (format on save)
@@ -179,3 +204,5 @@ Every non-numeric value is a string in single quotes
 `position: 'fixed'`: positions content relative to browser
 
 - Ex: `bottom: '0px'`, will position content at bottom of browser regardless of any content, on top of the content displayed
+
+## Firestore
