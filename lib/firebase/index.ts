@@ -4,12 +4,11 @@ import { initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
-  // connectFirestoreEmulator,`
+  connectFirestoreEmulator,
   deleteDoc,
   doc,
-  DocumentData,
   getDocs,
-  initializeFirestore,
+  getFirestore,
 } from 'firebase/firestore';
 import getConfig from 'next/config';
 
@@ -18,7 +17,7 @@ import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
 const firebaseConfig = publicRuntimeConfig.firebaseConfig;
-// const emulatorEnabled = firebaseConfig.emulatorEnabled;
+const emulatorEnabled = firebaseConfig.emulatorEnabled;
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -28,13 +27,12 @@ const app = initializeApp(firebaseConfig);
 /* getFirestore returns existing Firestore or creates a new one with default settings
  * initializeFirestore creates a new one with optional settings
  */
-// const db = getFirestore(app);
-const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
-// const db = initializeFirestore(app, { experimentalForceLongPolling: true });
+const db = getFirestore(app);
 
-// if (emulatorEnabled) {
-//   connectFirestoreEmulator(db, 'localhost', 8080);
-// }
+// Ensure emultor flag is off in production env when deploying
+if (emulatorEnabled) {
+  connectFirestoreEmulator(db, 'localhost', 8080);
+}
 
 const setUsers = async (): Promise<void> => {
   try {
@@ -62,15 +60,6 @@ const setUsers = async (): Promise<void> => {
   }
 };
 
-// const getUsers = async (): Promise<void> => {};
-
-const getCities = async (): Promise<DocumentData[]> => {
-  const citiesCol = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCol);
-  const cityList = citySnapshot.docs.map(doc => doc.data());
-  return cityList;
-};
-
 const getUsers = async (): Promise<void> => {
   const querySnapshot = await getDocs(collection(db, 'users'));
   querySnapshot.forEach(doc => {
@@ -90,4 +79,4 @@ const deleteUsers = async (collectionName: string): Promise<void> => {
   });
 };
 
-export { setUsers, getCities, getUsers, deleteUser, deleteUsers };
+export { setUsers, getUsers, deleteUser, deleteUsers };
