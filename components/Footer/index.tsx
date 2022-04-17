@@ -1,12 +1,12 @@
 import { useRouter } from 'next/router';
 import { FC } from 'react';
-import { Column, Row } from '../UI/Structure';
+import { Column } from '../UI/Structure';
 
 const Footer: FC = () => {
   const router = useRouter();
 
   return (
-    <Row style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto' }}>
+    <>
       <Column style={{ marginLeft: '0px', marginRight: 'auto' }} onClick={() => router.push('/')}>
         Pricey
       </Column>
@@ -16,7 +16,7 @@ const Footer: FC = () => {
       >
         About Us
       </Column>
-    </Row>
+    </>
   );
 };
 

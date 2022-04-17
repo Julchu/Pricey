@@ -1,6 +1,6 @@
 import React, { FC, ReactNode } from 'react';
 import Footer from '../Footer';
-import { InnerWrapper, Wrapper } from './styles';
+import { FooterWrapper, InnerWrapper, Wrapper } from './styles';
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   return (
@@ -12,7 +12,9 @@ const Layout: FC<{ children: ReactNode }> = ({ children }) => {
 
       <InnerWrapper>{children}</InnerWrapper>
 
-      <Footer />
+      <FooterWrapper>
+        <Footer />
+      </FooterWrapper>
     </Wrapper>
   );
 };

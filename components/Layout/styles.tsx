@@ -16,3 +16,10 @@ export const HeaderWrapper = styled.div({
 export const InnerWrapper = styled.div({
   padding: '30px',
 });
+
+export const FooterWrapper = styled.div({
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  marginTop: 'auto',
+});

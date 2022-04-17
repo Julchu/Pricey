@@ -4,38 +4,39 @@ import { initializeApp } from 'firebase/app';
 import {
   addDoc,
   collection,
-  connectFirestoreEmulator,
+  // connectFirestoreEmulator,`
+  deleteDoc,
+  doc,
   DocumentData,
   getDocs,
-  getFirestore,
+  initializeFirestore,
 } from 'firebase/firestore';
 import getConfig from 'next/config';
-
-const { publicRuntimeConfig } = getConfig();
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Initialize Firebase
+const { publicRuntimeConfig } = getConfig();
 const firebaseConfig = publicRuntimeConfig.firebaseConfig;
+// const emulatorEnabled = firebaseConfig.emulatorEnabled;
+
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-// app.firestore().useEmulator('localhost', 5003);
 
 // const analytics = getAnalytics(app);
-const db = getFirestore(app);
 
-if (firebaseConfig.emulatorEnabled) {
-  connectFirestoreEmulator(db, 'localhost', 8080);
-}
+/* getFirestore returns existing Firestore or creates a new one with default settings
+ * initializeFirestore creates a new one with optional settings
+ */
+// const db = getFirestore(app);
+const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+// const db = initializeFirestore(app, { experimentalForceLongPolling: true });
 
-const testSetFirebase1 = async (): Promise<DocumentData[]> => {
-  const citiesCol = collection(db, 'cities');
-  const citySnapshot = await getDocs(citiesCol);
-  const cityList = citySnapshot.docs.map(doc => doc.data());
-  return cityList;
-};
+// if (emulatorEnabled) {
+//   connectFirestoreEmulator(db, 'localhost', 8080);
+// }
 
-const testSetFirebase = async (): Promise<void> => {
+const setUsers = async (): Promise<void> => {
   try {
     const docRef = await addDoc(collection(db, 'users'), {
       first: 'Ada',
@@ -61,11 +62,32 @@ const testSetFirebase = async (): Promise<void> => {
   }
 };
 
-const testViewfirebase = async (): Promise<void> => {
+// const getUsers = async (): Promise<void> => {};
+
+const getCities = async (): Promise<DocumentData[]> => {
+  const citiesCol = collection(db, 'cities');
+  const citySnapshot = await getDocs(citiesCol);
+  const cityList = citySnapshot.docs.map(doc => doc.data());
+  return cityList;
+};
+
+const getUsers = async (): Promise<void> => {
   const querySnapshot = await getDocs(collection(db, 'users'));
   querySnapshot.forEach(doc => {
-    console.log(`${doc.id} => ${doc.data()}`);
+    console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
   });
 };
 
-export { testSetFirebase1, testSetFirebase, testViewfirebase };
+const deleteUser = async (collectionName: string, docName: string): Promise<void> => {
+  await deleteDoc(doc(db, collectionName, docName));
+};
+
+const deleteUsers = async (collectionName: string): Promise<void> => {
+  const querySnapshot = await getDocs(collection(db, collectionName));
+  querySnapshot.forEach(async doc => {
+    console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
+    await deleteUser(collectionName, doc.id);
+  });
+};
+
+export { setUsers, getCities, getUsers, deleteUser, deleteUsers };
