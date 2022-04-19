@@ -56,7 +56,9 @@ yarn install
 yarn dev
 
 # Launching the Firebase/Firestore emulator
+# You can open the emulator at localhost:4000/firestore
 firebase --project <projectId> emulators:start --only firestore
+
 
 # TODO: Installing Firebase functions
 cd functions
