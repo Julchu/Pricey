@@ -1,15 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
-import {
-  addDoc,
-  collection,
-  connectFirestoreEmulator,
-  deleteDoc,
-  doc,
-  getDocs,
-  getFirestore,
-} from 'firebase/firestore';
+import { connectFirestoreEmulator, getFirestore } from 'firebase/firestore';
 import getConfig from 'next/config';
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -34,49 +26,4 @@ if (emulatorEnabled) {
   connectFirestoreEmulator(db, 'localhost', 8080);
 }
 
-const setUsers = async (): Promise<void> => {
-  try {
-    const docRef = await addDoc(collection(db, 'users'), {
-      first: 'Ada',
-      last: 'Lovelace',
-      born: 1815,
-    });
-    console.log('Document written with ID: ', docRef.id);
-  } catch (e) {
-    console.error('Error adding document: ', e);
-  }
-
-  try {
-    const docRef = await addDoc(collection(db, 'users'), {
-      first: 'Alan',
-      middle: 'Mathison',
-      last: 'Turing',
-      born: 1912,
-    });
-
-    console.log('Document written with ID: ', docRef.id);
-  } catch (e) {
-    console.error('Error adding document: ', e);
-  }
-};
-
-const getUsers = async (): Promise<void> => {
-  const querySnapshot = await getDocs(collection(db, 'users'));
-  querySnapshot.forEach(doc => {
-    console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-  });
-};
-
-const deleteUser = async (collectionName: string, docName: string): Promise<void> => {
-  await deleteDoc(doc(db, collectionName, docName));
-};
-
-const deleteUsers = async (collectionName: string): Promise<void> => {
-  const querySnapshot = await getDocs(collection(db, collectionName));
-  querySnapshot.forEach(async doc => {
-    console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-    await deleteUser(collectionName, doc.id);
-  });
-};
-
-export { setUsers, getUsers, deleteUser, deleteUsers };
+export { db };

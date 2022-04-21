@@ -27,3 +27,8 @@ export const Line = styled.div({
   borderTop: '1px solid lightgrey',
   boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
 });
+
+/* TODO: add media query breakpoints:
+ * https://emotion.sh/docs/media-queries
+ * yarn add facepaint
+ */

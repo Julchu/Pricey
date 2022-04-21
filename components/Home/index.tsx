@@ -1,17 +1,17 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { deleteUsers, getUsers, setUsers } from '../../lib/firebase';
+import { deleteUsers, getUsers, setUsers } from '../../hooks/testFirestore';
 import { Hyperlink, StripeButton } from '../UI/Buttons';
-import { Input } from '../UI/Form';
+import { Input, Select } from '../UI/Form';
 import { Column, Grid, Line, Row } from '../UI/Structure';
 
 // import { Timestamp } from 'firebase/firestore';
 
 type HomeProps = {
-  onSubmit: (data: SearchFormData) => Promise<void>;
+  onSubmit: (data: IngredientFormData) => Promise<void>;
 };
 
-export type SearchFormData = {
+export type IngredientFormData = {
   name: string;
   price: number;
   unit: string;
@@ -21,7 +21,7 @@ export type SearchFormData = {
   // time?: Timestamp;
 };
 
-const defaultFormValues = (): Partial<SearchFormData> => ({
+const defaultFormValues = (): Partial<IngredientFormData> => ({
   // Add fields that are required for object submitted to Firebase as empty strings
   name: '',
   unit: '',
@@ -35,48 +35,59 @@ const IngredientForm: FC = () => {
   const {
     register,
     formState: { errors },
-  } = useFormContext<SearchFormData>();
+  } = useFormContext<IngredientFormData>();
+
+  const validateIsNumber = (value: number): boolean => {
+    if (value) return true;
+    return false;
+  };
+
+  const [selectValue, setSelectValue] = useState('');
 
   return (
     <>
       <Row>
         <Column style={{ width: '30%', marginRight: '20px' }}>
-          <Input {...register('name', { required: true })} placeholder="Search for an ingredient" />
-          {errors.name?.type === 'required' && 'Ingredient name is required'}
+          <Input
+            {...register('name', { required: true })}
+            placeholder={
+              errors.name?.type === 'required'
+                ? 'Ingredient name is required'
+                : 'Search for an ingredient'
+            }
+            error={errors.name?.type === 'required' ? 'red' : ''}
+          />
         </Column>
         <Column style={{ width: '10%', marginRight: '20px' }}>
           <Input
-            {...register('price', { valueAsNumber: true, required: false })}
-            placeholder="Price"
+            {...register('price', {
+              valueAsNumber: true,
+              required: true,
+              validate: price => validateIsNumber(price),
+            })}
+            placeholder={'Price'}
+            error={
+              errors.price?.type === 'required' || errors.price?.type === 'validate' ? 'red' : ''
+            }
           />
-          {errors.price?.type === 'required' && 'Price is required'}
         </Column>
-        <Column style={{ width: '10%', marginRight: '20px' }}>
-          <Input {...register('unit', { required: true })} placeholder="Unit" />
-          {errors.unit?.type === 'required' && 'Unit is required'}
-        </Column>
-        <StripeButton>Submit data</StripeButton>
 
-        {/* Controller for unit dropdown */}
-        {/* <Controller
-            name="firstName"
-            control={control}
-            render={({ field }) => <Input {...field} />}
-          />
-          <Controller
-            name="select"
-            control={control}
-            render={({ field }) => (
-              <Select
-                {...field}
-                options={[
-                  { value: 'chocolate', label: 'Chocolate' },
-                  { value: 'strawberry', label: 'Strawberry' },
-                  { value: 'vanilla', label: 'Vanilla' },
-                ]}
-              />
-            )}
-          /> */}
+        {/* Create custom dropdown menu styling */}
+        <Column style={{ width: '10%', marginRight: '20px' }}>
+          <Select
+            {...register('unit', { required: true })}
+            onChange={e => setSelectValue(e.target.value)}
+            value={selectValue}
+          >
+            <option value="" disabled hidden>
+              Unit
+            </option>
+            <option value="lb">lb</option>
+            <option value="kg">kg</option>
+          </Select>
+        </Column>
+
+        <StripeButton>Submit data</StripeButton>
       </Row>
     </>
   );
@@ -84,7 +95,7 @@ const IngredientForm: FC = () => {
 
 // Page shown at `localhost:3000/`
 const Home: FC<HomeProps> = ({ onSubmit }) => {
-  const methods = useForm<SearchFormData>({ defaultValues: defaultFormValues() });
+  const methods = useForm<IngredientFormData>({ defaultValues: defaultFormValues() });
   const { handleSubmit } = methods;
 
   // Testing for result cards
