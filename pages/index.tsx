@@ -1,11 +1,11 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useCallback } from 'react';
-import Home, { SearchFormData } from '../components/Home';
+import Home, { IngredientFormData } from '../components/Home';
 import Layout from '../components/Layout';
 
 const IndexPage: NextPage = () => {
-  const onSubmit = useCallback(async (data: SearchFormData): Promise<void> => {
+  const onSubmit = useCallback(async (data: IngredientFormData): Promise<void> => {
     console.log(data);
   }, []);
 
