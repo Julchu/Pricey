@@ -5,6 +5,11 @@ export const Wrapper = styled.div({
   width: '100vw',
   display: 'flex',
   flexDirection: 'column',
+
+  /* To ignore padding for specific components:
+   * add { marginLeft: '-30px', marginRight: '-30px', width: 'auto' } to
+   * specific component's style
+   */
   padding: '30px',
 });
 
@@ -14,7 +19,7 @@ export const HeaderWrapper = styled.div({
 });
 
 export const InnerWrapper = styled.div({
-  padding: '30px',
+  // padding: '30px',
 });
 
 export const FooterWrapper = styled.div({
