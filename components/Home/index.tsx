@@ -55,7 +55,7 @@ const IngredientForm: FC = () => {
                 ? 'Ingredient name is required'
                 : 'Search for an ingredient'
             }
-            error={errors.name?.type === 'required' ? 'red' : ''}
+            error={errors.name?.type === 'required'}
           />
         </Column>
         <Column style={{ width: '10%', marginRight: '20px' }}>
@@ -66,19 +66,21 @@ const IngredientForm: FC = () => {
               validate: price => validateIsNumber(price),
             })}
             placeholder={'Price'}
-            error={
-              errors.price?.type === 'required' || errors.price?.type === 'validate' ? 'red' : ''
-            }
+            error={errors.price?.type === 'required' || errors.price?.type === 'validate'}
           />
         </Column>
 
-        {/* Create custom dropdown menu styling */}
+        {/* TODO: create custom dropdown menu styling */}
         <Column style={{ width: '10%', marginRight: '20px' }}>
           <Select
-            {...register('unit', { required: true })}
+            {...register('unit', {
+              required: true,
+            })}
+            error={errors.unit?.type === 'required'}
             onChange={e => setSelectValue(e.target.value)}
             value={selectValue}
           >
+            {/* TODO: custom error handling for unit: unit stays red after fix until submit */}
             <option value="" disabled hidden>
               Unit
             </option>
@@ -124,7 +126,6 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
       <Row>
         <Hyperlink
           onClick={async () => {
-            // TODO: connect to Firestore
             await setUsers();
           }}
         >
