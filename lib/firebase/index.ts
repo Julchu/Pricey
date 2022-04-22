@@ -1,5 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp } from 'firebase/app';
+import { getApp, getApps, initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
 import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
 import getConfig from 'next/config';
@@ -12,7 +12,7 @@ const firebaseConfig = publicRuntimeConfig.firebaseConfig;
 const emulatorEnabled = firebaseConfig.emulatorEnabled;
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // const analytics = getAnalytics(app);
 
@@ -23,7 +23,7 @@ const app = initializeApp(firebaseConfig);
 const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
 
 // Ensure emulator flag is off in production env when deploying
-if (emulatorEnabled === 'true') {
+if (emulatorEnabled && getApps().length > 0 && db) {
   connectFirestoreEmulator(db, 'localhost', 8080);
 }
 

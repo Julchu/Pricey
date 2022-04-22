@@ -2,8 +2,8 @@ import { FC, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { deleteUsers, getUsers, setUsers } from '../../hooks/testFirestore';
 import { Hyperlink, StripeButton } from '../UI/Buttons';
-import { Input, Select } from '../UI/Form';
 import { Column, Grid, Line, Row } from '../UI/Structure';
+import { HomeInput, HomeSelect } from './styles';
 
 // import { Timestamp } from 'firebase/firestore';
 
@@ -34,6 +34,7 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
 const IngredientForm: FC = () => {
   const {
     register,
+    clearErrors,
     formState: { errors },
   } = useFormContext<IngredientFormData>();
 
@@ -48,7 +49,7 @@ const IngredientForm: FC = () => {
     <>
       <Row>
         <Column style={{ width: '30%', marginRight: '20px' }}>
-          <Input
+          <HomeInput
             {...register('name', { required: true })}
             placeholder={
               errors.name?.type === 'required'
@@ -59,7 +60,7 @@ const IngredientForm: FC = () => {
           />
         </Column>
         <Column style={{ width: '10%', marginRight: '20px' }}>
-          <Input
+          <HomeInput
             {...register('price', {
               valueAsNumber: true,
               required: true,
@@ -72,12 +73,15 @@ const IngredientForm: FC = () => {
 
         {/* TODO: create custom dropdown menu styling */}
         <Column style={{ width: '10%', marginRight: '20px' }}>
-          <Select
+          <HomeSelect
             {...register('unit', {
               required: true,
             })}
             error={errors.unit?.type === 'required'}
-            onChange={e => setSelectValue(e.target.value)}
+            onChange={e => {
+              setSelectValue(e.target.value);
+              clearErrors('unit');
+            }}
             value={selectValue}
           >
             {/* TODO: custom error handling for unit: unit stays red after fix until submit */}
@@ -86,7 +90,7 @@ const IngredientForm: FC = () => {
             </option>
             <option value="lb">lb</option>
             <option value="kg">kg</option>
-          </Select>
+          </HomeSelect>
         </Column>
 
         <StripeButton>Submit data</StripeButton>

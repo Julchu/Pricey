@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 
-export const Input = styled.input<{ error?: boolean }>(({ disabled, error }) => ({
+export const Input = styled.input({
   fontFamily: 'Montserrat',
   letterSpacing: '2px',
   fontSize: '16px',
-  color: disabled || error ? 'red' : 'black',
+  color: 'black',
 
   padding: '5px 20px',
   height: '40px',
@@ -21,27 +21,21 @@ export const Input = styled.input<{ error?: boolean }>(({ disabled, error }) => 
   },
 
   '::placeholder': {
-    fontWeight: error ? 'normal' : '300',
-    color: error ? 'red' : 'grey',
+    fontWeight: '300',
+    color: 'grey',
   },
 
   '&:focus': {
     boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
     // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
   },
-}));
+});
 
-export const Select = styled.select<{ error?: boolean; value?: string }>(({ error, value }) => ({
+// TODO: refactor to move props into Home component/style
+export const Select = styled.select({
   fontFamily: 'Montserrat',
   letterSpacing: '2px',
   fontSize: '16px',
-
-  /* If error: red bold ('normal')
-   * Else no error, and value: black normal ('400')
-   * Else (placeholder): grey lightest (300)
-   */
-  color: error ? 'red' : value ? 'black' : 'grey',
-  fontWeight: error ? 'normal' : value ? '400' : '300',
 
   padding: '5px 20px',
   height: '40px',
@@ -57,15 +51,10 @@ export const Select = styled.select<{ error?: boolean; value?: string }>(({ erro
     boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
   },
 
-  '::placeholder': {
-    fontWeight: error ? 'normal' : '300',
-    color: error ? 'red' : 'grey',
-  },
-
   '&:focus': {
     boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
     // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
   },
-}));
+});
 
 /* Box shadow reference: https://getcssscan.com/css-box-shadow-examples */
