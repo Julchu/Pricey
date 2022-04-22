@@ -2,8 +2,8 @@ import { FC, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { deleteUsers, getUsers, setUsers } from '../../hooks/testFirestore';
 import { Hyperlink, StripeButton } from '../UI/Buttons';
-import { Column, Grid, Line, Row } from '../UI/Structure';
-import { HomeInput, HomeSelect } from './styles';
+import { Column, Line, Row } from '../UI/Structure';
+import { HomeGrid, HomeInput, HomeSelect } from './styles';
 
 // import { Timestamp } from 'firebase/firestore';
 
@@ -104,7 +104,12 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
   const { handleSubmit } = methods;
 
   // Testing for result cards
-  const searchResults = ['a', 'b', 'c', 'd'];
+  const searchResults: IngredientFormData[] = [
+    { name: 'a', price: 0, unit: 'lb' },
+    { name: 'b', price: 0, unit: 'lb' },
+    { name: 'c', price: 0, unit: 'lb' },
+    { name: 'd', price: 0, unit: 'lb' },
+  ];
 
   return (
     <>
@@ -119,11 +124,11 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
       <Line />
 
       <Row>
-        <Grid>
-          {searchResults.map((letter, index) => {
-            return <Card key={`${letter}_${index}`} letter={letter} />;
+        <HomeGrid>
+          {searchResults.map((result, index) => {
+            return <Card key={`${result.name}_${index}`} result={result} />;
           })}
-        </Grid>
+        </HomeGrid>
       </Row>
 
       <Row>
@@ -159,8 +164,14 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 };
 
 // Search result cards
-const Card: FC<{ letter: string }> = ({ letter }) => {
-  return <>{letter}</>;
+const Card: FC<{ result: IngredientFormData }> = ({ result: { name, price, unit } }) => {
+  return (
+    <div style={{ backgroundColor: 'blue' }}>
+      <Row>Name: {name}</Row>
+      <Row>Price: ${price}</Row>
+      <Row>Unit: {unit}</Row>
+    </div>
+  );
 };
 
 export default Home;

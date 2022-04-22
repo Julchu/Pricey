@@ -13,9 +13,10 @@ export const Row = styled.div({
 
 export const Grid = styled.div({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, 350px)',
-  columnGap: '44px',
-  rowGap: '44px',
+  width: '100%',
+  gridTemplateColumns: 'repeat(auto-fill, 150px)',
+  columnGap: '15px',
+  rowGap: '15px',
 });
 
 export const Test = styled.div(() => ({
