@@ -7,11 +7,14 @@ const Footer: FC = () => {
 
   return (
     <>
-      <Column style={{ marginLeft: '0px', marginRight: 'auto' }} onClick={() => router.push('/')}>
+      <Column
+        style={{ marginLeft: '0px', marginRight: 'auto', cursor: 'pointer' }}
+        onClick={() => router.push('/')}
+      >
         Pricey
       </Column>
       <Column
-        style={{ marginLeft: 'auto', marginRight: '0px' }}
+        style={{ marginLeft: 'auto', marginRight: '0px', cursor: 'pointer' }}
         onClick={() => router.push('/about')}
       >
         About Us
