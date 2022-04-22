@@ -31,45 +31,41 @@ export const Input = styled.input<{ error?: boolean }>(({ disabled, error }) => 
   },
 }));
 
-export const Select = styled.select<{ error?: boolean; value?: string }>(({ error, value }) => {
-  console.log('error', error);
-  console.log('value', value);
-  return {
-    fontFamily: 'Montserrat',
-    letterSpacing: '2px',
-    fontSize: '16px',
+export const Select = styled.select<{ error?: boolean; value?: string }>(({ error, value }) => ({
+  fontFamily: 'Montserrat',
+  letterSpacing: '2px',
+  fontSize: '16px',
 
-    /* If error: red bold ('normal')
-     * Else no error, and value: black normal ('400')
-     * Else (placeholder): grey lightest (300)
-     */
-    color: error ? 'red' : value ? 'black' : 'grey',
-    fontWeight: error ? 'normal' : value ? '400' : '300',
+  /* If error: red bold ('normal')
+   * Else no error, and value: black normal ('400')
+   * Else (placeholder): grey lightest (300)
+   */
+  color: error ? 'red' : value ? 'black' : 'grey',
+  fontWeight: error ? 'normal' : value ? '400' : '300',
 
-    padding: '5px 20px',
-    height: '40px',
-    width: '100%',
+  padding: '5px 20px',
+  height: '40px',
+  width: '100%',
 
-    border: 'none',
-    outline: 'none',
-    borderRadius: '5px',
-    boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px',
-    transition: 'box-shadow 0.2s ease-in-out',
+  border: 'none',
+  outline: 'none',
+  borderRadius: '5px',
+  boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px',
+  transition: 'box-shadow 0.2s ease-in-out',
 
-    '&:hover': {
-      boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
-    },
+  '&:hover': {
+    boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
+  },
 
-    '::placeholder': {
-      fontWeight: error ? 'normal' : '300',
-      color: error ? 'red' : 'grey',
-    },
+  '::placeholder': {
+    fontWeight: error ? 'normal' : '300',
+    color: error ? 'red' : 'grey',
+  },
 
-    '&:focus': {
-      boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-      // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
-    },
-  };
-});
+  '&:focus': {
+    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+    // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
+  },
+}));
 
 /* Box shadow reference: https://getcssscan.com/css-box-shadow-examples */
