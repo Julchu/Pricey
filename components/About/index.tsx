@@ -86,7 +86,6 @@ const About: FC = () => {
       {/* style={{ marginLeft: 'auto', marginRight: 'auto' }} */}
       <Row style={{ justifyContent: 'center' }}>Contributors</Row>
 
-      {/* TODO: clean up redundent CSS for centering grid */}
       <div
         style={{
           paddingLeft: '100px',

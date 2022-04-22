@@ -31,7 +31,6 @@ export const Input = styled.input({
   },
 });
 
-// TODO: refactor to move props into Home component/style
 export const Select = styled.select({
   fontFamily: 'Montserrat',
   letterSpacing: '2px',

@@ -84,7 +84,6 @@ const IngredientForm: FC = () => {
             }}
             value={selectValue}
           >
-            {/* TODO: custom error handling for unit: unit stays red after fix until submit */}
             <option value="" disabled hidden>
               Unit
             </option>
