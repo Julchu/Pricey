@@ -3,11 +3,17 @@ import Head from 'next/head';
 import { useCallback } from 'react';
 import Home, { IngredientFormData } from '../components/Home';
 import Layout from '../components/Layout';
+import useCreateIngredient from '../hooks/useCreateIngredient';
 
 const IndexPage: NextPage = () => {
-  const onSubmit = useCallback(async (data: IngredientFormData): Promise<void> => {
-    console.log(data);
-  }, []);
+  const [{ createIngredient }, _loading, _error] = useCreateIngredient();
+
+  const onSubmit = useCallback(
+    async (data: IngredientFormData): Promise<void> => {
+      await createIngredient(data);
+    },
+    [createIngredient],
+  );
 
   // const onSubmit = useCallback(
   //   async (data: RecipeFormData, cb): Promise<void> => {

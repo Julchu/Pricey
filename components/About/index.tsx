@@ -2,8 +2,8 @@ import { FC } from 'react';
 import { openInNewTab } from '../../lib/openLink';
 import { GithubLogo } from '../Icons/Github';
 import { Hyperlink } from '../UI/Buttons';
-import { Row } from '../UI/Structure';
-import { ProfileGrid, ProfilePicture, ProfileWrapper } from './styles';
+import { RoundedImage, Row } from '../UI/Structure';
+import { ProfileGrid, ProfileWrapper } from './styles';
 
 type GithubUser = {
   name: string;
@@ -45,7 +45,7 @@ const Profile: FC<GithubUser> = ({ name, link, imageSrc, alt, width, height }) =
     >
       <Row>
         {imageSrc ? (
-          <ProfilePicture src={imageSrc} alt={alt} width={width} height={height} />
+          <RoundedImage src={imageSrc} alt={alt} width={width} height={height} />
         ) : (
           <GithubLogo style={{ width, height }} />
         )}

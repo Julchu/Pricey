@@ -1,14 +1,4 @@
 import styled from '@emotion/styled';
-import Image from 'next/image';
-
-export const ProfilePicture = styled(Image)<{
-  height?: string | '200px';
-  width?: string | '200px';
-}>(({ height, width }) => ({
-  height,
-  width,
-  borderRadius: '6px',
-}));
 
 export const ProfileGrid = styled.div({
   display: 'grid',

@@ -2,8 +2,8 @@ import { FC, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { deleteUsers, getUsers, setUsers } from '../../hooks/testFirestore';
 import { Hyperlink, StripeButton } from '../UI/Buttons';
-import { Column, Line, Row } from '../UI/Structure';
-import { HomeGrid, HomeInput, HomeSelect } from './styles';
+import { Column, Line, RoundedImage, Row } from '../UI/Structure';
+import { CardWrapper, HomeGrid, HomeInput, HomeSelect } from './styles';
 
 // import { Timestamp } from 'firebase/firestore';
 
@@ -30,6 +30,71 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
   // Time that item was recorded
   // time?:
 });
+
+// Page shown at `localhost:3000/`
+const Home: FC<HomeProps> = ({ onSubmit }) => {
+  const methods = useForm<IngredientFormData>({ defaultValues: defaultFormValues() });
+  const { handleSubmit } = methods;
+
+  // Testing for result cards
+  const searchResults: IngredientFormData[] = [
+    { name: 'a', price: 0, unit: 'lb' },
+    { name: 'b', price: 0, unit: 'lb' },
+    { name: 'c', price: 0, unit: 'lb' },
+    { name: 'd', price: 0, unit: 'lb' },
+  ];
+
+  return (
+    <>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <IngredientForm />
+          {/* <Column> */}
+          {/* </Column> */}
+        </form>
+      </FormProvider>
+
+      <Line />
+
+      <Row>
+        <HomeGrid>
+          {searchResults.map((result, index) => {
+            return <Card key={`${result.name}_${index}`} result={result} />;
+          })}
+        </HomeGrid>
+      </Row>
+
+      <Row>
+        <Hyperlink
+          onClick={async () => {
+            await setUsers();
+          }}
+        >
+          setUsers
+        </Hyperlink>
+      </Row>
+
+      <Row>
+        <Hyperlink
+          onClick={async () => {
+            await getUsers();
+          }}
+        >
+          getUsers
+        </Hyperlink>
+      </Row>
+      <Row>
+        <Hyperlink
+          onClick={async () => {
+            await deleteUsers('users');
+          }}
+        >
+          deleteUsers
+        </Hyperlink>
+      </Row>
+    </>
+  );
+};
 
 const IngredientForm: FC = () => {
   const {
@@ -98,79 +163,24 @@ const IngredientForm: FC = () => {
   );
 };
 
-// Page shown at `localhost:3000/`
-const Home: FC<HomeProps> = ({ onSubmit }) => {
-  const methods = useForm<IngredientFormData>({ defaultValues: defaultFormValues() });
-  const { handleSubmit } = methods;
-
-  // Testing for result cards
-  const searchResults: IngredientFormData[] = [
-    { name: 'a', price: 0, unit: 'lb' },
-    { name: 'b', price: 0, unit: 'lb' },
-    { name: 'c', price: 0, unit: 'lb' },
-    { name: 'd', price: 0, unit: 'lb' },
-  ];
-
-  return (
-    <>
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <IngredientForm />
-          {/* <Column> */}
-          {/* </Column> */}
-        </form>
-      </FormProvider>
-
-      <Line />
-
-      <Row>
-        <HomeGrid>
-          {searchResults.map((result, index) => {
-            return <Card key={`${result.name}_${index}`} result={result} />;
-          })}
-        </HomeGrid>
-      </Row>
-
-      <Row>
-        <Hyperlink
-          onClick={async () => {
-            await setUsers();
-          }}
-        >
-          setUsers
-        </Hyperlink>
-      </Row>
-
-      <Row>
-        <Hyperlink
-          onClick={async () => {
-            await getUsers();
-          }}
-        >
-          getUsers
-        </Hyperlink>
-      </Row>
-      <Row>
-        <Hyperlink
-          onClick={async () => {
-            await deleteUsers('users');
-          }}
-        >
-          deleteUsers
-        </Hyperlink>
-      </Row>
-    </>
-  );
-};
-
 // Search result cards
 const Card: FC<{ result: IngredientFormData }> = ({ result: { name, price, unit } }) => {
   return (
-    <div style={{ backgroundColor: 'blue' }}>
+    <CardWrapper>
+      {/* Image */}
+      <RoundedImage
+        src={'media/foodPlaceholder.png'}
+        alt="Food placeholder"
+        width="577px"
+        height="433px"
+      />
+
+      {/* Info */}
       <Row>Name: {name}</Row>
       <Row>Price: ${price}</Row>
       <Row>Unit: {unit}</Row>
-    </div>
+      {/* <Row>Location: {location}</Row> */}
+    </CardWrapper>
   );
 };
 
