@@ -1,30 +1,8 @@
-import {
-  doc,
-  DocumentReference,
-  QueryDocumentSnapshot,
-  setDoc,
-  SnapshotOptions,
-} from 'firebase/firestore';
+import { doc, DocumentReference, setDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
 import { db } from '../lib/firebase';
-import { Ingredient } from '../lib/firebase/interfaces';
-
-// Firestore data converter
-const ingredientConverter = {
-  toFirestore: ({ name, price, unit, location }: Ingredient) => {
-    return {
-      name,
-      price,
-      unit,
-      location,
-    };
-  },
-  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
-    const data = snapshot.data(options);
-    return data.name, data.price, data.unit, data.location;
-  },
-};
+import { Ingredient, ingredientConverter } from '../lib/firebase/interfaces';
 
 type CreateIngredientMethods = {
   createIngredient: (ingredientData: IngredientFormData) => Promise<DocumentReference<Ingredient>>;
@@ -61,27 +39,6 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         setError(e as Error);
       }
 
-      /* Add: auto-generate doc and give it ID automatically
-       * addDoc(collection requires odd-numbered path)
-       * Ex: db, collection: <collectionName>; becomes collectionName/0tG4ooMGjsdiyMfbjP3x
-       * Ex: db, collection: <collectionName>, <documentName>, <subCollectionName>; collectionName/0tG4ooMGjsdiyMfbjP3x/strawberry
-       */
-
-      /* const ingredientsCollectionRef = collection(db, 'ingredients').withConverter(
-        ingredientConverter,
-      );
-
-      try {
-        const docRef = await addDoc(ingredientsCollectionRef, {
-          name,
-          price,
-          unit,
-        });
-        console.log('Document written with ID: ', docRef.id);
-      } catch (e) {
-        setError(e as Error);
-      } */
-
       return ingredientDocumentRef;
     },
     [],
@@ -91,3 +48,23 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
 };
 
 export default useCreateIngredient;
+
+/* Add: auto-generate doc and give it ID automatically
+ * addDoc(collection requires odd-numbered path)
+ * Ex: db, collection: <collectionName>; becomes collectionName/0tG4ooMGjsdiyMfbjP3x
+ * Ex: db, collection: <collectionName>, <documentName>, <subCollectionName>; collectionName/0tG4ooMGjsdiyMfbjP3x/strawberry
+ */
+
+/* 
+const ingredientsCollectionRef = collection(db, 'ingredients').withConverter(ingredientConverter);
+try {
+  const docRef = await addDoc(ingredientsCollectionRef, {
+    name,
+    price,
+    unit,
+  });
+  console.log('Document written with ID: ', docRef.id);
+} catch (e) {
+  setError(e as Error);
+} 
+*/
