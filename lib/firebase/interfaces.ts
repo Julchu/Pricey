@@ -1,37 +1,50 @@
 // import { Timestamp } from "firebase/firestore";
 
-import { QueryDocumentSnapshot, SnapshotOptions } from 'firebase/firestore';
+import {
+  DocumentData,
+  FieldValue,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+  Timestamp,
+} from 'firebase/firestore';
 
-// const ingredientRef = db.ingredients.doc(ingredient.name.trim().toLocaleLowerCase());
 export interface Ingredient {
   name: string;
   price: number;
   unit: string;
   location?: string;
   submitter?: User;
-  // time: Timestamp
+  createdAt: Timestamp;
+}
+
+/* All ingredient names will be placed in collection /ingredientNames within a document named as the first letter of the ingredient name
+ * Ex: /ingredientNames/a/almond: { ingredientIds[]: list of id used in /ingredients for almond }
+ */
+export interface IngredientName {
+  ids: string[] | FieldValue;
 }
 
 export interface User {
   name: string;
   location?: string;
 
-  // joinDate?: Timestamp
+  createdAt?: Timestamp;
   // Preferences
 }
 
-// Firestore data converter
-export const ingredientConverter = {
-  toFirestore: ({ name, price, unit, location }: Ingredient) => {
-    return {
-      name,
-      price,
-      unit,
-      location,
-    };
-  },
+// Firestore data converters
+export const ingredientsConverter = {
+  toFirestore: (ingredient: Ingredient): DocumentData => ingredient,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
-    return data.name, data.price, data.unit, data.location;
+    return data.name, data.price, data.unit, data.location, data.createdat;
+  },
+};
+
+export const ingredientNameConverter = {
+  toFirestore: (ingredientName: IngredientName): DocumentData => ingredientName,
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
+    const data = snapshot.data(options);
+    return data.name;
   },
 };

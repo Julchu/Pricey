@@ -1,6 +1,6 @@
 import { FC, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { deleteUsers, getUsers, setUsers } from '../../hooks/testFirestore';
+import { deleteCollection, getDocuments } from '../../hooks/useCreateIngredient';
 import { Hyperlink, StripeButton } from '../UI/Buttons';
 import { Column, Line, RoundedImage, Row } from '../UI/Structure';
 import { CardWrapper, HomeGrid, HomeInput, HomeSelect } from './styles';
@@ -44,6 +44,16 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
     { name: 'd', price: 0, unit: 'lb' },
   ];
 
+  // TODO: subscription query to retrieve ingredients for cards
+  // const q = query(collection(db, 'ingredients'));
+  // const unsubscribe = onSnapshot(q, querySnapshot => {
+  //   const ingredients = [];
+  //   querySnapshot.forEach(doc => {
+  //     ingredients.push(doc.data().name);
+  //   });
+  //   console.log(ingredients);
+  // });
+
   return (
     <>
       <FormProvider {...methods}>
@@ -58,6 +68,10 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
       <Row>
         <HomeGrid>
+          {/* TODO: if no results, show card to submit data (replace submit button) */}
+          {searchResults.length == 0 ? <Card /> : null}
+
+          {/* TODO: if results, add onClick to update/add data to ingredients */}
           {searchResults.map((result, index) => {
             return <Card key={`${result.name}_${index}`} result={result} />;
           })}
@@ -67,29 +81,22 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
       <Row>
         <Hyperlink
           onClick={async () => {
-            await setUsers();
+            await getDocuments('ingredients');
+            await getDocuments('ingredientNames');
           }}
         >
-          setUsers
+          Get Ingredients
         </Hyperlink>
       </Row>
 
       <Row>
         <Hyperlink
           onClick={async () => {
-            await getUsers();
+            await deleteCollection('ingredients');
+            await deleteCollection('ingredientNames');
           }}
         >
-          getUsers
-        </Hyperlink>
-      </Row>
-      <Row>
-        <Hyperlink
-          onClick={async () => {
-            await deleteUsers('users');
-          }}
-        >
-          deleteUsers
+          Delete Ingredients
         </Hyperlink>
       </Row>
     </>
@@ -113,6 +120,7 @@ const IngredientForm: FC = () => {
   return (
     <>
       <Row>
+        {/* Ingredient name input */}
         <Column style={{ width: '30%', marginRight: '20px' }}>
           <HomeInput
             {...register('name', { required: true })}
@@ -124,6 +132,8 @@ const IngredientForm: FC = () => {
             error={errors.name?.type === 'required'}
           />
         </Column>
+
+        {/* Price input */}
         <Column style={{ width: '10%', marginRight: '20px' }}>
           <HomeInput
             {...register('price', {
@@ -137,6 +147,7 @@ const IngredientForm: FC = () => {
         </Column>
 
         {/* TODO: create custom dropdown menu styling */}
+        {/* Unit selector */}
         <Column style={{ width: '10%', marginRight: '20px' }}>
           <HomeSelect
             {...register('unit', {
@@ -157,6 +168,7 @@ const IngredientForm: FC = () => {
           </HomeSelect>
         </Column>
 
+        {/* Replace button with empty card (when no results) */}
         <StripeButton>Submit data</StripeButton>
       </Row>
     </>
@@ -164,7 +176,7 @@ const IngredientForm: FC = () => {
 };
 
 // Search result cards
-const Card: FC<{ result: IngredientFormData }> = ({ result: { name, price, unit } }) => {
+const Card: FC<{ result?: IngredientFormData }> = ({ result }) => {
   return (
     <CardWrapper>
       {/* Image */}
@@ -176,9 +188,9 @@ const Card: FC<{ result: IngredientFormData }> = ({ result: { name, price, unit 
       />
 
       {/* Info */}
-      <Row>Name: {name}</Row>
-      <Row>Price: ${price}</Row>
-      <Row>Unit: {unit}</Row>
+      <Row>Name: {result?.name}</Row>
+      <Row>Price: ${result?.price}</Row>
+      <Row>Unit: {result?.unit}</Row>
       {/* <Row>Location: {location}</Row> */}
     </CardWrapper>
   );
