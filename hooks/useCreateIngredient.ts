@@ -91,7 +91,9 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
 
 export const getDocuments = async (collectionName: string): Promise<void> => {
   const querySnapshot = await getDocs(collection(db, collectionName));
-  return querySnapshot.forEach(doc => doc);
+  querySnapshot.forEach(doc => {
+    console.log(doc.id, doc.data());
+  });
 };
 
 const deleteDocument = async (collectionName: string, docName: string): Promise<void> => {
