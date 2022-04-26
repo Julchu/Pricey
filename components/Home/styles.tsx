@@ -54,7 +54,7 @@ export const CardInfoWrapper = styled.div({
 });
 
 export const HomeGrid = styled(Grid)({
-  gridTemplateColumns: 'repeat(auto-fill, 230px)',
+  gridTemplateColumns: 'repeat(auto-fill, 250px)',
   columnGap: '30px',
   rowGap: '30px',
 });
