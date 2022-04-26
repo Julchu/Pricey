@@ -8,9 +8,12 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 
 - [x] Add Firebase/Firestore
 - [x] Deploy GH Pages/Firebase Hosting
-- [] Firestore types
-- [] Design ingredient historical data structure
-- [] Saving ingredient into to Firestore
+- [-] Firestore types
+- [x] Design ingredient historical data structure
+- [x] Saving ingredient info to Firestore
+- [ ] Deleting Ingredient and subtracting info from IngredientInfo
+- [ ] Users and saving submitter to Ingredients/IngredientInfo
+- [ ] Location data
 
 # Setup
 
@@ -211,3 +214,45 @@ Every non-numeric value is a string in single quotes
 - Ex: `bottom: '0px'`, will position content at bottom of browser regardless of any content, on top of the content displayed
 
 ## Firestore
+
+## Firestore with React
+
+Using useEffects with Firestore queries/commands, as opposed to external functions for onClicks():
+
+```typescript
+/* Live-updating retrieval of all documents and their contents */
+useEffect(() => {
+  const q = query(collection(db, 'ingredientNames'));
+  const unsub = onSnapshot(q, snapshot => {
+    const listOfDocs: SetStateAction<DocumentData | undefined> = [];
+    snapshot.forEach(doc => {
+      listOfDocs.push(doc.data());
+    });
+    setSearchResults(listOfDocs);
+  });
+}, [searchInput]);
+
+/* Live-updating retrieval of specific document and its contents */
+useEffect(() => {
+  onSnapshot(doc(db, 'ingredientNames', searchInput[0] || 'a'), doc => {
+    setSearchResults(doc.data());
+  });
+}, [searchInput]);
+
+/* Single non-updating retrieval of specific document by id */
+useEffect(() => {
+  const getDocOnce = async () => {
+    const snap = await getDoc(doc(db, 'ingredientNames', 'a'));
+    if (snap.exists()) {
+      setSearchResults(snap.data());
+    } else {
+      return [];
+    }
+  };
+  getDocOnce();
+}, []);
+
+useEffect(() => {
+  console.log(searchResults);
+}, [searchResults]);
+```

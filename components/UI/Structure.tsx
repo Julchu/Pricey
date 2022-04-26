@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import Image from 'next/image';
 
 export const Column = styled.div({
   display: 'flex',
@@ -13,9 +14,10 @@ export const Row = styled.div({
 
 export const Grid = styled.div({
   display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, 350px)',
-  columnGap: '44px',
-  rowGap: '44px',
+  width: '100%',
+  gridTemplateColumns: 'repeat(auto-fill, 150px)',
+  columnGap: '15px',
+  rowGap: '15px',
 });
 
 export const Test = styled.div(() => ({
@@ -23,10 +25,19 @@ export const Test = styled.div(() => ({
 }));
 
 export const Line = styled.div({
-  margin: '20px -30px 50px -30px',
+  margin: '20px -30px',
   borderTop: '1px solid lightgrey',
   boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
 });
+
+export const RoundedImage = styled(Image)<{
+  height?: string | '200px';
+  width?: string | '200px';
+}>(({ height, width }) => ({
+  height,
+  width,
+  borderRadius: '6px',
+}));
 
 /* TODO: add media query breakpoints:
  * https://emotion.sh/docs/media-queries
