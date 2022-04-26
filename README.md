@@ -11,9 +11,12 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 - [-] Firestore types
 - [x] Design ingredient historical data structure
 - [x] Saving ingredient info to Firestore
+- [ ] Filter current data from query (full ingredient search)
+- [ ] IngredientInfo price per unit with toggle
 - [ ] Deleting Ingredient and subtracting info from IngredientInfo
 - [ ] Users and saving submitter to Ingredients/IngredientInfo
 - [ ] Location data
+- [ ] Dark mode toggle
 
 # Setup
 
