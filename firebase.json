@@ -12,6 +12,7 @@
   },
   "hosting": {
     "public": "out",
+    "cleanUrls": true,
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   },
   "rewrites": [
@@ -22,6 +23,14 @@
     {
       "source": "/functions",
       "destination": "/functions.html"
+    },
+    {
+      "source": "/template",
+      "destination": "/template.html"
+    },
+    {
+      "source": "**",
+      "destination": "/index.html"
     }
   ],
   "storage": {
