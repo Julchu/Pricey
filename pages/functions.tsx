@@ -7,8 +7,8 @@ const FunctionsPage: NextPage = () => {
   return (
     <>
       <Head>
-        <title>About Pricey</title>
-        <meta name="description" content="About Us" />
+        <title>Functions</title>
+        <meta name="description" content="Functions" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
