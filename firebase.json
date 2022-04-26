@@ -14,6 +14,16 @@
     "public": "out",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
   },
+  "rewrites": [
+    {
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/functions",
+      "destination": "/functions.html"
+    }
+  ],
   "storage": {
     "rules": "storage.rules"
   },
