@@ -8,7 +8,7 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 
 - [x] Add Firebase/Firestore
 - [x] Deploy GH Pages/Firebase Hosting
-- [] Firestore types
+- [ ] Firestore types
 - [x] Design ingredient historical data structure
 - [x] Saving ingredient info to Firestore
 - [ ] Filter current data from query (full ingredient search)
