@@ -1,12 +1,6 @@
 // import { Timestamp } from "firebase/firestore";
 
-import {
-  DocumentData,
-  FieldValue,
-  QueryDocumentSnapshot,
-  SnapshotOptions,
-  Timestamp,
-} from 'firebase/firestore';
+import { FieldValue, QueryDocumentSnapshot, SnapshotOptions, Timestamp } from 'firebase/firestore';
 
 export interface Ingredient {
   name: string;
@@ -14,14 +8,17 @@ export interface Ingredient {
   unit: string;
   location?: string;
   submitter?: User;
-  createdAt: Timestamp;
+  createdAt: Timestamp | FieldValue;
 }
 
 /* All ingredient names will be placed in collection /ingredientNames within a document named as the first letter of the ingredient name
  * Ex: /ingredientNames/a/almond: { ingredientIds[]: list of id used in /ingredients for almond }
  */
-export interface IngredientName {
+export interface IngredientInfo {
   ids: string[] | FieldValue;
+  count: number | FieldValue;
+  total: number | FieldValue;
+  lowest?: number;
 }
 
 export interface User {
@@ -34,17 +31,23 @@ export interface User {
 
 // Firestore data converters
 export const ingredientsConverter = {
-  toFirestore: (ingredient: Ingredient): DocumentData => ingredient,
+  toFirestore: (ingredient: Ingredient): Ingredient => ingredient,
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
+    snapshot.data(options),
+};
+
+export const ingredientInfoConverter = {
+  toFirestore: (ingredientInfo: IngredientInfo) => ingredientInfo,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
-    return data.name, data.price, data.unit, data.location, data.createdat;
+    // return data.id, data.count as number, data.total as number, data.lowest;
+    return data;
   },
 };
 
-export const ingredientNameConverter = {
-  toFirestore: (ingredientName: IngredientName): DocumentData => ingredientName,
-  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
-    const data = snapshot.data(options);
-    return data.name;
-  },
-};
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const converter = <T>() => ({
+  toFirestore: (data: T) => data,
+  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
+    snapshot.data(options) as T,
+});

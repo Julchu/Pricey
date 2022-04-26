@@ -1,9 +1,11 @@
-import { FC, useState } from 'react';
+import { doc, DocumentData, onSnapshot } from 'firebase/firestore';
+import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { deleteCollection, getDocuments } from '../../hooks/useCreateIngredient';
-import { Hyperlink, StripeButton } from '../UI/Buttons';
-import { Column, Line, RoundedImage, Row } from '../UI/Structure';
-import { CardWrapper, HomeGrid, HomeInput, HomeSelect } from './styles';
+import { db } from '../../lib/firebase';
+import { IngredientInfo } from '../../lib/firebase/interfaces';
+import { StripeButton } from '../UI/Buttons';
+import { Column, Grid, Line, RoundedImage, Row } from '../UI/Structure';
+import { CardInfoWrapper, CardWrapper, HomeGrid, HomeInput, HomeSelect } from './styles';
 
 // import { Timestamp } from 'firebase/firestore';
 
@@ -33,34 +35,31 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
 
 // Page shown at `localhost:3000/`
 const Home: FC<HomeProps> = ({ onSubmit }) => {
+  // React Hook Form
   const methods = useForm<IngredientFormData>({ defaultValues: defaultFormValues() });
   const { handleSubmit } = methods;
 
-  // Testing for result cards
-  const searchResults: IngredientFormData[] = [
-    { name: 'a', price: 0, unit: 'lb' },
-    { name: 'b', price: 0, unit: 'lb' },
-    { name: 'c', price: 0, unit: 'lb' },
-    { name: 'd', price: 0, unit: 'lb' },
-  ];
+  // Manual ingredient search
+  const [searchInput, setSearchInput] = useState('');
+  const [searchResults, setSearchResults] = useState<DocumentData | undefined>([]);
 
-  // TODO: subscription query to retrieve ingredients for cards
-  // const q = query(collection(db, 'ingredients'));
-  // const unsubscribe = onSnapshot(q, querySnapshot => {
-  //   const ingredients = [];
-  //   querySnapshot.forEach(doc => {
-  //     ingredients.push(doc.data().name);
-  //   });
-  //   console.log(ingredients);
-  // });
+  /* Live-updating retrieval of specific document and its contents */
+  useEffect(() => {
+    onSnapshot(doc(db, 'ingredientInfo', searchInput[0] || 'a'), doc => {
+      doc.exists() ? setSearchResults(doc.data()) : setSearchResults([]);
+    });
+  }, [searchInput]);
+
+  // useEffect(() => {
+  //   if (searchResults) console.log('entries: ', searchResults);
+  // }, [searchResults]);
 
   return (
     <>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <IngredientForm />
-          {/* <Column> */}
-          {/* </Column> */}
+          {/* TODO: pass setter for name search into form, to pass search value back */}
+          <IngredientForm searchInput={searchInput} setSearchInput={setSearchInput} />
         </form>
       </FormProvider>
 
@@ -69,59 +68,54 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
       <Row>
         <HomeGrid>
           {/* TODO: if no results, show card to submit data (replace submit button) */}
-          {searchResults.length == 0 ? <Card /> : null}
+          {/* {searchResults?.length === 0 ? <Card /> : null} */}
 
           {/* TODO: if results, add onClick to update/add data to ingredients */}
-          {searchResults.map((result, index) => {
-            return <Card key={`${result.name}_${index}`} result={result} />;
-          })}
+          {searchResults &&
+            Object.entries(searchResults).map(([name, info], index) => {
+              return <Card key={`${name}_${index}`} name={name} info={info} />;
+            })}
         </HomeGrid>
-      </Row>
-
-      <Row>
-        <Hyperlink
-          onClick={async () => {
-            await getDocuments('ingredients');
-            await getDocuments('ingredientNames');
-          }}
-        >
-          Get Ingredients
-        </Hyperlink>
-      </Row>
-
-      <Row>
-        <Hyperlink
-          onClick={async () => {
-            await deleteCollection('ingredients');
-            await deleteCollection('ingredientNames');
-          }}
-        >
-          Delete Ingredients
-        </Hyperlink>
       </Row>
     </>
   );
 };
 
-const IngredientForm: FC = () => {
+const IngredientForm: FC<{
+  searchInput: string;
+  setSearchInput: Dispatch<SetStateAction<string>>;
+}> = ({ searchInput, setSearchInput }) => {
   const {
     register,
     clearErrors,
     formState: { errors },
   } = useFormContext<IngredientFormData>();
 
+  const setFirstLetter = (input: string): void => {
+    if (input && input[0] !== searchInput[0]) {
+      setSearchInput(input[0]);
+    }
+  };
+
+  const [selectValue, setSelectValue] = useState('');
+
   const validateIsNumber = (value: number): boolean => {
     if (value) return true;
     return false;
   };
 
-  const [selectValue, setSelectValue] = useState('');
-
   return (
     <>
-      <Row>
+      <Grid
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, 250px)',
+          columnGap: '30px',
+          rowGap: '30px',
+        }}
+      >
         {/* Ingredient name input */}
-        <Column style={{ width: '30%', marginRight: '20px' }}>
+        <Column>
           <HomeInput
             {...register('name', { required: true })}
             placeholder={
@@ -130,11 +124,15 @@ const IngredientForm: FC = () => {
                 : 'Search for an ingredient'
             }
             error={errors.name?.type === 'required'}
+            onChange={e => {
+              setFirstLetter(e.target.value);
+              clearErrors('name');
+            }}
           />
         </Column>
 
         {/* Price input */}
-        <Column style={{ width: '10%', marginRight: '20px' }}>
+        <Column>
           <HomeInput
             {...register('price', {
               valueAsNumber: true,
@@ -148,7 +146,7 @@ const IngredientForm: FC = () => {
 
         {/* TODO: create custom dropdown menu styling */}
         {/* Unit selector */}
-        <Column style={{ width: '10%', marginRight: '20px' }}>
+        <Column>
           <HomeSelect
             {...register('unit', {
               required: true,
@@ -170,13 +168,16 @@ const IngredientForm: FC = () => {
 
         {/* Replace button with empty card (when no results) */}
         <StripeButton>Submit data</StripeButton>
-      </Row>
+      </Grid>
     </>
   );
 };
 
 // Search result cards
-const Card: FC<{ result?: IngredientFormData }> = ({ result }) => {
+const Card: FC<{ name?: string; info?: IngredientInfo }> = ({ name, info }) => {
+  const averagePrice =
+    info?.total && info?.count ? (info?.total as number) / (info?.count as number) : null;
+
   return (
     <CardWrapper>
       {/* Image */}
@@ -188,10 +189,11 @@ const Card: FC<{ result?: IngredientFormData }> = ({ result }) => {
       />
 
       {/* Info */}
-      <Row>Name: {result?.name}</Row>
-      <Row>Price: ${result?.price}</Row>
-      <Row>Unit: {result?.unit}</Row>
-      {/* <Row>Location: {location}</Row> */}
+      <CardInfoWrapper>
+        <Row style={{ wordWrap: 'break-word' }}>Name: {name}</Row>
+        {averagePrice ? <Row>Average: ${averagePrice / 100}</Row> : null}
+        {info?.lowest ? <Row>Lowest: ${info?.lowest / 100}</Row> : null}
+      </CardInfoWrapper>
     </CardWrapper>
   );
 };

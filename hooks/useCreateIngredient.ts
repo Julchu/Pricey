@@ -3,19 +3,19 @@ import {
   arrayUnion,
   collection,
   CollectionReference,
-  deleteDoc,
   doc,
-  getDocs,
+  getDoc,
+  increment,
+  serverTimestamp,
   setDoc,
-  Timestamp,
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
 import { db } from '../lib/firebase';
 import {
   Ingredient,
-  IngredientName,
-  ingredientNameConverter,
+  IngredientInfo,
+  ingredientInfoConverter,
   ingredientsConverter,
 } from '../lib/firebase/interfaces';
 
@@ -44,18 +44,18 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         ingredientsConverter,
       );
 
-      // Ex: /ingredientNames/a/almond: { id: id used in /ingredients for almond }
-      const ingredientDocumentRef = doc(db, 'ingredientNames', trimmedName[0]).withConverter(
-        ingredientNameConverter,
+      // Ex: /ingredientNames/a/almond: { info }
+      const ingredientDocumentRef = doc(db, 'ingredientInfo', trimmedName[0]).withConverter(
+        ingredientInfoConverter,
       );
 
-      // Ensuring all fields are passed
+      // Ensuring all fields are passed by typechecking Ingredient
       const newIngredient: Ingredient = {
         name,
-        price,
+        price: price * 100,
         unit,
         location,
-        createdAt: Timestamp.now(),
+        createdAt: serverTimestamp(),
       };
 
       /* If you want to auto generate an ID, use addDoc() + collection()
@@ -65,14 +65,27 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         // /ingredients collection
         const docRef = await addDoc(ingredientsCollectionRef, newIngredient);
 
-        const ingredientName: IngredientName = { ids: arrayUnion(docRef.id) };
+        // Getting current summary to compare lowest
+        const currentIngredientInfo = await getDoc(
+          doc(db, trimmedName, trimmedName[0]).withConverter(ingredientInfoConverter),
+        ).then(doc => doc.data());
+
+        const ingredientInfo: IngredientInfo = {
+          ids: arrayUnion(docRef.id),
+          count: increment(1),
+          total: increment(price * 100),
+          lowest:
+            !currentIngredientInfo?.lowest || price < currentIngredientInfo?.lowest
+              ? price * 100
+              : undefined,
+        };
 
         // /ingredientNames collection
         await setDoc(
           ingredientDocumentRef,
           {
             // Setting key as ingredient name, value as the ingredient's name
-            [`${trimmedName}`]: ingredientName,
+            [`${trimmedName}`]: ingredientInfo,
           },
           { merge: true },
         );
@@ -81,31 +94,12 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
       }
 
       setLoading(false);
-      return ingredientsCollectionRef;
+      return ingredientsCollectionRef as CollectionReference<Ingredient>;
     },
     [],
   );
 
   return [{ createIngredient }, loading, error];
-};
-
-export const getDocuments = async (collectionName: string): Promise<void> => {
-  const querySnapshot = await getDocs(collection(db, collectionName));
-  querySnapshot.forEach(doc => {
-    console.log(doc.id, doc.data());
-  });
-};
-
-const deleteDocument = async (collectionName: string, docName: string): Promise<void> => {
-  await deleteDoc(doc(db, collectionName, docName));
-};
-
-export const deleteCollection = async (collectionName: string): Promise<void> => {
-  const querySnapshot = await getDocs(collection(db, collectionName));
-  querySnapshot.forEach(async doc => {
-    console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-    await deleteDocument(collectionName, doc.id);
-  });
 };
 
 export default useCreateIngredient;

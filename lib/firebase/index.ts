@@ -1,5 +1,5 @@
 // Import the functions you need from the SDKs you need
-import { getApp, getApps, initializeApp } from 'firebase/app';
+import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
 import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
 import getConfig from 'next/config';
@@ -12,7 +12,16 @@ const firebaseConfig = publicRuntimeConfig.firebaseConfig;
 const emulatorEnabled = firebaseConfig.emulatorEnabled;
 
 // Initialize Firebase
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+// const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const createFirebaseApp = (config = {}): FirebaseApp => {
+  try {
+    return getApp();
+  } catch (e) {
+    return initializeApp(config);
+  }
+};
+
+const app = createFirebaseApp(firebaseConfig);
 
 // const analytics = getAnalytics(app);
 
@@ -20,11 +29,18 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
  * initializeFirestore creates a new one with optional settings
  * Ex: const db = initializeFirestore(app, { experimentalForceLongPolling: true });
  */
-const db = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+  ignoreUndefinedProperties: true,
+});
 
 // Ensure emulator flag is off in production env when deploying
-if (emulatorEnabled && getApps().length > 0 && db) {
-  connectFirestoreEmulator(db, 'localhost', 8080);
+try {
+  if (emulatorEnabled && getApps().length > 0 && db !== null) {
+    connectFirestoreEmulator(db, 'localhost', 8080);
+  }
+} catch (e) {
+  console.log(e);
 }
 
 export { db };

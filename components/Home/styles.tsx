@@ -33,8 +33,7 @@ export const CardWrapper = styled.div({
   fontSize: '16px',
   color: 'black',
 
-  padding: '10px 10px',
-  width: '200px',
+  width: '250px',
   height: '300px',
 
   border: 'none',
@@ -45,16 +44,17 @@ export const CardWrapper = styled.div({
 
   '&:hover': {
     boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
-  },
-
-  '&:focus': {
-    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
+    // boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
     // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
   },
 });
 
+export const CardInfoWrapper = styled.div({
+  padding: '0px 30px',
+});
+
 export const HomeGrid = styled(Grid)({
-  gridTemplateColumns: 'repeat(auto-fill, 200px)',
-  columnGap: '50px',
-  rowGap: '50px',
+  gridTemplateColumns: 'repeat(auto-fill, 230px)',
+  columnGap: '30px',
+  rowGap: '30px',
 });
