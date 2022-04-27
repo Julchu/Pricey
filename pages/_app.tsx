@@ -1,5 +1,6 @@
+import React, { ComponentType, useState } from 'react';
+import { DarkModeContext } from '../hooks/darkModeContext';
 import '../styles/globals.css';
-import React, { ComponentType } from 'react';
 // import ThemeProvider from '../components/UI/ThemeProvider';
 
 type Props = {
@@ -9,10 +10,12 @@ type Props = {
 };
 
 const App = ({ Component, pageProps }: Props): JSX.Element => {
+  const [darkMode, setDarkMode] = useState(false);
+
   return (
-    // <ThemeProvider>
-    // </ThemeProvider>
-    <Component {...pageProps} />
+    <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
+      <Component {...pageProps} />
+    </DarkModeContext.Provider>
   );
 };
 

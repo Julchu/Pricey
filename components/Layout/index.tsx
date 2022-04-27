@@ -1,10 +1,13 @@
 import React, { FC, ReactNode } from 'react';
+import { darkModeStyles, useDarkMode } from '../../hooks/darkModeContext';
 import Footer from '../Footer';
 import { FooterWrapper, InnerWrapper, Wrapper } from './styles';
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
+  const { darkMode } = useDarkMode();
+
   return (
-    <Wrapper>
+    <Wrapper style={darkModeStyles(darkMode)}>
       {/* No Header */}
       {/* <HeaderWrapper>
         <Header />
