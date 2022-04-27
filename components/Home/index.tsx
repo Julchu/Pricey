@@ -7,8 +7,6 @@ import { StripeButton } from '../UI/Buttons';
 import { Column, Grid, Line, RoundedImage, Row } from '../UI/Structure';
 import { CardInfoWrapper, CardWrapper, HomeGrid, HomeInput, HomeSelect } from './styles';
 
-// import { Timestamp } from 'firebase/firestore';
-
 type HomeProps = {
   onSubmit: (data: IngredientFormData) => Promise<void>;
 };
@@ -18,9 +16,6 @@ export type IngredientFormData = {
   price: number;
   unit: string;
   location?: string;
-
-  // Time that item was recorded
-  // time?: Timestamp;
 };
 
 const defaultFormValues = (): Partial<IngredientFormData> => ({
@@ -28,9 +23,6 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
   name: '',
   unit: '',
   location: '',
-
-  // Time that item was recorded
-  // time?:
 });
 
 // Page shown at `localhost:3000/`
@@ -56,6 +48,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
   return (
     <>
+      {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* TODO: pass setter for name search into form, to pass search value back */}
