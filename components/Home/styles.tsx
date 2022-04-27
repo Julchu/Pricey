@@ -53,7 +53,13 @@ export const CardInfoWrapper = styled.div({
   padding: '0px 30px',
 });
 
-export const HomeGrid = styled(Grid)({
+export const HomeCardGrid = styled(Grid)({
+  gridTemplateColumns: 'repeat(auto-fill, 250px)',
+  columnGap: '30px',
+  rowGap: '30px',
+});
+
+export const HomeInputGrid = styled(Grid)({
   gridTemplateColumns: 'repeat(auto-fill, 250px)',
   columnGap: '30px',
   rowGap: '30px',

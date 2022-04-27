@@ -4,8 +4,15 @@ import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { db } from '../../lib/firebase';
 import { IngredientInfo } from '../../lib/firebase/interfaces';
 import { StripeButton } from '../UI/Buttons';
-import { Column, Grid, Line, RoundedImage, Row } from '../UI/Structure';
-import { CardInfoWrapper, CardWrapper, HomeGrid, HomeInput, HomeSelect } from './styles';
+import { Column, Line, RoundedImage, Row } from '../UI/Structure';
+import {
+  CardInfoWrapper,
+  CardWrapper,
+  HomeCardGrid,
+  HomeInput,
+  HomeInputGrid,
+  HomeSelect,
+} from './styles';
 
 type HomeProps = {
   onSubmit: (data: IngredientFormData) => Promise<void>;
@@ -48,8 +55,8 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
   }, [searchFirstLetter]);
 
   /*useEffect(() => {
-      if (searchResults) console.log('entries: ', searchResults);
-    }, [searchResults]);*/
+    if (searchResults) console.log('entries: ', searchResults);
+  }, [searchResults]);*/
 
   const filteredResults = useMemo(() => {
     if (searchResults)
@@ -74,7 +81,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
       <Line />
 
       <Row>
-        <HomeGrid>
+        <HomeCardGrid>
           {/* TODO: if no results, show card to submit data (replace submit button) */}
           {/* {searchResults?.length === 0 ? <Card /> : null} */}
 
@@ -82,7 +89,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
           {filteredResults?.map(([name, info], index) => {
             return <Card key={`${name}_${index}`} name={name} info={info} />;
           })}
-        </HomeGrid>
+        </HomeCardGrid>
       </Row>
     </>
   );
@@ -113,16 +120,9 @@ const IngredientForm: FC<{
 
   return (
     <>
-      <Grid
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 250px)',
-          columnGap: '30px',
-          rowGap: '30px',
-        }}
-      >
+      <HomeInputGrid>
         {/* Ingredient name input */}
-        <Column>
+        <Column style={{ gridColumn: '1/3', minWidth: '500px' }}>
           <HomeInput
             {...register('name', { required: true })}
             placeholder={
@@ -140,7 +140,7 @@ const IngredientForm: FC<{
         </Column>
 
         {/* Price input */}
-        <Column>
+        <Column style={{ minWidth: '250px' }}>
           <HomeInput
             {...register('price', {
               valueAsNumber: true,
@@ -154,7 +154,7 @@ const IngredientForm: FC<{
 
         {/* TODO: create custom dropdown menu styling */}
         {/* Unit selector */}
-        <Column>
+        <Column style={{ minWidth: '250px' }}>
           <HomeSelect
             {...register('unit', {
               required: true,
@@ -176,7 +176,7 @@ const IngredientForm: FC<{
 
         {/* Replace button with empty card (when no results) */}
         <StripeButton>Submit data</StripeButton>
-      </Grid>
+      </HomeInputGrid>
     </>
   );
 };
