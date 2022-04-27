@@ -19,7 +19,7 @@ export const HeaderWrapper = styled.div({
 });
 
 export const InnerWrapper = styled.div({
-  // padding: '30px',
+  marginBottom: '30px',
 });
 
 export const FooterWrapper = styled.div({
