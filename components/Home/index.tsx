@@ -1,5 +1,5 @@
 import { doc, DocumentData, onSnapshot } from 'firebase/firestore';
-import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { db } from '../../lib/firebase';
 import { IngredientInfo } from '../../lib/firebase/interfaces';
@@ -31,28 +31,43 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
   const methods = useForm<IngredientFormData>({ defaultValues: defaultFormValues() });
   const { handleSubmit } = methods;
 
-  // Manual ingredient search
+  /* Manual ingredient search
+   * searchInput: is used for filtering search results after query
+   * searchFirstLetter: is to ensure query is only ran if first letter is different, to access the different document
+   * searchResults holds array of streamed results
+   */
   const [searchInput, setSearchInput] = useState('');
+  const [searchFirstLetter, setSearchFirstLetter] = useState('');
   const [searchResults, setSearchResults] = useState<DocumentData | undefined>([]);
 
   /* Live-updating retrieval of specific document and its contents */
   useEffect(() => {
-    onSnapshot(doc(db, 'ingredientInfo', searchInput[0] || 'a'), doc => {
+    onSnapshot(doc(db, 'ingredientInfo', searchFirstLetter || 'a'), doc => {
       doc.exists() ? setSearchResults(doc.data()) : setSearchResults([]);
     });
-  }, [searchInput]);
+  }, [searchFirstLetter]);
 
-  // useEffect(() => {
-  //   if (searchResults) console.log('entries: ', searchResults);
-  // }, [searchResults]);
+  /*useEffect(() => {
+      if (searchResults) console.log('entries: ', searchResults);
+    }, [searchResults]);*/
+
+  const filteredResults = useMemo(() => {
+    if (searchResults)
+      return Object.entries(searchResults).filter(([name, info]) => {
+        if (name.includes(searchInput)) return info;
+      });
+  }, [searchInput, searchResults]);
 
   return (
     <>
       {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {/* TODO: pass setter for name search into form, to pass search value back */}
-          <IngredientForm searchInput={searchInput} setSearchInput={setSearchInput} />
+          <IngredientForm
+            searchInput={searchInput}
+            setSearchInput={setSearchInput}
+            setSearchFirstLetter={setSearchFirstLetter}
+          />
         </form>
       </FormProvider>
 
@@ -64,10 +79,9 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
           {/* {searchResults?.length === 0 ? <Card /> : null} */}
 
           {/* TODO: if results, add onClick to update/add data to ingredients */}
-          {searchResults &&
-            Object.entries(searchResults).map(([name, info], index) => {
-              return <Card key={`${name}_${index}`} name={name} info={info} />;
-            })}
+          {filteredResults?.map(([name, info], index) => {
+            return <Card key={`${name}_${index}`} name={name} info={info} />;
+          })}
         </HomeGrid>
       </Row>
     </>
@@ -77,7 +91,8 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 const IngredientForm: FC<{
   searchInput: string;
   setSearchInput: Dispatch<SetStateAction<string>>;
-}> = ({ searchInput, setSearchInput }) => {
+  setSearchFirstLetter: Dispatch<SetStateAction<string>>;
+}> = ({ searchInput, setSearchInput, setSearchFirstLetter }) => {
   const {
     register,
     clearErrors,
@@ -86,15 +101,14 @@ const IngredientForm: FC<{
 
   const setFirstLetter = (input: string): void => {
     if (input && input[0] !== searchInput[0]) {
-      setSearchInput(input[0]);
+      setSearchFirstLetter(input[0]);
     }
   };
 
   const [selectValue, setSelectValue] = useState('');
 
   const validateIsNumber = (value: number): boolean => {
-    if (value) return true;
-    return false;
+    return !!value;
   };
 
   return (
@@ -118,7 +132,8 @@ const IngredientForm: FC<{
             }
             error={errors.name?.type === 'required'}
             onChange={e => {
-              setFirstLetter(e.target.value);
+              setSearchInput(e.target.value);
+              setFirstLetter(e.target.value[0]);
               clearErrors('name');
             }}
           />
