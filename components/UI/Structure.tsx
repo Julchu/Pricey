@@ -20,10 +20,6 @@ export const Grid = styled.div({
   rowGap: '15px',
 });
 
-export const Test = styled.div(() => ({
-  margin: '0px 10px',
-}));
-
 export const Line = styled.div({
   margin: '20px -30px',
   borderTop: '1px solid lightgrey',
