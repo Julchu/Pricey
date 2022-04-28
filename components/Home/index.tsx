@@ -60,9 +60,11 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
   const filteredResults = useMemo(() => {
     if (searchResults)
-      return Object.entries(searchResults).filter(([name, info]) => {
-        if (name.includes(searchInput)) return info;
-      });
+      return Object.entries(searchResults)
+        .filter(([name, info]) => {
+          if (name.includes(searchInput)) return info;
+        })
+        .sort();
   }, [searchInput, searchResults]);
 
   return (
