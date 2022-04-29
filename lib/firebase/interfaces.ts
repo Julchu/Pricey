@@ -1,6 +1,12 @@
 // import { Timestamp } from "firebase/firestore";
 
-import { FieldValue, QueryDocumentSnapshot, SnapshotOptions, Timestamp } from 'firebase/firestore';
+import {
+  FieldValue,
+  FirestoreDataConverter,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+  Timestamp,
+} from 'firebase/firestore';
 
 export interface Ingredient {
   name: string;
@@ -15,6 +21,7 @@ export interface Ingredient {
  * Ex: /ingredientNames/a/almond: { ingredientIds[]: list of id used in /ingredients for almond }
  */
 export interface IngredientInfo {
+  name: string;
   ids: string[] | FieldValue;
   count: number | FieldValue;
   total: number | FieldValue;
@@ -30,23 +37,7 @@ export interface User {
 }
 
 // Firestore data converters
-export const ingredientsConverter = {
-  toFirestore: (ingredient: Ingredient): Ingredient => ingredient,
-  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
-    snapshot.data(options),
-};
-
-export const ingredientInfoConverter = {
-  toFirestore: (ingredientInfo: IngredientInfo) => ingredientInfo,
-  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
-    const data = snapshot.data(options);
-    return data.id, data.count as number, data.total as number, data.lowest;
-    // return data;
-  },
-};
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const converter = <T>() => ({
+export const converter = <T>(): FirestoreDataConverter<T> => ({
   toFirestore: (data: T) => data,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
     snapshot.data(options) as T,

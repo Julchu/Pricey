@@ -9,7 +9,7 @@ const Functions: FC = () => {
       <Row>
         <Hyperlink
           onClick={async () => {
-            await getDocuments('ingredients');
+            // await getDocuments('ingredients');
             await getDocuments('ingredientInfo');
           }}
         >

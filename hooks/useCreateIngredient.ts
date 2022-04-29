@@ -12,12 +12,7 @@ import {
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
 import { db } from '../lib/firebase';
-import {
-  Ingredient,
-  IngredientInfo,
-  ingredientInfoConverter,
-  ingredientsConverter,
-} from '../lib/firebase/interfaces';
+import { converter, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
 
 type CreateIngredientMethods = {
   createIngredient: (
@@ -43,12 +38,12 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
       const ingredientsCollectionRef = collection(db, 'ingredients').withConverter(
-        ingredientsConverter,
+        converter<Ingredient>(),
       );
 
-      // Ex: /ingredientNames/a/almond: { info }
-      const ingredientDocumentRef = await doc(db, 'ingredientInfo', trimmedName[0]).withConverter(
-        ingredientInfoConverter,
+      // Ex: /ingredientInfo/almond: { info }
+      const ingredientDocumentRef = await doc(db, 'ingredientInfo', trimmedName).withConverter(
+        converter<IngredientInfo>(),
       );
 
       // Ensuring all fields are passed by typechecking Ingredient
@@ -68,28 +63,29 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         const docRef = await addDoc(ingredientsCollectionRef, newIngredient);
 
         // Getting current summary to compare lowest
-        const currentIngredientInfo = await getDoc(doc(db, 'ingredientInfo', trimmedName[0])).then(
-          doc => doc.data(),
-        );
+        const currentIngredientInfo = await getDoc(ingredientDocumentRef).then(doc => doc.data());
 
-        const lowest = currentIngredientInfo?.[trimmedName].lowest > price ? price : undefined;
+        /* If lowest exists:
+         ** If lowest > price: price
+         ** Else: lowest
+         * Else price
+         */
+        const lowest = currentIngredientInfo?.lowest
+          ? currentIngredientInfo?.lowest > price
+            ? price
+            : currentIngredientInfo?.lowest
+          : price;
 
         const ingredientInfo: IngredientInfo = {
+          name: trimmedName,
           ids: arrayUnion(docRef.id),
           count: increment(1),
           total: increment(price),
-          lowest: lowest ?? lowest,
+          lowest,
         };
 
-        // /ingredientNames collection
-        await setDoc(
-          ingredientDocumentRef,
-          {
-            // Setting key as ingredient name, value as the ingredient's name
-            [`${trimmedName}`]: ingredientInfo,
-          },
-          { merge: true },
-        );
+        // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistant)
+        await setDoc(ingredientDocumentRef, ingredientInfo, { merge: true });
       } catch (e) {
         setError(e as Error);
       }
@@ -148,4 +144,14 @@ try {
   setError(e as Error);
 }
 
-return ingredientDocumentRef; */
+return ingredientDocumentRef;
+
+// Setting key as ingredient name, value as the ingredient's name
+await setDoc(
+  ingredientDocumentRef,
+  {
+    [`${trimmedName}`]: ingredientInfo,
+  },
+  { merge: true },
+);
+*/

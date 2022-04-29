@@ -1,8 +1,7 @@
-import { doc, DocumentData, onSnapshot } from 'firebase/firestore';
+import { collection, limit, onSnapshot, query, where } from 'firebase/firestore';
 import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { db } from '../../lib/firebase';
-import { IngredientInfo } from '../../lib/firebase/interfaces';
+import { converter, IngredientInfo } from '../../lib/firebase/interfaces';
 import { Column, Line, RoundedImage, Row } from '../UI/Structure';
 import {
   CardInfoWrapper,
@@ -14,6 +13,7 @@ import {
   HomeInputGrid,
   HomeSelect,
 } from './styles';
+import { db } from '../../lib/firebase';
 
 type HomeProps = {
   onSubmit: (data: IngredientFormData) => Promise<void>;
@@ -41,31 +41,34 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
   /* Manual ingredient search
    * searchInput: is used for filtering search results after query
-   * searchFirstLetter: is to ensure query is only ran if first letter is different, to access the different document
    * searchResults holds array of streamed results
    */
   const [searchInput, setSearchInput] = useState('');
-  const [searchFirstLetter, setSearchFirstLetter] = useState('');
-  const [searchResults, setSearchResults] = useState<DocumentData | undefined>([]);
+  const [searchResults, setSearchResults] = useState<IngredientInfo[]>([]);
 
   /* Live-updating retrieval of specific document and its contents */
   useEffect(() => {
-    onSnapshot(doc(db, 'ingredientInfo', searchFirstLetter || 'a'), doc => {
-      doc.exists() ? setSearchResults(doc.data()) : setSearchResults([]);
+    const q = query(
+      collection(db, 'ingredientInfo').withConverter(converter<IngredientInfo>()),
+      where('count', '>', 0),
+      limit(8),
+    );
+
+    onSnapshot(q, querySnapshot => {
+      const ingredientInfoList: IngredientInfo[] = [];
+      querySnapshot.forEach(doc => {
+        ingredientInfoList.push(doc.data());
+      });
+      setSearchResults(ingredientInfoList);
     });
-  }, [searchFirstLetter]);
+  }, []);
 
   /*useEffect(() => {
     if (searchResults) console.log('entries: ', searchResults);
   }, [searchResults]);*/
 
   const filteredResults = useMemo(() => {
-    if (searchResults)
-      return Object.entries(searchResults)
-        .filter(([name, info]) => {
-          if (name.includes(searchInput)) return info;
-        })
-        .sort();
+    return searchResults.filter(ingredientInfo => ingredientInfo.name.includes(searchInput)).sort();
   }, [searchInput, searchResults]);
 
   return (
@@ -73,11 +76,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
       {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
         <>
-          <IngredientForm
-            searchInput={searchInput}
-            setSearchInput={setSearchInput}
-            setSearchFirstLetter={setSearchFirstLetter}
-          />
+          <IngredientForm setSearchInput={setSearchInput} />
 
           <Line />
 
@@ -86,12 +85,11 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
               {filteredResults?.length === 0 ? (
                 <Card input={searchInput} onClickHandler={handleSubmit(onSubmit)} />
               ) : (
-                filteredResults?.map(([name, info], index) => {
+                filteredResults?.map((ingredientInfo, index) => {
                   return (
                     <Card
-                      key={`${name}_${index}`}
-                      name={name}
-                      info={info}
+                      key={`${ingredientInfo.name}_${index}`}
+                      ingredientInfo={ingredientInfo}
                       onClickHandler={handleSubmit(onSubmit)}
                     />
                   );
@@ -106,21 +104,13 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 };
 
 const IngredientForm: FC<{
-  searchInput: string;
   setSearchInput: Dispatch<SetStateAction<string>>;
-  setSearchFirstLetter: Dispatch<SetStateAction<string>>;
-}> = ({ searchInput, setSearchInput, setSearchFirstLetter }) => {
+}> = ({ setSearchInput }) => {
   const {
     register,
     clearErrors,
     formState: { errors },
   } = useFormContext<IngredientFormData>();
-
-  const setFirstLetter = (input: string): void => {
-    if (input && input[0] !== searchInput[0]) {
-      setSearchFirstLetter(input[0]);
-    }
-  };
 
   const [selectValue, setSelectValue] = useState('');
 
@@ -143,7 +133,6 @@ const IngredientForm: FC<{
             error={errors.name?.type === 'required'}
             onChange={e => {
               setSearchInput(e.target.value);
-              setFirstLetter(e.target.value[0]);
               clearErrors('name');
             }}
           />
@@ -190,23 +179,25 @@ const IngredientForm: FC<{
 
 // Search result cards
 const Card: FC<{
-  name?: string;
-  info?: IngredientInfo;
+  ingredientInfo?: IngredientInfo;
   input?: string;
   onClickHandler?: () => void;
-}> = ({ name, info, input, onClickHandler }) => {
+}> = ({ ingredientInfo, input, onClickHandler }) => {
+  // IngredientInfo fields
   const averagePrice =
-    info?.total && info?.count ? (info?.total as number) / (info?.count as number) : null;
+    ingredientInfo?.total && ingredientInfo?.count
+      ? (ingredientInfo.total as number) / (ingredientInfo.count as number)
+      : null;
 
   return (
     <CardWrapper onClick={onClickHandler}>
       {/* Image */}
       <HomeImageDiv>
         <RoundedImage
-          src={info ? 'media/foodPlaceholder.png' : 'media/imageUploadIcon.png'}
-          alt={info ? 'Food placeholder' : 'Upload image'}
-          width={info ? '577px' : '150px'}
-          height={info ? '433px' : '100px'}
+          src={ingredientInfo ? 'media/foodPlaceholder.png' : 'media/imageUploadIcon.png'}
+          alt={ingredientInfo ? 'Food placeholder' : 'Upload image'}
+          width={ingredientInfo ? '577px' : '150px'}
+          height={ingredientInfo ? '433px' : '100px'}
         />
       </HomeImageDiv>
 
@@ -215,10 +206,10 @@ const Card: FC<{
       {/* Info */}
       <CardInfoWrapper>
         <Row style={{ wordWrap: 'break-word' }}>
-          {info ? `Name: ${name}` : `Add ${input} to the list`}
+          {ingredientInfo ? `Name: ${ingredientInfo.name}` : `Add ${input} to the list`}
         </Row>
         {averagePrice ? <Row>Average: ${averagePrice / 100}</Row> : null}
-        {info?.lowest ? <Row>Lowest: ${info?.lowest / 100}</Row> : null}
+        {ingredientInfo?.lowest ? <Row>Lowest: ${ingredientInfo.lowest / 100}</Row> : null}
       </CardInfoWrapper>
     </CardWrapper>
   );
