@@ -5,19 +5,8 @@ Tracking historically-lowest price of items we purchase on a recurring basis.
 Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in
 different units.
 
-# TODO:
-
-- [x] Add Firebase/Firestore
-- [x] Deploy GH Pages/Firebase Hosting
-- [ ] Firestore types
-- [x] Design ingredient historical data structure
-- [x] Saving ingredient info to Firestore
-- [ ] Filter current data from query (full ingredient search)
-- [ ] IngredientInfo price per unit with toggle
-- [ ] Deleting Ingredient and subtracting info from IngredientInfo
-- [ ] Users and saving submitter to Ingredients/IngredientInfo
-- [ ] Location data
-- [ ] Dark mode toggle
+# TODO
+- [TODO Board](https://github.com/Julchu/Pricey/projects/2)
 
 # Setup
 
