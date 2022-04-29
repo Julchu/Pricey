@@ -1,7 +1,7 @@
-import { collection, limit, onSnapshot, query, where } from 'firebase/firestore';
+import { limit, onSnapshot, query, where } from 'firebase/firestore';
 import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { converter, IngredientInfo } from '../../lib/firebase/interfaces';
+import { db, IngredientInfo } from '../../lib/firebase/interfaces';
 import { Column, Line, RoundedImage, Row } from '../UI/Structure';
 import {
   CardInfoWrapper,
@@ -15,7 +15,6 @@ import {
   HomeInputGrid,
   HomeSelect,
 } from './styles';
-import { db } from '../../lib/firebase';
 import { currencyFormatter } from '../../lib/textFormatters';
 
 type HomeProps = {
@@ -51,11 +50,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
   /* Live-updating retrieval of specific document and its contents */
   useEffect(() => {
-    const q = query(
-      collection(db, 'ingredientInfo').withConverter(converter<IngredientInfo>()),
-      where('count', '>', 0),
-      limit(8),
-    );
+    const q = query(db.ingredientInfoCollection, where('count', '>', 0), limit(8));
 
     onSnapshot(q, querySnapshot => {
       const ingredientInfoList: IngredientInfo[] = [];
