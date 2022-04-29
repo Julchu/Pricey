@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { Input, Select } from '../UI/Form';
-import { Grid } from '../UI/Structure';
+import { Grid, Line } from '../UI/Structure';
 
 export const HomeInput = styled(Input)<{ error?: boolean }>(({ disabled, error }) => ({
   color: disabled || error ? 'red' : 'black',
@@ -36,6 +36,9 @@ export const CardWrapper = styled.div({
   width: '250px',
   height: '300px',
 
+  display: 'flex',
+  flexDirection: 'column',
+
   border: 'none',
   outline: 'none',
   borderRadius: '5px',
@@ -50,7 +53,7 @@ export const CardWrapper = styled.div({
 });
 
 export const CardInfoWrapper = styled.div({
-  padding: '0px 30px',
+  margin: 'auto',
 });
 
 export const HomeCardGrid = styled(Grid)({
@@ -63,4 +66,13 @@ export const HomeInputGrid = styled(Grid)({
   gridTemplateColumns: 'repeat(auto-fill, 250px)',
   columnGap: '30px',
   rowGap: '30px',
+});
+
+export const HomeImageDiv = styled.div({
+  height: '180px',
+  width: '100%',
+});
+
+export const HomeCardLine = styled(Line)({
+  margin: '0px',
 });

@@ -3,12 +3,13 @@ import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from 'reac
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { db } from '../../lib/firebase';
 import { IngredientInfo } from '../../lib/firebase/interfaces';
-import { StripeButton } from '../UI/Buttons';
 import { Column, Line, RoundedImage, Row } from '../UI/Structure';
 import {
   CardInfoWrapper,
   CardWrapper,
   HomeCardGrid,
+  HomeCardLine,
+  HomeImageDiv,
   HomeInput,
   HomeInputGrid,
   HomeSelect,
@@ -60,38 +61,47 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
   const filteredResults = useMemo(() => {
     if (searchResults)
-      return Object.entries(searchResults).filter(([name, info]) => {
-        if (name.includes(searchInput)) return info;
-      });
+      return Object.entries(searchResults)
+        .filter(([name, info]) => {
+          if (name.includes(searchInput)) return info;
+        })
+        .sort();
   }, [searchInput, searchResults]);
 
   return (
-    <>
+    <form>
       {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <>
           <IngredientForm
             searchInput={searchInput}
             setSearchInput={setSearchInput}
             setSearchFirstLetter={setSearchFirstLetter}
           />
-        </form>
+
+          <Line />
+
+          <Row>
+            <HomeCardGrid>
+              {filteredResults?.length === 0 ? (
+                <Card input={searchInput} onClickHandler={handleSubmit(onSubmit)} />
+              ) : (
+                filteredResults?.map(([name, info], index) => {
+                  return (
+                    <Card
+                      key={`${name}_${index}`}
+                      name={name}
+                      info={info}
+                      onClickHandler={handleSubmit(onSubmit)}
+                    />
+                  );
+                })
+              )}
+            </HomeCardGrid>
+          </Row>
+        </>
       </FormProvider>
-
-      <Line />
-
-      <Row>
-        <HomeCardGrid>
-          {/* TODO: if no results, show card to submit data (replace submit button) */}
-          {/* {searchResults?.length === 0 ? <Card /> : null} */}
-
-          {/* TODO: if results, add onClick to update/add data to ingredients */}
-          {filteredResults?.map(([name, info], index) => {
-            return <Card key={`${name}_${index}`} name={name} info={info} />;
-          })}
-        </HomeCardGrid>
-      </Row>
-    </>
+    </form>
   );
 };
 
@@ -173,32 +183,40 @@ const IngredientForm: FC<{
             <option value="kg">kg</option>
           </HomeSelect>
         </Column>
-
-        {/* Replace button with empty card (when no results) */}
-        <StripeButton>Submit data</StripeButton>
       </HomeInputGrid>
     </>
   );
 };
 
 // Search result cards
-const Card: FC<{ name?: string; info?: IngredientInfo }> = ({ name, info }) => {
+const Card: FC<{
+  name?: string;
+  info?: IngredientInfo;
+  input?: string;
+  onClickHandler?: () => void;
+}> = ({ name, info, input, onClickHandler }) => {
   const averagePrice =
     info?.total && info?.count ? (info?.total as number) / (info?.count as number) : null;
 
   return (
-    <CardWrapper>
+    <CardWrapper onClick={onClickHandler}>
       {/* Image */}
-      <RoundedImage
-        src={'media/foodPlaceholder.png'}
-        alt="Food placeholder"
-        width="577px"
-        height="433px"
-      />
+      <HomeImageDiv>
+        <RoundedImage
+          src={info ? 'media/foodPlaceholder.png' : 'media/imageUploadIcon.png'}
+          alt={info ? 'Food placeholder' : 'Upload image'}
+          width={info ? '577px' : '150px'}
+          height={info ? '433px' : '100px'}
+        />
+      </HomeImageDiv>
+
+      <HomeCardLine />
 
       {/* Info */}
       <CardInfoWrapper>
-        <Row style={{ wordWrap: 'break-word' }}>Name: {name}</Row>
+        <Row style={{ wordWrap: 'break-word' }}>
+          {info ? `Name: ${name}` : `Add ${input} to the list`}
+        </Row>
         {averagePrice ? <Row>Average: ${averagePrice / 100}</Row> : null}
         {info?.lowest ? <Row>Lowest: ${info?.lowest / 100}</Row> : null}
       </CardInfoWrapper>

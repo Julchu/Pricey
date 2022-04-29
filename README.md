@@ -1,8 +1,9 @@
 # Pricey
 
-Tracking historically lowest price of items we purchase on a recurring basis.
+Tracking historically-lowest price of items we purchase on a recurring basis.
 
-Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in different units.
+Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in
+different units.
 
 # TODO:
 
