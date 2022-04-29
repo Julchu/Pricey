@@ -10,6 +10,7 @@ const Footer: FC = () => {
     <FooterInnerWrapper>
       <StripeButton onClick={() => router.push('/')}>Pricey</StripeButton>
       <StripeButton onClick={() => router.push('/about')}>About Us</StripeButton>
+      <StripeButton onClick={() => router.push('/functions')}>Functions</StripeButton>
     </FooterInnerWrapper>
   );
 };

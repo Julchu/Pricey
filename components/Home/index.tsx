@@ -7,13 +7,16 @@ import {
   CardInfoWrapper,
   CardWrapper,
   HomeCardGrid,
+  HomeCardInfoRow,
   HomeCardLine,
   HomeImageDiv,
+  HomeImageHolder,
   HomeInput,
   HomeInputGrid,
   HomeSelect,
 } from './styles';
 import { db } from '../../lib/firebase';
+import { currencyFormatter } from '../../lib/textFormatters';
 
 type HomeProps = {
   onSubmit: (data: IngredientFormData) => Promise<void>;
@@ -82,19 +85,17 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
           <Row>
             <HomeCardGrid>
-              {filteredResults?.length === 0 ? (
-                <Card input={searchInput} onClickHandler={handleSubmit(onSubmit)} />
-              ) : (
-                filteredResults?.map((ingredientInfo, index) => {
-                  return (
-                    <Card
-                      key={`${ingredientInfo.name}_${index}`}
-                      ingredientInfo={ingredientInfo}
-                      onClickHandler={handleSubmit(onSubmit)}
-                    />
-                  );
-                })
-              )}
+              <Card searchInput={searchInput} onClickHandler={handleSubmit(onSubmit)} />
+              {filteredResults?.map((ingredientInfo, index) => {
+                return (
+                  <Card
+                    key={`${ingredientInfo.name}_${index}`}
+                    searchInput={searchInput}
+                    ingredientInfo={ingredientInfo}
+                    onClickHandler={handleSubmit(onSubmit)}
+                  />
+                );
+              })}
             </HomeCardGrid>
           </Row>
         </>
@@ -177,39 +178,62 @@ const IngredientForm: FC<{
   );
 };
 
-// Search result cards
-const Card: FC<{
+type CardProps = {
   ingredientInfo?: IngredientInfo;
-  input?: string;
+  searchInput?: string;
   onClickHandler?: () => void;
-}> = ({ ingredientInfo, input, onClickHandler }) => {
+};
+// Search result cards
+const Card: FC<CardProps> = ({ ingredientInfo, searchInput, onClickHandler }) => {
   // IngredientInfo fields
   const averagePrice =
     ingredientInfo?.total && ingredientInfo?.count
       ? (ingredientInfo.total as number) / (ingredientInfo.count as number)
       : null;
 
+  const highlighted = searchInput === ingredientInfo?.name;
+  const clickable = searchInput === ingredientInfo?.name || !ingredientInfo;
+
   return (
-    <CardWrapper onClick={onClickHandler}>
+    <CardWrapper highlighted={highlighted}>
       {/* Image */}
       <HomeImageDiv>
-        <RoundedImage
-          src={ingredientInfo ? 'media/foodPlaceholder.png' : 'media/imageUploadIcon.png'}
-          alt={ingredientInfo ? 'Food placeholder' : 'Upload image'}
-          width={ingredientInfo ? '577px' : '150px'}
-          height={ingredientInfo ? '433px' : '100px'}
-        />
+        <HomeImageHolder>
+          {/* TODO: image uploading */}
+          <RoundedImage
+            src={ingredientInfo ? 'media/foodPlaceholder.png' : 'media/imageUploadIcon.png'}
+            alt={ingredientInfo ? 'Food placeholder' : 'Upload image'}
+            width={ingredientInfo ? '577px' : '150px'}
+            height={ingredientInfo ? '433px' : '100px'}
+          />
+        </HomeImageHolder>
       </HomeImageDiv>
 
       <HomeCardLine />
 
       {/* Info */}
-      <CardInfoWrapper>
-        <Row style={{ wordWrap: 'break-word' }}>
-          {ingredientInfo ? `Name: ${ingredientInfo.name}` : `Add ${input} to the list`}
-        </Row>
-        {averagePrice ? <Row>Average: ${averagePrice / 100}</Row> : null}
-        {ingredientInfo?.lowest ? <Row>Lowest: ${ingredientInfo.lowest / 100}</Row> : null}
+      <CardInfoWrapper onClick={clickable ? onClickHandler : undefined}>
+        {ingredientInfo ? (
+          <HomeCardInfoRow>
+            Name: <b style={{ color: '#0070f3' }}>{ingredientInfo.name}</b>
+          </HomeCardInfoRow>
+        ) : (
+          <HomeCardInfoRow>Add</HomeCardInfoRow>
+        )}
+
+        {averagePrice ? (
+          <HomeCardInfoRow>Average: {currencyFormatter.format(averagePrice / 100)}</HomeCardInfoRow>
+        ) : (
+          <HomeCardInfoRow>
+            <b style={{ color: '#0070f3' }}>{searchInput || 'an ingredient'}</b>
+          </HomeCardInfoRow>
+        )}
+
+        <HomeCardInfoRow>
+          {ingredientInfo?.lowest
+            ? `Lowest: ${currencyFormatter.format(ingredientInfo.lowest / 100)}`
+            : 'to the list'}
+        </HomeCardInfoRow>
       </CardInfoWrapper>
     </CardWrapper>
   );
