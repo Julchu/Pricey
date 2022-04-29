@@ -11,8 +11,8 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
-import { db } from '../lib/firebase';
-import { converter, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
+import { firestore } from '../lib/firebase';
+import { converter, db, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
 
 type CreateIngredientMethods = {
   createIngredient: (
@@ -37,14 +37,10 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
-      const ingredientsCollectionRef = collection(db, 'ingredients').withConverter(
-        converter<Ingredient>(),
-      );
+      const ingredientsCollectionRef = db.ingredientCollection;
 
       // Ex: /ingredientInfo/almond: { info }
-      const ingredientDocumentRef = await doc(db, 'ingredientInfo', trimmedName).withConverter(
-        converter<IngredientInfo>(),
-      );
+      const ingredientDocumentRef = db.ingredientInfoDoc(trimmedName);
 
       // Ensuring all fields are passed by typechecking Ingredient
       const newIngredient: Ingredient = {
@@ -66,8 +62,8 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         const currentIngredientInfo = await getDoc(ingredientDocumentRef).then(doc => doc.data());
 
         /* If lowest exists:
-         ** If lowest > price: price
-         ** Else: lowest
+         * * If lowest > price: price
+         * * Else: lowest
          * Else price
          */
         const lowest = currentIngredientInfo?.lowest

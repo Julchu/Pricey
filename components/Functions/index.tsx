@@ -10,7 +10,7 @@ const Functions: FC = () => {
         <Hyperlink
           onClick={async () => {
             // await getDocuments('ingredients');
-            await getDocuments('ingredientInfo');
+            await getDocuments('ingredientInfos');
           }}
         >
           Get Ingredients
@@ -22,6 +22,7 @@ const Functions: FC = () => {
           onClick={async () => {
             await deleteCollection('ingredients');
             await deleteCollection('ingredientInfo');
+            await deleteCollection('ingredientInfos');
           }}
         >
           Delete Ingredients

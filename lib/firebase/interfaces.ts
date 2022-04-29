@@ -1,12 +1,17 @@
 // import { Timestamp } from "firebase/firestore";
 
 import {
+  collection,
+  doc,
+  DocumentReference,
   FieldValue,
   FirestoreDataConverter,
   QueryDocumentSnapshot,
   SnapshotOptions,
   Timestamp,
 } from 'firebase/firestore';
+import { firestore } from './index';
+import { CollectionReference } from '@firebase/firestore';
 
 export interface Ingredient {
   name: string;
@@ -42,3 +47,27 @@ export const converter = <T>(): FirestoreDataConverter<T> => ({
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
     snapshot.data(options) as T,
 });
+
+const collectionPoint = <T>(collectionPath: string): CollectionReference<T> =>
+  collection(firestore, collectionPath).withConverter(converter<T>());
+
+const docPoint = <T>(collectionPath: string, ...extraPaths: string[]): DocumentReference<T> =>
+  doc(firestore, collectionPath, ...extraPaths).withConverter(converter<T>());
+
+/* dataPoint use-cases:
+ * const ingredientsCollectionRef = db.ingredientCollection;
+ * const ingredientDocumentRef = db.ingredientInfoDoc(id, ...extraPaths);
+ * * const ingredientDocumentRef = doc(db.ingredientCollection, id, ...extraPaths);
+ */
+export const db = {
+  // Collections
+  ingredientCollection: collectionPoint<Ingredient>('ingredients'),
+  ingredientInfoCollection: collectionPoint<IngredientInfo>('ingredientInfos'),
+  userCollection: collectionPoint<User>('users'),
+
+  // Docs
+  ingredientDoc: (...extraPaths: string[]) => docPoint<Ingredient>('ingredients', ...extraPaths),
+  ingredientInfoDoc: (...extraPaths: string[]) =>
+    docPoint<IngredientInfo>('ingredientInfos', ...extraPaths),
+  userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
+};
