@@ -1,9 +1,7 @@
 import {
   addDoc,
   arrayUnion,
-  collection,
   CollectionReference,
-  doc,
   getDoc,
   increment,
   serverTimestamp,
@@ -11,8 +9,7 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
-import { firestore } from '../lib/firebase';
-import { converter, db, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
+import { db, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
 
 type CreateIngredientMethods = {
   createIngredient: (
