@@ -40,8 +40,8 @@ export const ingredientInfoConverter = {
   toFirestore: (ingredientInfo: IngredientInfo) => ingredientInfo,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
     const data = snapshot.data(options);
-    // return data.id, data.count as number, data.total as number, data.lowest;
-    return data;
+    return data.id, data.count as number, data.total as number, data.lowest;
+    // return data;
   },
 };
 
