@@ -215,7 +215,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, onClickHandler }) =>
       <CardInfoWrapper onClick={clickable ? onClickHandler : undefined}>
         {ingredientInfo ? (
           <HomeCardInfoRow>
-            Name: <b style={{ color: '#0070f3' }}>{ingredientInfo.name}</b>
+            <b style={{ color: '#0070f3' }}>{ingredientInfo.name}</b>
           </HomeCardInfoRow>
         ) : (
           <HomeCardInfoRow>Add</HomeCardInfoRow>
