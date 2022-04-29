@@ -38,6 +38,8 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
       setLoading(true);
 
+      price *= 100;
+
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
       const ingredientsCollectionRef = collection(db, 'ingredients').withConverter(
@@ -45,14 +47,14 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
       );
 
       // Ex: /ingredientNames/a/almond: { info }
-      const ingredientDocumentRef = doc(db, 'ingredientInfo', trimmedName[0]).withConverter(
+      const ingredientDocumentRef = await doc(db, 'ingredientInfo', trimmedName[0]).withConverter(
         ingredientInfoConverter,
       );
 
       // Ensuring all fields are passed by typechecking Ingredient
       const newIngredient: Ingredient = {
         name,
-        price: price * 100,
+        price,
         unit,
         location,
         createdAt: serverTimestamp(),
@@ -66,18 +68,17 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         const docRef = await addDoc(ingredientsCollectionRef, newIngredient);
 
         // Getting current summary to compare lowest
-        const currentIngredientInfo = await getDoc(
-          doc(db, trimmedName, trimmedName[0]).withConverter(ingredientInfoConverter),
-        ).then(doc => doc.data());
+        const currentIngredientInfo = await getDoc(doc(db, 'ingredientInfo', trimmedName[0])).then(
+          doc => doc.data(),
+        );
+
+        const lowest = currentIngredientInfo?.[trimmedName].lowest > price ? price : undefined;
 
         const ingredientInfo: IngredientInfo = {
           ids: arrayUnion(docRef.id),
           count: increment(1),
-          total: increment(price * 100),
-          lowest:
-            !currentIngredientInfo?.lowest || price < currentIngredientInfo?.lowest
-              ? price * 100
-              : undefined,
+          total: increment(price),
+          lowest: lowest ?? lowest,
         };
 
         // /ingredientNames collection
