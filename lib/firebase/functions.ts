@@ -1,6 +1,6 @@
-import { getDocs, collection, deleteDoc, doc, getDoc } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
 import { db } from '.';
-import { converter, IngredientInfo } from './interfaces';
+import { converter, IngredientInfo } from './interfaces'; // Retrieves list of documents
 
 // Retrieves list of documents
 export const getDocuments = async (collectionName: string): Promise<void> => {
