@@ -68,8 +68,8 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         const docRef = await addDoc(ingredientsCollectionRef, newIngredient);
 
         // Getting current summary to compare lowest
-        const currentIngredientInfo = await getDoc(doc(db, 'ingredientInfo', 'a')).then(doc =>
-          doc.data(),
+        const currentIngredientInfo = await getDoc(doc(db, 'ingredientInfo', trimmedName[0])).then(
+          doc => doc.data(),
         );
 
         const lowest = currentIngredientInfo?.[trimmedName].lowest > price ? price : undefined;
