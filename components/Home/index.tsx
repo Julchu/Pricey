@@ -83,12 +83,13 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
           <Row>
             <HomeCardGrid>
               {filteredResults?.length === 0 ? (
-                <Card input={searchInput} onClickHandler={handleSubmit(onSubmit)} />
+                <Card searchInput={searchInput} onClickHandler={handleSubmit(onSubmit)} />
               ) : (
                 filteredResults?.map((ingredientInfo, index) => {
                   return (
                     <Card
                       key={`${ingredientInfo.name}_${index}`}
+                      searchInput={searchInput}
                       ingredientInfo={ingredientInfo}
                       onClickHandler={handleSubmit(onSubmit)}
                     />
@@ -180,9 +181,9 @@ const IngredientForm: FC<{
 // Search result cards
 const Card: FC<{
   ingredientInfo?: IngredientInfo;
-  input?: string;
+  searchInput?: string;
   onClickHandler?: () => void;
-}> = ({ ingredientInfo, input, onClickHandler }) => {
+}> = ({ ingredientInfo, searchInput, onClickHandler }) => {
   // IngredientInfo fields
   const averagePrice =
     ingredientInfo?.total && ingredientInfo?.count
@@ -190,7 +191,7 @@ const Card: FC<{
       : null;
 
   return (
-    <CardWrapper onClick={onClickHandler}>
+    <CardWrapper current={searchInput === ingredientInfo?.name} onClick={onClickHandler}>
       {/* Image */}
       <HomeImageDiv>
         <RoundedImage
@@ -206,7 +207,7 @@ const Card: FC<{
       {/* Info */}
       <CardInfoWrapper>
         <Row style={{ wordWrap: 'break-word' }}>
-          {ingredientInfo ? `Name: ${ingredientInfo.name}` : `Add ${input} to the list`}
+          {ingredientInfo ? `Name: ${ingredientInfo.name}` : `Add ${searchInput} to the list`}
         </Row>
         {averagePrice ? <Row>Average: ${averagePrice / 100}</Row> : null}
         {ingredientInfo?.lowest ? <Row>Lowest: ${ingredientInfo.lowest / 100}</Row> : null}
