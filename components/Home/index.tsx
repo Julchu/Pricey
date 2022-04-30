@@ -1,5 +1,5 @@
 import { limit, onSnapshot, query, where } from 'firebase/firestore';
-import { Dispatch, FC, SetStateAction, useEffect, useMemo, useState } from 'react';
+import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { db, IngredientInfo } from '../../lib/firebase/interfaces';
 import { Column, Line, RoundedImage, Row } from '../UI/Structure';
@@ -46,6 +46,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
    * searchResults holds array of streamed results
    */
   const [searchInput, setSearchInput] = useState('');
+  const [foundIngredient, setFoundIngredient] = useState(false);
   const [searchResults, setSearchResults] = useState<IngredientInfo[]>([]);
 
   /* Live-updating retrieval of specific document and its contents */
@@ -66,6 +67,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
   }, [searchResults]);*/
 
   const filteredResults = useMemo(() => {
+    setFoundIngredient(searchResults.some(({ name }) => searchInput === name));
     return searchResults.filter(ingredientInfo => ingredientInfo.name.includes(searchInput)).sort();
   }, [searchInput, searchResults]);
 
@@ -80,14 +82,18 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
           <Row>
             <HomeCardGrid>
-              <Card searchInput={searchInput} onClickHandler={handleSubmit(onSubmit)} />
+              {!foundIngredient ? (
+                <Card searchInput={searchInput} handleSubmit={handleSubmit(onSubmit)} />
+              ) : null}
+
               {filteredResults?.map((ingredientInfo, index) => {
                 return (
                   <Card
                     key={`${ingredientInfo.name}_${index}`}
                     searchInput={searchInput}
+                    setSearchInput={setSearchInput}
                     ingredientInfo={ingredientInfo}
-                    onClickHandler={handleSubmit(onSubmit)}
+                    handleSubmit={handleSubmit(onSubmit)}
                   />
                 );
               })}
@@ -176,18 +182,31 @@ const IngredientForm: FC<{
 type CardProps = {
   ingredientInfo?: IngredientInfo;
   searchInput?: string;
-  onClickHandler?: () => void;
+  setSearchInput?: Dispatch<SetStateAction<string>>;
+  handleSubmit?: () => void;
 };
 // Search result cards
-const Card: FC<CardProps> = ({ ingredientInfo, searchInput, onClickHandler }) => {
+const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, handleSubmit }) => {
   // IngredientInfo fields
   const averagePrice =
     ingredientInfo?.total && ingredientInfo?.count
       ? (ingredientInfo.total as number) / (ingredientInfo.count as number)
       : null;
 
+  const { setValue, resetField } = useFormContext<IngredientFormData>();
+
   const highlighted = searchInput === ingredientInfo?.name;
-  const clickable = searchInput === ingredientInfo?.name || !ingredientInfo;
+  const searchedIngredient = searchInput === ingredientInfo?.name || !ingredientInfo;
+
+  const onClickHandler = useCallback(() => {
+    if (setSearchInput && ingredientInfo && handleSubmit) {
+      setValue('name', ingredientInfo?.name);
+      resetField('price');
+      resetField('unit');
+      setSearchInput(ingredientInfo?.name);
+      handleSubmit();
+    }
+  }, [ingredientInfo, setSearchInput]);
 
   return (
     <CardWrapper highlighted={highlighted}>
@@ -207,7 +226,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, onClickHandler }) =>
       <HomeCardLine />
 
       {/* Info */}
-      <CardInfoWrapper onClick={clickable ? onClickHandler : undefined}>
+      <CardInfoWrapper onClick={searchedIngredient ? handleSubmit : onClickHandler}>
         {ingredientInfo ? (
           <HomeCardInfoRow>
             <b style={{ color: '#0070f3' }}>{ingredientInfo.name}</b>
