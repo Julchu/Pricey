@@ -206,7 +206,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
       setSearchInput(ingredientInfo?.name);
       handleSubmit();
     }
-  }, [ingredientInfo, setSearchInput]);
+  }, [handleSubmit, ingredientInfo, resetField, setSearchInput, setValue]);
 
   return (
     <CardWrapper highlighted={highlighted}>
