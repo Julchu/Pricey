@@ -1,22 +1,12 @@
 # Pricey
 
-Tracking historically lowest price of items we purchase on a recurring basis.
+Tracking historically-lowest price of items we purchase on a recurring basis.
 
-Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in different units.
+Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in
+different units.
 
-# TODO:
-
-- [x] Add Firebase/Firestore
-- [x] Deploy GH Pages/Firebase Hosting
-- [ ] Firestore types
-- [x] Design ingredient historical data structure
-- [x] Saving ingredient info to Firestore
-- [ ] Filter current data from query (full ingredient search)
-- [ ] IngredientInfo price per unit with toggle
-- [ ] Deleting Ingredient and subtracting info from IngredientInfo
-- [ ] Users and saving submitter to Ingredients/IngredientInfo
-- [ ] Location data
-- [ ] Dark mode toggle
+# TODO
+- [TODO Board](https://github.com/Julchu/Pricey/projects/2)
 
 # Setup
 
@@ -190,72 +180,4 @@ If you understand `getters` and `setters`, we can also pass down `setter` functi
   - Required for devs to install when building app
   - Ex: linters, formatters
 
-## Basic Emotion styled components
-
-Emotion allows you to style components in a function/object format, similar to how we build normal React components
-
-Our base styled components will go into `/UI`, and each specific component's styles can either build unique styled components, or inherit from one in `/UI`
-
-- Ex: `/components/UI/buttons.tsx`
-
-Syntax is similar to CSS but with camelCase instead of kebab-case
-
-- Ex: `fontSize` instead of `font-size`
-
-Every non-numeric value is a string in single quotes
-
-- Ex: `fontSize: '24px'`, `fontSize: 24`
-
-## CSS Notes
-
-`display: 'flex'`: displays content relative to other content
-
-- Content will be displayed in order
-
-`position: 'fixed'`: positions content relative to browser
-
-- Ex: `bottom: '0px'`, will position content at bottom of browser regardless of any content, on top of the content displayed
-
 ## Firestore
-
-## Firestore with React
-
-Using useEffects with Firestore queries/commands, as opposed to external functions for onClicks():
-
-```typescript
-/* Live-updating retrieval of all documents and their contents */
-useEffect(() => {
-  const q = query(collection(db, 'ingredientNames'));
-  const unsub = onSnapshot(q, snapshot => {
-    const listOfDocs: SetStateAction<DocumentData | undefined> = [];
-    snapshot.forEach(doc => {
-      listOfDocs.push(doc.data());
-    });
-    setSearchResults(listOfDocs);
-  });
-}, [searchInput]);
-
-/* Live-updating retrieval of specific document and its contents */
-useEffect(() => {
-  onSnapshot(doc(db, 'ingredientNames', searchInput[0] || 'a'), doc => {
-    setSearchResults(doc.data());
-  });
-}, [searchInput]);
-
-/* Single non-updating retrieval of specific document by id */
-useEffect(() => {
-  const getDocOnce = async () => {
-    const snap = await getDoc(doc(db, 'ingredientNames', 'a'));
-    if (snap.exists()) {
-      setSearchResults(snap.data());
-    } else {
-      return [];
-    }
-  };
-  getDocOnce();
-}, []);
-
-useEffect(() => {
-  console.log(searchResults);
-}, [searchResults]);
-```

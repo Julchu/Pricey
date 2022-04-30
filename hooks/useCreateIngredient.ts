@@ -1,9 +1,7 @@
 import {
   addDoc,
   arrayUnion,
-  collection,
   CollectionReference,
-  doc,
   getDoc,
   increment,
   serverTimestamp,
@@ -11,13 +9,8 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
-import { db } from '../lib/firebase';
-import {
-  Ingredient,
-  IngredientInfo,
-  ingredientInfoConverter,
-  ingredientsConverter,
-} from '../lib/firebase/interfaces';
+import { db, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
+import { priceConverter } from '../lib/textFormatters';
 
 type CreateIngredientMethods = {
   createIngredient: (
@@ -38,22 +31,19 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
       setLoading(true);
 
+      price = unit === 'lb' ? price * 100 : priceConverter(price, 'lb');
+
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
-      const ingredientsCollectionRef = collection(db, 'ingredients').withConverter(
-        ingredientsConverter,
-      );
+      const ingredientsCollectionRef = db.ingredientCollection;
 
-      // Ex: /ingredientNames/a/almond: { info }
-      const ingredientDocumentRef = doc(db, 'ingredientInfo', trimmedName[0]).withConverter(
-        ingredientInfoConverter,
-      );
+      // Ex: /ingredientInfo/almond: { info }
+      const ingredientDocumentRef = db.ingredientInfoDoc(trimmedName);
 
       // Ensuring all fields are passed by typechecking Ingredient
       const newIngredient: Ingredient = {
         name,
-        price: price * 100,
-        unit,
+        price,
         location,
         createdAt: serverTimestamp(),
       };
@@ -66,29 +56,29 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         const docRef = await addDoc(ingredientsCollectionRef, newIngredient);
 
         // Getting current summary to compare lowest
-        const currentIngredientInfo = await getDoc(
-          doc(db, trimmedName, trimmedName[0]).withConverter(ingredientInfoConverter),
-        ).then(doc => doc.data());
+        const currentIngredientInfo = await getDoc(ingredientDocumentRef).then(doc => doc.data());
+
+        /* If lowest exists:
+         * * If lowest > price: price
+         * * Else: lowest
+         * Else price
+         */
+        const lowest = currentIngredientInfo?.lowest
+          ? currentIngredientInfo?.lowest > price
+            ? price
+            : currentIngredientInfo?.lowest
+          : price;
 
         const ingredientInfo: IngredientInfo = {
+          name: trimmedName,
           ids: arrayUnion(docRef.id),
           count: increment(1),
-          total: increment(price * 100),
-          lowest:
-            !currentIngredientInfo?.lowest || price < currentIngredientInfo?.lowest
-              ? price * 100
-              : undefined,
+          total: increment(price),
+          lowest,
         };
 
-        // /ingredientNames collection
-        await setDoc(
-          ingredientDocumentRef,
-          {
-            // Setting key as ingredient name, value as the ingredient's name
-            [`${trimmedName}`]: ingredientInfo,
-          },
-          { merge: true },
-        );
+        // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistant)
+        await setDoc(ingredientDocumentRef, ingredientInfo, { merge: true });
       } catch (e) {
         setError(e as Error);
       }
@@ -147,4 +137,14 @@ try {
   setError(e as Error);
 }
 
-return ingredientDocumentRef; */
+return ingredientDocumentRef;
+
+// Setting key as ingredient name, value as the ingredient's name
+await setDoc(
+  ingredientDocumentRef,
+  {
+    [`${trimmedName}`]: ingredientInfo,
+  },
+  { merge: true },
+);
+*/

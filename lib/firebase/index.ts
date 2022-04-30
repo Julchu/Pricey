@@ -24,23 +24,24 @@ const createFirebaseApp = (config = {}): FirebaseApp => {
 const app = createFirebaseApp(firebaseConfig);
 
 // const analytics = getAnalytics(app);
+// const storage = getStorage(app);
 
 /* getFirestore returns existing Firestore or creates a new one with default settings
  * initializeFirestore creates a new one with optional settings
  * Ex: const db = initializeFirestore(app, { experimentalForceLongPolling: true });
  */
-const db = initializeFirestore(app, {
+const firestore = initializeFirestore(app, {
   experimentalAutoDetectLongPolling: true,
   ignoreUndefinedProperties: true,
 });
 
 // Ensure emulator flag is off in production env when deploying
 try {
-  if (emulatorEnabled && getApps().length > 0 && db !== null) {
-    connectFirestoreEmulator(db, 'localhost', 8080);
+  if (emulatorEnabled && getApps().length > 0 && firestore !== null) {
+    connectFirestoreEmulator(firestore, 'localhost', 8080);
   }
 } catch (e) {
   console.log(e);
 }
 
-export { db };
+export { firestore };

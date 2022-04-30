@@ -1,13 +1,21 @@
-import { doc, DocumentData, onSnapshot } from 'firebase/firestore';
-import { Dispatch, FC, SetStateAction, useEffect, useState } from 'react';
+import { limit, onSnapshot, query, where } from 'firebase/firestore';
+import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { db } from '../../lib/firebase';
-import { IngredientInfo } from '../../lib/firebase/interfaces';
-import { StripeButton } from '../UI/Buttons';
-import { Column, Grid, Line, RoundedImage, Row } from '../UI/Structure';
-import { CardInfoWrapper, CardWrapper, HomeGrid, HomeInput, HomeSelect } from './styles';
-
-// import { Timestamp } from 'firebase/firestore';
+import { db, IngredientInfo } from '../../lib/firebase/interfaces';
+import { Column, Line, RoundedImage, Row } from '../UI/Structure';
+import {
+  CardInfoWrapper,
+  CardWrapper,
+  HomeCardGrid,
+  HomeCardInfoRow,
+  HomeCardLine,
+  HomeImageDiv,
+  HomeImageHolder,
+  HomeInput,
+  HomeInputGrid,
+  HomeSelect,
+} from './styles';
+import { currencyFormatter } from '../../lib/textFormatters';
 
 type HomeProps = {
   onSubmit: (data: IngredientFormData) => Promise<void>;
@@ -18,9 +26,6 @@ export type IngredientFormData = {
   price: number;
   unit: string;
   location?: string;
-
-  // Time that item was recorded
-  // time?: Timestamp;
 };
 
 const defaultFormValues = (): Partial<IngredientFormData> => ({
@@ -28,9 +33,6 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
   name: '',
   unit: '',
   location: '',
-
-  // Time that item was recorded
-  // time?:
 });
 
 // Page shown at `localhost:3000/`
@@ -39,84 +41,92 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
   const methods = useForm<IngredientFormData>({ defaultValues: defaultFormValues() });
   const { handleSubmit } = methods;
 
-  // Manual ingredient search
+  /* Manual ingredient search
+   * searchInput: is used for filtering search results after query
+   * searchResults holds array of streamed results
+   */
   const [searchInput, setSearchInput] = useState('');
-  const [searchResults, setSearchResults] = useState<DocumentData | undefined>([]);
+  const [foundIngredient, setFoundIngredient] = useState(false);
+  const [searchResults, setSearchResults] = useState<IngredientInfo[]>([]);
 
   /* Live-updating retrieval of specific document and its contents */
   useEffect(() => {
-    onSnapshot(doc(db, 'ingredientInfo', searchInput[0] || 'a'), doc => {
-      doc.exists() ? setSearchResults(doc.data()) : setSearchResults([]);
-    });
-  }, [searchInput]);
+    const q = query(db.ingredientInfoCollection, where('count', '>', 0), limit(8));
 
-  // useEffect(() => {
-  //   if (searchResults) console.log('entries: ', searchResults);
-  // }, [searchResults]);
+    onSnapshot(q, querySnapshot => {
+      const ingredientInfoList: IngredientInfo[] = [];
+      querySnapshot.forEach(doc => {
+        ingredientInfoList.push(doc.data());
+      });
+      setSearchResults(ingredientInfoList);
+    });
+  }, []);
+
+  /*useEffect(() => {
+    if (searchResults) console.log('entries: ', searchResults);
+  }, [searchResults]);*/
+
+  const filteredResults = useMemo(() => {
+    setFoundIngredient(searchResults.some(({ name }) => searchInput === name));
+    return searchResults.filter(ingredientInfo => ingredientInfo.name.includes(searchInput)).sort();
+  }, [searchInput, searchResults]);
 
   return (
-    <>
+    <form>
+      {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {/* TODO: pass setter for name search into form, to pass search value back */}
-          <IngredientForm searchInput={searchInput} setSearchInput={setSearchInput} />
-        </form>
+        <>
+          <IngredientForm setSearchInput={setSearchInput} />
+
+          <Line />
+
+          <Row>
+            <HomeCardGrid>
+              {!foundIngredient ? (
+                <Card searchInput={searchInput} handleSubmit={handleSubmit(onSubmit)} />
+              ) : null}
+
+              {filteredResults?.map((ingredientInfo, index) => {
+                return (
+                  <Card
+                    key={`${ingredientInfo.name}_${index}`}
+                    searchInput={searchInput}
+                    setSearchInput={setSearchInput}
+                    ingredientInfo={ingredientInfo}
+                    handleSubmit={handleSubmit(onSubmit)}
+                  />
+                );
+              })}
+            </HomeCardGrid>
+          </Row>
+        </>
       </FormProvider>
-
-      <Line />
-
-      <Row>
-        <HomeGrid>
-          {/* TODO: if no results, show card to submit data (replace submit button) */}
-          {/* {searchResults?.length === 0 ? <Card /> : null} */}
-
-          {/* TODO: if results, add onClick to update/add data to ingredients */}
-          {searchResults &&
-            Object.entries(searchResults).map(([name, info], index) => {
-              return <Card key={`${name}_${index}`} name={name} info={info} />;
-            })}
-        </HomeGrid>
-      </Row>
-    </>
+    </form>
   );
 };
 
 const IngredientForm: FC<{
-  searchInput: string;
   setSearchInput: Dispatch<SetStateAction<string>>;
-}> = ({ searchInput, setSearchInput }) => {
+}> = ({ setSearchInput }) => {
   const {
     register,
     clearErrors,
     formState: { errors },
   } = useFormContext<IngredientFormData>();
 
-  const setFirstLetter = (input: string): void => {
-    if (input && input[0] !== searchInput[0]) {
-      setSearchInput(input[0]);
-    }
-  };
-
   const [selectValue, setSelectValue] = useState('');
 
   const validateIsNumber = (value: number): boolean => {
-    if (value) return true;
-    return false;
+    return !!value;
   };
 
   return (
     <>
-      <Grid
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, 250px)',
-          columnGap: '30px',
-          rowGap: '30px',
-        }}
-      >
+      <HomeInputGrid>
         {/* Ingredient name input */}
-        <Column>
+        <Column style={{ gridColumn: '1/3', minWidth: '500px' }}>
           <HomeInput
+            type={'search'}
             {...register('name', { required: true })}
             placeholder={
               errors.name?.type === 'required'
@@ -125,14 +135,14 @@ const IngredientForm: FC<{
             }
             error={errors.name?.type === 'required'}
             onChange={e => {
-              setFirstLetter(e.target.value);
+              setSearchInput(e.target.value.toLocaleLowerCase('en-US'));
               clearErrors('name');
             }}
           />
         </Column>
 
         {/* Price input */}
-        <Column>
+        <Column style={{ minWidth: '250px' }}>
           <HomeInput
             {...register('price', {
               valueAsNumber: true,
@@ -146,7 +156,7 @@ const IngredientForm: FC<{
 
         {/* TODO: create custom dropdown menu styling */}
         {/* Unit selector */}
-        <Column>
+        <Column style={{ minWidth: '250px' }}>
           <HomeSelect
             {...register('unit', {
               required: true,
@@ -165,34 +175,80 @@ const IngredientForm: FC<{
             <option value="kg">kg</option>
           </HomeSelect>
         </Column>
-
-        {/* Replace button with empty card (when no results) */}
-        <StripeButton>Submit data</StripeButton>
-      </Grid>
+      </HomeInputGrid>
     </>
   );
 };
 
+type CardProps = {
+  ingredientInfo?: IngredientInfo;
+  searchInput?: string;
+  setSearchInput?: Dispatch<SetStateAction<string>>;
+  handleSubmit?: () => void;
+};
 // Search result cards
-const Card: FC<{ name?: string; info?: IngredientInfo }> = ({ name, info }) => {
+const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, handleSubmit }) => {
+  // IngredientInfo fields
   const averagePrice =
-    info?.total && info?.count ? (info?.total as number) / (info?.count as number) : null;
+    ingredientInfo?.total && ingredientInfo?.count
+      ? (ingredientInfo.total as number) / (ingredientInfo.count as number)
+      : null;
+
+  const { setValue, resetField } = useFormContext<IngredientFormData>();
+
+  const highlighted = searchInput === ingredientInfo?.name;
+  const searchedIngredient = searchInput === ingredientInfo?.name || !ingredientInfo;
+
+  const onClickHandler = useCallback(() => {
+    if (setSearchInput && ingredientInfo && handleSubmit) {
+      setValue('name', ingredientInfo?.name);
+      resetField('price');
+      resetField('unit');
+      setSearchInput(ingredientInfo?.name);
+      handleSubmit();
+    }
+  }, [handleSubmit, ingredientInfo, resetField, setSearchInput, setValue]);
 
   return (
-    <CardWrapper>
+    <CardWrapper highlighted={highlighted}>
       {/* Image */}
-      <RoundedImage
-        src={'media/foodPlaceholder.png'}
-        alt="Food placeholder"
-        width="577px"
-        height="433px"
-      />
+      <HomeImageDiv>
+        <HomeImageHolder>
+          {/* TODO: image uploading */}
+          <RoundedImage
+            src={ingredientInfo ? 'media/foodPlaceholder.png' : 'media/imageUploadIcon.png'}
+            alt={ingredientInfo ? 'Food placeholder' : 'Upload image'}
+            width={ingredientInfo ? '577px' : '150px'}
+            height={ingredientInfo ? '433px' : '100px'}
+          />
+        </HomeImageHolder>
+      </HomeImageDiv>
+
+      <HomeCardLine />
 
       {/* Info */}
-      <CardInfoWrapper>
-        <Row style={{ wordWrap: 'break-word' }}>Name: {name}</Row>
-        {averagePrice ? <Row>Average: ${averagePrice / 100}</Row> : null}
-        {info?.lowest ? <Row>Lowest: ${info?.lowest / 100}</Row> : null}
+      <CardInfoWrapper onClick={searchedIngredient ? handleSubmit : onClickHandler}>
+        {ingredientInfo ? (
+          <HomeCardInfoRow>
+            <b style={{ color: '#0070f3' }}>{ingredientInfo.name}</b>
+          </HomeCardInfoRow>
+        ) : (
+          <HomeCardInfoRow>Add</HomeCardInfoRow>
+        )}
+
+        {averagePrice ? (
+          <HomeCardInfoRow>Average: {currencyFormatter.format(averagePrice / 100)}</HomeCardInfoRow>
+        ) : (
+          <HomeCardInfoRow>
+            <b style={{ color: '#0070f3' }}>{searchInput || 'an ingredient'}</b>
+          </HomeCardInfoRow>
+        )}
+
+        <HomeCardInfoRow>
+          {ingredientInfo?.lowest
+            ? `Lowest: ${currencyFormatter.format(ingredientInfo.lowest / 100)}`
+            : 'to the list'}
+        </HomeCardInfoRow>
       </CardInfoWrapper>
     </CardWrapper>
   );

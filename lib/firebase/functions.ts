@@ -1,10 +1,10 @@
-import { getDocs, collection, deleteDoc, doc, getDoc } from 'firebase/firestore';
-import { db } from '.';
-import { converter, IngredientInfo } from './interfaces';
+import { collection, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
+import { firestore } from '.';
+import { db, IngredientInfo } from './interfaces';
 
 // Retrieves list of documents
 export const getDocuments = async (collectionName: string): Promise<void> => {
-  const querySnapshot = await getDocs(collection(db, collectionName));
+  const querySnapshot = await getDocs(collection(firestore, collectionName));
   querySnapshot.forEach(doc => {
     console.log(doc.id, doc.data());
   });
@@ -18,7 +18,7 @@ export const getIngredientNames = async (
 ): Promise<void> => {
   const snap = await getDoc(
     // Retrieve single document with known id
-    doc(db, collectionName, documentId).withConverter(converter<IngredientInfo>()),
+    db.ingredientInfoDoc(documentId),
   );
   if (snap.exists()) {
     callback(snap.data());
@@ -26,13 +26,23 @@ export const getIngredientNames = async (
 };
 
 const deleteDocument = async (collectionName: string, docName: string): Promise<void> => {
-  await deleteDoc(doc(db, collectionName, docName));
+  await deleteDoc(doc(firestore, collectionName, docName));
 };
 
 export const deleteCollection = async (collectionName: string): Promise<void> => {
-  const querySnapshot = await getDocs(collection(db, collectionName));
-  querySnapshot.forEach(async doc => {
+  const querySnapshot = await getDocs(collection(firestore, collectionName));
+  querySnapshot.forEach(doc => {
     console.log(`${doc.id} => ${JSON.stringify(doc.data())}`);
-    await deleteDocument(collectionName, doc.id);
+    deleteDocument(collectionName, doc.id);
   });
 };
+
+/*
+
+const storageRef = ref(storage, 'some-child');
+
+// 'file' comes from the Blob or File API
+uploadBytes(storageRef, file).then(snapshot => {
+  console.log('Uploaded a blob or file!');
+});
+*/

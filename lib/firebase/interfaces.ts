@@ -1,11 +1,21 @@
 // import { Timestamp } from "firebase/firestore";
 
-import { FieldValue, QueryDocumentSnapshot, SnapshotOptions, Timestamp } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  DocumentReference,
+  FieldValue,
+  FirestoreDataConverter,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+  Timestamp,
+} from 'firebase/firestore';
+import { firestore } from './index';
+import { CollectionReference } from '@firebase/firestore';
 
 export interface Ingredient {
   name: string;
   price: number;
-  unit: string;
   location?: string;
   submitter?: User;
   createdAt: Timestamp | FieldValue;
@@ -15,6 +25,7 @@ export interface Ingredient {
  * Ex: /ingredientNames/a/almond: { ingredientIds[]: list of id used in /ingredients for almond }
  */
 export interface IngredientInfo {
+  name: string;
   ids: string[] | FieldValue;
   count: number | FieldValue;
   total: number | FieldValue;
@@ -30,24 +41,32 @@ export interface User {
 }
 
 // Firestore data converters
-export const ingredientsConverter = {
-  toFirestore: (ingredient: Ingredient): Ingredient => ingredient,
-  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
-    snapshot.data(options),
-};
-
-export const ingredientInfoConverter = {
-  toFirestore: (ingredientInfo: IngredientInfo) => ingredientInfo,
-  fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) => {
-    const data = snapshot.data(options);
-    // return data.id, data.count as number, data.total as number, data.lowest;
-    return data;
-  },
-};
-
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const converter = <T>() => ({
+export const converter = <T>(): FirestoreDataConverter<T> => ({
   toFirestore: (data: T) => data,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
     snapshot.data(options) as T,
 });
+
+const collectionPoint = <T>(collectionPath: string): CollectionReference<T> =>
+  collection(firestore, collectionPath).withConverter(converter<T>());
+
+const docPoint = <T>(collectionPath: string, ...extraPaths: string[]): DocumentReference<T> =>
+  doc(firestore, collectionPath, ...extraPaths).withConverter(converter<T>());
+
+/* dataPoint use-cases:
+ * const ingredientsCollectionRef = db.ingredientCollection;
+ * const ingredientDocumentRef = db.ingredientInfoDoc(id, ...extraPaths);
+ * * const ingredientDocumentRef = doc(db.ingredientCollection, id, ...extraPaths);
+ */
+export const db = {
+  // Collections
+  ingredientCollection: collectionPoint<Ingredient>('ingredients'),
+  ingredientInfoCollection: collectionPoint<IngredientInfo>('ingredientInfos'),
+  userCollection: collectionPoint<User>('users'),
+
+  // Docs
+  ingredientDoc: (...extraPaths: string[]) => docPoint<Ingredient>('ingredients', ...extraPaths),
+  ingredientInfoDoc: (...extraPaths: string[]) =>
+    docPoint<IngredientInfo>('ingredientInfos', ...extraPaths),
+  userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
+};

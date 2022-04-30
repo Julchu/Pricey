@@ -11,6 +11,9 @@ export const Wrapper = styled.div({
    * specific component's style
    */
   padding: '30px',
+
+  // No bottom padding to line up home page with other pages
+  paddingBottom: '0px',
 });
 
 export const HeaderWrapper = styled.div({
