@@ -126,6 +126,7 @@ const IngredientForm: FC<{
         {/* Ingredient name input */}
         <Column style={{ gridColumn: '1/3', minWidth: '500px' }}>
           <HomeInput
+            type={'search'}
             {...register('name', { required: true })}
             placeholder={
               errors.name?.type === 'required'
