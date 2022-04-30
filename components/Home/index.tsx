@@ -128,7 +128,7 @@ const IngredientForm: FC<{
             }
             error={errors.name?.type === 'required'}
             onChange={e => {
-              setSearchInput(e.target.value);
+              setSearchInput(e.target.value.toLocaleLowerCase('en-US'));
               clearErrors('name');
             }}
           />
