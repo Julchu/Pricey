@@ -16,7 +16,6 @@ import { CollectionReference } from '@firebase/firestore';
 export interface Ingredient {
   name: string;
   price: number;
-  unit: string;
   location?: string;
   submitter?: User;
   createdAt: Timestamp | FieldValue;
