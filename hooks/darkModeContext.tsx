@@ -6,8 +6,8 @@ type DarkModeType = {
 };
 
 export const darkModeStyles = (mode: boolean): CSSProperties => ({
-  backgroundColor: mode ? '#212121' : '',
-  color: mode ? 'white' : '',
+  backgroundColor: mode ? '#212121' : 'unset',
+  color: mode ? 'white' : 'black',
 });
 
 export const DarkModeContext = createContext<DarkModeType>({
