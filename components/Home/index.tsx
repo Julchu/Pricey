@@ -144,6 +144,7 @@ const IngredientForm: FC<{
         {/* Price input */}
         <Column style={{ minWidth: '250px' }}>
           <HomeInput
+            type={'search'}
             {...register('price', {
               valueAsNumber: true,
               required: true,
