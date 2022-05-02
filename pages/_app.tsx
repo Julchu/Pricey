@@ -3,6 +3,7 @@ import { DarkModeContext } from '../contexts/DarkModeContext';
 import '../styles/globals.css';
 import { ThemeProvider } from '@emotion/react';
 import { darkModeStyles } from '../components/UI/DarkMode';
+import { UnitContext } from '../contexts/UnitContext';
 
 type Props = {
   Component: ComponentType;
@@ -12,11 +13,14 @@ type Props = {
 
 const App = ({ Component, pageProps }: Props): JSX.Element => {
   const [darkMode, setDarkMode] = useState(false);
+  const [unit, setUnit] = useState('lb');
 
   return (
     <ThemeProvider theme={darkModeStyles(darkMode)}>
       <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
-        <Component {...pageProps} />
+        <UnitContext.Provider value={{ unit, setUnit }}>
+          <Component {...pageProps} />
+        </UnitContext.Provider>
       </DarkModeContext.Provider>
     </ThemeProvider>
   );

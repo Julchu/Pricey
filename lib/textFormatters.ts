@@ -6,5 +6,5 @@ export const currencyFormatter = new Intl.NumberFormat(undefined, {
 });
 
 export const priceConverter = (price: number, convertTo: string): number => {
-  return convertTo === 'lb' ? price / 2.2046 : convertTo === 'kg' ? price * 2.2046 : 0;
+  return convertTo === 'lb' ? price / 2.2046 : convertTo === 'kg' ? price * 2.2046 : price;
 };
