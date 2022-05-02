@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import { Input, Select } from '../UI/Form';
 import { Grid, Line, Row } from '../UI/Structure';
+import home from './index';
 
 export const HomeInput = styled(Input)<{ error?: boolean }>(({ disabled, error }) => ({
   color: disabled || error ? 'red' : 'black',
@@ -27,34 +28,34 @@ export const HomeSelect = styled(Select)<{ error?: boolean; value?: string }>(
   }),
 );
 
-export const CardWrapper = styled.div<{ highlighted?: boolean }>(({ highlighted }) => ({
-  fontFamily: 'Montserrat',
-  letterSpacing: '2px',
-  fontSize: '16px',
-  color: 'black',
+export const CardWrapper = styled.div<{ highlighted?: boolean }>(
+  ({ theme: { boxShadows }, highlighted }) => ({
+    fontFamily: 'Montserrat',
+    letterSpacing: '2px',
+    fontSize: '16px',
 
-  width: '250px',
-  height: '300px',
+    // Change colors for dark-mode
+    color: 'black',
+    backgroundColor: 'white',
 
-  display: 'flex',
-  flexDirection: 'column',
+    width: '250px',
+    height: '300px',
 
-  border: 'none',
-  outline: 'none',
-  borderRadius: '5px',
-  boxShadow: !highlighted
-    ? 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px'
-    : 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
-  transition: 'box-shadow 0.2s ease-in-out',
+    display: 'flex',
+    flexDirection: 'column',
 
-  '&:hover': {
-    boxShadow: !highlighted
-      ? 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px'
-      : 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-    // boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-    // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
-  },
-}));
+    border: 'none',
+    outline: 'none',
+    borderRadius: '5px',
+    boxShadow: !highlighted ? boxShadows?.normal : boxShadows?.under,
+    transition: 'box-shadow 0.2s ease-in-out',
+
+    '&:hover': {
+      boxShadow: !highlighted ? boxShadows?.hover : boxShadows?.focus,
+      // boxShadow: boxShadows?.under,
+    },
+  }),
+);
 
 export const CardInfoWrapper = styled.div({
   height: '100%',
