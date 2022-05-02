@@ -10,6 +10,7 @@ import {
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
 import { db, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
+import { priceConverter } from '../lib/textFormatters';
 
 type CreateIngredientMethods = {
   createIngredient: (
@@ -30,7 +31,7 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
       setLoading(true);
 
-      price *= 100;
+      price = unit === 'lb' ? price * 100 : priceConverter(price, 'lb');
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
@@ -43,7 +44,6 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
       const newIngredient: Ingredient = {
         name,
         price,
-        unit,
         location,
         createdAt: serverTimestamp(),
       };

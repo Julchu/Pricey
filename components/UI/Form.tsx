@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 
-export const Input = styled.input({
+export const Input = styled.input(({ theme: { boxShadows } }) => ({
   fontFamily: 'Montserrat',
   letterSpacing: '2px',
   fontSize: '16px',
@@ -13,11 +13,11 @@ export const Input = styled.input({
   border: 'none',
   outline: 'none',
   borderRadius: '5px',
-  boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px',
+  boxShadow: boxShadows?.normal,
   transition: 'box-shadow 0.2s ease-in-out',
 
   '&:hover': {
-    boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
+    boxShadow: boxShadows?.hover,
   },
 
   '::placeholder': {
@@ -26,12 +26,11 @@ export const Input = styled.input({
   },
 
   '&:focus': {
-    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-    // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
+    boxShadow: boxShadows?.focus,
   },
-});
+}));
 
-export const Select = styled.select({
+export const Select = styled.select(({ theme: { boxShadows } }) => ({
   fontFamily: 'Montserrat',
   letterSpacing: '2px',
   fontSize: '16px',
@@ -43,17 +42,16 @@ export const Select = styled.select({
   border: 'none',
   outline: 'none',
   borderRadius: '5px',
-  boxShadow: 'rgba(99, 99, 99, 0.2) 0px 2px 8px 0px',
+  boxShadow: boxShadows?.normal,
   transition: 'box-shadow 0.2s ease-in-out',
 
   '&:hover': {
-    boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px',
+    boxShadow: boxShadows?.hover,
   },
 
   '&:focus': {
-    boxShadow: 'rgba(0, 0, 0, 0.35) 0px 5px 15px',
-    // boxShadow: 'rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px',
+    boxShadow: boxShadows?.focus,
   },
-});
+}));
 
 /* Box shadow reference: https://getcssscan.com/css-box-shadow-examples */

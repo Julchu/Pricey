@@ -1,6 +1,8 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div({
+export const Wrapper = styled.div(({ theme: { backgroundColor, color } }) => ({
+  backgroundColor,
+  color,
   height: '100vh',
   width: '100vw',
   display: 'flex',
@@ -14,7 +16,7 @@ export const Wrapper = styled.div({
 
   // No bottom padding to line up home page with other pages
   paddingBottom: '0px',
-});
+}));
 
 export const HeaderWrapper = styled.div({
   marginLeft: 'auto',
