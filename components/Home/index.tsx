@@ -15,7 +15,8 @@ import {
   HomeInputGrid,
   HomeSelect,
 } from './styles';
-import { currencyFormatter } from '../../lib/textFormatters';
+import { currencyFormatter, priceConverter } from '../../lib/textFormatters';
+import { useUnit } from '../../contexts/UnitContext';
 
 type HomeProps = {
   onSubmit: (data: IngredientFormData) => Promise<void>;
@@ -189,11 +190,15 @@ type CardProps = {
 };
 // Search result cards
 const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, handleSubmit }) => {
+  // Showing price as unit preference
+  const { unit } = useUnit();
+  const convertedTotal = priceConverter(ingredientInfo?.total as number, unit);
+  const convertedLowest = priceConverter(ingredientInfo?.lowest as number, unit);
+
   // IngredientInfo fields
-  const averagePrice =
-    ingredientInfo?.total && ingredientInfo?.count
-      ? (ingredientInfo.total as number) / (ingredientInfo.count as number)
-      : null;
+  const averagePrice = ingredientInfo?.count
+    ? convertedTotal / (ingredientInfo.count as number)
+    : 0;
 
   const { setValue, resetField } = useFormContext<IngredientFormData>();
 
@@ -247,7 +252,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
 
         <HomeCardInfoRow>
           {ingredientInfo?.lowest
-            ? `Lowest: ${currencyFormatter.format(ingredientInfo.lowest / 100)}`
+            ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}`
             : 'to the list'}
         </HomeCardInfoRow>
       </CardInfoWrapper>
