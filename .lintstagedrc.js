@@ -5,11 +5,9 @@ const buildEslintCommand = filenames =>
 
 const buildTypeCheckCommand = filenames => {
   // Index 0 should be .lintstagedrc.js which we want to skip
-  return `tsc --target esnext --allowJs --skipLibCheck --strict --forceConsistentCasingInFileNames --noEmit --esModuleInterop --module esnext --moduleResolution node --resolveJsonModule  --isolatedModules --jsx preserve --jsxImportSource @emotion/react ${filenames
-    .map((f, index) => path.relative(process.cwd(), f))
-    .join(' ')}`;
+  return `tsc-files --noEmit`;
 };
 
 module.exports = {
-  '*.{js,jsx,ts,tsx}': [buildEslintCommand, buildTypeCheckCommand],
+  '**/*.{js,jsx,ts,tsx}?(x)': [buildEslintCommand, buildTypeCheckCommand],
 };
