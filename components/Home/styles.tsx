@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
 import { Input, Select } from '../UI/Form';
 import { Grid, Line, Row } from '../UI/Structure';
-import home from './index';
 
 export const HomeInput = styled(Input)<{ error?: boolean }>(({ disabled, error }) => ({
   color: disabled || error ? 'red' : 'black',
