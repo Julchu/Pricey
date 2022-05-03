@@ -34,3 +34,5 @@ export const darkModeStyles = (mode: boolean): Theme => {
     },
   };
 };
+
+export type ThemeType = ReturnType<typeof darkModeStyles>;
