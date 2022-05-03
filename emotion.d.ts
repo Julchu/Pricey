@@ -1,8 +1,8 @@
 // Theme types that need to be adjusted to add fields in DarkMode.tsx/darkModeStyles
-import { ThemeType } from './components/UI/DarkMode';
+// import { ThemeType } from './components/UI/DarkMode';
 
 declare module '@emotion/react' {
-  export interface Theme extends ThemeType {
+  export interface Theme {
     backgroundColor: string;
     color: string;
     fontWeight: {
