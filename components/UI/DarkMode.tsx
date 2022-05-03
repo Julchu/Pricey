@@ -1,6 +1,4 @@
-import { Theme } from '@emotion/react';
-
-export const darkModeStyles = (mode: boolean): Theme => {
+export const darkModeStyles = (mode: boolean): {} => {
   const invert = (r: number, g: number, b: number, a: number): string =>
     mode ? `${255 - r}, ${255 - g}, ${255 - b}, ${1 - a}` : `${r}, ${g}, ${b}, ${a}`;
 
@@ -34,3 +32,5 @@ export const darkModeStyles = (mode: boolean): Theme => {
     },
   };
 };
+
+export type ThemeType = ReturnType<typeof darkModeStyles>;

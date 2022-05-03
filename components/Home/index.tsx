@@ -175,6 +175,8 @@ const IngredientForm: FC<{
             </option>
             <option value="lb">lb</option>
             <option value="kg">kg</option>
+            <option value="ml">ml</option>
+            <option value="item">item</option>
           </HomeSelect>
         </Column>
       </HomeInputGrid>
@@ -243,7 +245,9 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
         )}
 
         {averagePrice ? (
-          <HomeCardInfoRow>Average: {currencyFormatter.format(averagePrice / 100)}</HomeCardInfoRow>
+          <HomeCardInfoRow>
+            Average: {currencyFormatter.format(averagePrice / 100)}/{unit}
+          </HomeCardInfoRow>
         ) : (
           <HomeCardInfoRow>
             <b style={{ color: '#0070f3' }}>{searchInput || 'an ingredient'}</b>
@@ -252,7 +256,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
 
         <HomeCardInfoRow>
           {ingredientInfo?.lowest
-            ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}`
+            ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}/${unit}`
             : 'to the list'}
         </HomeCardInfoRow>
       </CardInfoWrapper>
