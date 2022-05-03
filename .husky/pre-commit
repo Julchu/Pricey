@@ -1,5 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-# TODO: yarn type-check for staged only
 yarn lint-staged
