@@ -31,7 +31,7 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
       setLoading(true);
 
-      price = unit === 'lb' ? price * 100 : priceConverter(price, 'lb');
+      price = priceConverter(price * 100, unit);
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 

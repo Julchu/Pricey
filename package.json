@@ -12,8 +12,7 @@
     "lint:fix": "next lint --fix '**/*.{ts,tsx}'",
     "type-check": "tsc --noEmit",
     "type-check:firebase": "tsc -p functions --skipLibCheck --noEmit",
-    "prepare": "husky install",
-    "tsc-files": "tsc-files --noEmit"
+    "prepare": "husky install"
   },
   "dependencies": {
     "@emotion/react": "^11.9.0",
@@ -34,7 +33,6 @@
     "eslint-config-prettier": "^8.5.0",
     "husky": "^7.0.4",
     "lint-staged": "^12.3.7",
-    "tsc-files": "^1.1.3",
     "typescript": "4.6.3"
   }
 }

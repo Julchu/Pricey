@@ -5,6 +5,9 @@ export const currencyFormatter = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
 });
 
-export const priceConverter = (price: number, convertTo: string): number => {
-  return convertTo === 'lb' ? price / 2.2046 : convertTo === 'kg' ? price * 2.2046 : price;
+// Prices are /lb by default; switch to kg if needed
+export const priceConverter = (price: number, currentUnit: string): number => {
+  // if (currentUnit === 'lb') return price * 2.2046;
+  if (currentUnit === 'kg') return price / 2.2046;
+  else return price;
 };
