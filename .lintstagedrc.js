@@ -5,11 +5,13 @@ const buildEslintCommand = filenames =>
 
 // Working very unintentionally: keeps throwing unrelated Emotion errors
 const buildTypeCheckCommand = filenames => {
-  return `tsc-files --noEmit ${filenames
+  return 'tsc --noEmit';
+
+  /*return `tsc-files --noEmit ${filenames
     .map((f, index) => path.relative(process.cwd(), f))
-    .join(' ')}`;
+    .join(' ')}`;*/
 };
 
 module.exports = {
-  '**/*.{js,jsx,ts,tsx}?(x)': [buildEslintCommand],
+  '**/*.{js,jsx,ts,tsx}?(x)': [buildEslintCommand, buildTypeCheckCommand],
 };
