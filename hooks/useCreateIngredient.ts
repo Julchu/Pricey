@@ -9,7 +9,7 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
-import { db, Ingredient, IngredientInfo } from '../lib/firebase/interfaces';
+import { db, Ingredient, IngredientInfo, Unit } from '../lib/firebase/interfaces';
 import { priceConverter } from '../lib/textFormatters';
 
 type CreateIngredientMethods = {
@@ -46,6 +46,7 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         name,
         price,
         location,
+        unit: Unit[unit as keyof typeof Unit],
         createdAt: serverTimestamp(),
       };
 
@@ -70,15 +71,21 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
             : currentIngredientInfo?.lowest
           : price;
 
+        const convertedUnit =
+          currentIngredientInfo?.unit && (unit === Unit.kg || unit === Unit.lb)
+            ? Unit.lb
+            : Unit[unit as keyof typeof Unit];
+
         const ingredientInfo: IngredientInfo = {
           name: trimmedName,
           ids: arrayUnion(docRef.id),
           count: increment(1),
           total: increment(price),
           lowest,
+          unit: convertedUnit,
         };
 
-        // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistant)
+        // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent)
         await setDoc(ingredientDocumentRef, ingredientInfo, { merge: true });
       } catch (e) {
         setError(e as Error);

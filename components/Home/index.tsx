@@ -1,7 +1,7 @@
 import { limit, onSnapshot, query, where } from 'firebase/firestore';
 import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
-import { db, IngredientInfo } from '../../lib/firebase/interfaces';
+import { db, IngredientInfo, Unit } from '../../lib/firebase/interfaces';
 import { Column, Line, RoundedImage, Row } from '../UI/Structure';
 import {
   CardInfoWrapper,
@@ -126,7 +126,7 @@ const IngredientForm: FC<{
     <>
       <HomeInputGrid>
         {/* Ingredient name input */}
-        <Column style={{ gridColumn: '1/3', minWidth: '500px' }}>
+        <Column style={{ gridColumn: '1/3' }}>
           <HomeInput
             type={'search'}
             {...register('name', { required: true })}
@@ -188,10 +188,13 @@ const IngredientForm: FC<{
             <option value="" disabled hidden>
               Unit
             </option>
-            <option value="lb">lb</option>
-            <option value="kg">kg</option>
-            <option value="ml">ml</option>
-            <option value="unit">unit</option>
+            {Object.keys(Unit).map((unit, index) => {
+              return (
+                <option key={`${unit}_${index}`} value={unit}>
+                  {unit}
+                </option>
+              );
+            })}
           </HomeSelect>
         </Column>
       </HomeInputGrid>
@@ -208,9 +211,15 @@ type CardProps = {
 // Search result cards
 const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, handleSubmit }) => {
   // Showing price as unit preference
-  const { unit } = useUnit();
-  const convertedTotal = priceConverter(ingredientInfo?.total as number, unit);
-  const convertedLowest = priceConverter(ingredientInfo?.lowest as number, unit);
+  const { toggledUnit } = useUnit();
+
+  const convertedUnit =
+    ingredientInfo?.unit === Unit.lb || ingredientInfo?.unit === Unit.kg
+      ? toggledUnit
+      : ingredientInfo?.unit;
+
+  const convertedTotal = priceConverter(ingredientInfo?.total as number, toggledUnit);
+  const convertedLowest = priceConverter(ingredientInfo?.lowest as number, toggledUnit);
 
   // IngredientInfo fields
   const averagePrice = ingredientInfo?.count
@@ -256,12 +265,12 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
             <b style={{ color: '#0070f3' }}>{ingredientInfo.name}</b>
           </HomeCardInfoRow>
         ) : (
-          <HomeCardInfoRow>Add</HomeCardInfoRow>
+          <HomeCardInfoRow>Save</HomeCardInfoRow>
         )}
 
         {averagePrice ? (
           <HomeCardInfoRow>
-            Average: {currencyFormatter.format(averagePrice / 100)}/{unit}
+            {`Average: ${currencyFormatter.format(averagePrice / 100)}/${convertedUnit}`}
           </HomeCardInfoRow>
         ) : (
           <HomeCardInfoRow>
@@ -271,7 +280,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
 
         <HomeCardInfoRow>
           {ingredientInfo?.lowest
-            ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}/${unit}`
+            ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}/${convertedUnit}`
             : 'to the list'}
         </HomeCardInfoRow>
       </CardInfoWrapper>

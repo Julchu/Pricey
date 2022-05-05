@@ -1,12 +1,13 @@
 import { createContext, useContext } from 'react';
+import { Unit } from '../lib/firebase/interfaces';
 
 type UnitType = {
-  unit: string;
-  setUnit: (unit: string) => void;
+  toggledUnit: Unit;
+  setUnit: (unit: Unit) => void;
 };
 
 export const UnitContext = createContext<UnitType>({
-  unit: 'lb',
+  toggledUnit: Unit.lb,
   setUnit: () => {},
 });
 
