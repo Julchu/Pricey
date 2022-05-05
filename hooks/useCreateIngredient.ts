@@ -26,12 +26,13 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     async ({
       name,
       price,
+      quantity,
       unit,
       location,
     }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
       setLoading(true);
 
-      price = priceConverter(price * 100, unit);
+      price = priceConverter((price * 100) / quantity, unit);
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 

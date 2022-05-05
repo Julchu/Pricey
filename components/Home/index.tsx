@@ -25,6 +25,7 @@ type HomeProps = {
 export type IngredientFormData = {
   name: string;
   price: number;
+  quantity: number;
   unit: string;
   location?: string;
 };
@@ -156,6 +157,20 @@ const IngredientForm: FC<{
           />
         </Column>
 
+        {/* Quantity input */}
+        <Column style={{ minWidth: '250px' }}>
+          <HomeInput
+            type={'search'}
+            {...register('quantity', {
+              valueAsNumber: true,
+              required: true,
+              validate: price => validateIsNumber(price),
+            })}
+            placeholder={'Quantity'}
+            error={errors.quantity?.type === 'required' || errors.quantity?.type === 'validate'}
+          />
+        </Column>
+
         {/* TODO: create custom dropdown menu styling */}
         {/* Unit selector */}
         <Column style={{ minWidth: '250px' }}>
@@ -176,7 +191,7 @@ const IngredientForm: FC<{
             <option value="lb">lb</option>
             <option value="kg">kg</option>
             <option value="ml">ml</option>
-            <option value="item">item</option>
+            <option value="unit">unit</option>
           </HomeSelect>
         </Column>
       </HomeInputGrid>
