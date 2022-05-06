@@ -47,7 +47,12 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
    * searchInput: is used for filtering search results after query
    * searchResults holds array of streamed results
    */
-  const [searchInput, setSearchInput] = useState('');
+  const [newIngredient, setNewIngredient] = useState<IngredientFormData>({
+    name: '',
+    price: NaN,
+    quantity: NaN,
+    unit: '' as Unit,
+  });
   const [foundIngredient, setFoundIngredient] = useState(false);
   const [searchResults, setSearchResults] = useState<IngredientInfo[]>([]);
 
@@ -64,38 +69,40 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
     });
   }, []);
 
-  /*useEffect(() => {
-    if (searchResults) console.log('entries: ', searchResults);
-  }, [searchResults]);*/
-
   const filteredResults = useMemo(() => {
-    setFoundIngredient(searchResults.some(({ name }) => searchInput === name));
-    return searchResults.filter(ingredientInfo => ingredientInfo.name.includes(searchInput)).sort();
-  }, [searchInput, searchResults]);
+    setFoundIngredient(searchResults.some(({ name }) => newIngredient.name === name));
+    return searchResults
+      .filter(ingredientInfo => ingredientInfo.name.includes(newIngredient.name || ''))
+      .sort();
+  }, [searchResults, newIngredient.name]);
 
   return (
     <form>
       {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
         <>
-          <IngredientForm setSearchInput={setSearchInput} />
+          <IngredientForm newIngredient={newIngredient} setNewIngredient={setNewIngredient} />
 
           <Line />
 
           <Row>
             <HomeCardGrid>
               {!foundIngredient ? (
-                <Card searchInput={searchInput} handleSubmit={handleSubmit(onSubmit)} />
+                <Card
+                  handleSubmit={handleSubmit(onSubmit)}
+                  newIngredient={newIngredient}
+                  setNewIngredient={setNewIngredient}
+                />
               ) : null}
 
               {filteredResults?.map((ingredientInfo, index) => {
                 return (
                   <Card
                     key={`${ingredientInfo.name}_${index}`}
-                    searchInput={searchInput}
-                    setSearchInput={setSearchInput}
                     ingredientInfo={ingredientInfo}
                     handleSubmit={handleSubmit(onSubmit)}
+                    newIngredient={newIngredient}
+                    setNewIngredient={setNewIngredient}
                   />
                 );
               })}
@@ -108,15 +115,14 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 };
 
 const IngredientForm: FC<{
-  setSearchInput: Dispatch<SetStateAction<string>>;
-}> = ({ setSearchInput }) => {
+  newIngredient: IngredientFormData;
+  setNewIngredient: Dispatch<SetStateAction<IngredientFormData>>;
+}> = ({ newIngredient, setNewIngredient }) => {
   const {
     register,
     clearErrors,
     formState: { errors },
   } = useFormContext<IngredientFormData>();
-
-  const [selectValue, setSelectValue] = useState('');
 
   const validateIsNumber = (value: number): boolean => {
     return !!value;
@@ -137,7 +143,11 @@ const IngredientForm: FC<{
             }
             error={errors.name?.type === 'required'}
             onChange={e => {
-              setSearchInput(e.target.value.toLocaleLowerCase('en-US'));
+              setNewIngredient({
+                ...newIngredient,
+                name: e.target.value.toLocaleLowerCase('en-US'),
+              });
+
               clearErrors('name');
             }}
           />
@@ -152,6 +162,10 @@ const IngredientForm: FC<{
               required: true,
               validate: price => validateIsNumber(price),
             })}
+            onChange={e => {
+              setNewIngredient({ ...newIngredient, price: parseFloat(e.target.value) });
+              clearErrors('price');
+            }}
             placeholder={'Price'}
             error={errors.price?.type === 'required' || errors.price?.type === 'validate'}
           />
@@ -166,6 +180,10 @@ const IngredientForm: FC<{
               required: true,
               validate: price => validateIsNumber(price),
             })}
+            onChange={e => {
+              setNewIngredient({ ...newIngredient, quantity: parseFloat(e.target.value) });
+              clearErrors('quantity');
+            }}
             placeholder={'Quantity'}
             error={errors.quantity?.type === 'required' || errors.quantity?.type === 'validate'}
           />
@@ -180,10 +198,10 @@ const IngredientForm: FC<{
             })}
             error={errors.unit?.type === 'required'}
             onChange={e => {
-              setSelectValue(e.target.value);
+              setNewIngredient({ ...newIngredient, unit: e.target.value as Unit });
               clearErrors('unit');
             }}
-            value={selectValue}
+            value={newIngredient.unit}
           >
             <option value="" disabled hidden>
               Unit
@@ -204,14 +222,12 @@ const IngredientForm: FC<{
 
 type CardProps = {
   ingredientInfo?: IngredientInfo;
-  searchInput?: string;
-  setSearchInput?: Dispatch<SetStateAction<string>>;
   handleSubmit?: () => void;
+  newIngredient: IngredientFormData;
+  setNewIngredient: Dispatch<SetStateAction<IngredientFormData>>;
 };
 // Search result cards
-const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, handleSubmit }) => {
-  const { setValue, getValues, resetField } = useFormContext<IngredientFormData>();
-
+const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setNewIngredient }) => {
   // Showing price as unit preference
   const { toggledUnit, oppositeUnit } = useUnit();
 
@@ -237,33 +253,19 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
     ? convertedTotal / (ingredientInfo.count as number)
     : 0;
 
-  const highlighted = searchInput === ingredientInfo?.name;
-  const searchedIngredient = searchInput === ingredientInfo?.name || !ingredientInfo;
+  const highlighted = newIngredient.name === ingredientInfo?.name;
+  const searchedIngredient = newIngredient.name === ingredientInfo?.name || !ingredientInfo;
 
-  //
-  // TODO: If ingredient doesn't exist, preview price
-  // const previewPrice = (getValues('price') * 100) / getValues('quantity') / 100;
-  // const convertedPreviewPrice = priceConverter(
-  //   previewPrice,
-  //   getValues('unit'),
-  //   oppositeUnit,
-  // );
-
-  // const previewUnit =
-  //   getValues('unit') === Unit.lb || getValues('unit') === Unit.kg
-  //     ? toggledUnit
-  //     : getValues('unit');
+  const previewPrice = (newIngredient.price * 100) / newIngredient.quantity / 100;
+  const convertedPreviewPrice = priceConverter(previewPrice, newIngredient.unit, oppositeUnit);
 
   // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
   const onClickHandler = useCallback(() => {
-    if (setSearchInput && ingredientInfo && handleSubmit) {
-      setValue('name', ingredientInfo?.name);
-      resetField('price');
-      resetField('unit');
-      setSearchInput(ingredientInfo?.name);
+    if (ingredientInfo && handleSubmit) {
+      setNewIngredient({ ...newIngredient, name: ingredientInfo.name });
       handleSubmit();
     }
-  }, [handleSubmit, ingredientInfo, resetField, setSearchInput, setValue]);
+  }, [handleSubmit, ingredientInfo, setNewIngredient, newIngredient]);
 
   return (
     <CardWrapper highlighted={highlighted}>
@@ -298,7 +300,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
           </HomeCardInfoRow>
         ) : (
           <HomeCardInfoRow>
-            <b style={{ color: '#0070f3' }}>{searchInput || 'an ingredient'}</b>
+            <b style={{ color: '#0070f3' }}>{newIngredient.name || 'an ingredient'}</b>
           </HomeCardInfoRow>
         )}
 
@@ -306,8 +308,8 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
         <HomeCardInfoRow>
           {ingredientInfo?.lowest
             ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}/${convertedUnit}`
-            : getValues('price') && getValues('quantity')
-            ? 'to the list' // `${currencyFormatter.format(convertedPreviewPrice)}/${previewUnit}`
+            : newIngredient.price && newIngredient.quantity
+            ? `${currencyFormatter.format(convertedPreviewPrice)}/${newIngredient.unit}`
             : null}
         </HomeCardInfoRow>
       </CardInfoWrapper>
