@@ -26,15 +26,15 @@ export type IngredientFormData = {
   name: string;
   price: number;
   quantity: number;
-  unit: string;
+  unit: Unit;
   location?: string;
 };
 
 const defaultFormValues = (): Partial<IngredientFormData> => ({
   // Add fields that are required for object submitted to Firebase as empty strings
-  name: '',
-  unit: '',
-  location: '',
+  // submitter: '',
+  // location: '',
+  // timestamp
 });
 
 // Page shown at `localhost:3000/`
@@ -210,27 +210,51 @@ type CardProps = {
 };
 // Search result cards
 const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, handleSubmit }) => {
-  // Showing price as unit preference
-  const { toggledUnit } = useUnit();
+  const { setValue, getValues, resetField } = useFormContext<IngredientFormData>();
 
+  // Showing price as unit preference
+  const { toggledUnit, oppositeUnit } = useUnit();
+
+  // Setting to toggledUnit allows re-rendering of unit because it's a state
+  // If unit is Unit.lb or Unit.kg, use toggledUnit; else use saved unit, or form unit
   const convertedUnit =
-    ingredientInfo?.unit === Unit.lb || ingredientInfo?.unit === Unit.kg
+    ingredientInfo && (ingredientInfo.unit === Unit.lb || ingredientInfo.unit === Unit.kg)
       ? toggledUnit
       : ingredientInfo?.unit;
 
-  const convertedTotal = priceConverter(ingredientInfo?.total as number, toggledUnit);
-  const convertedLowest = priceConverter(ingredientInfo?.lowest as number, toggledUnit);
+  const convertedTotal =
+    ingredientInfo && convertedUnit
+      ? priceConverter(ingredientInfo.total as number, convertedUnit, oppositeUnit)
+      : 0;
+
+  const convertedLowest =
+    ingredientInfo && convertedUnit
+      ? priceConverter(ingredientInfo.lowest as number, convertedUnit, oppositeUnit)
+      : 0;
 
   // IngredientInfo fields
   const averagePrice = ingredientInfo?.count
     ? convertedTotal / (ingredientInfo.count as number)
     : 0;
 
-  const { setValue, resetField } = useFormContext<IngredientFormData>();
-
   const highlighted = searchInput === ingredientInfo?.name;
   const searchedIngredient = searchInput === ingredientInfo?.name || !ingredientInfo;
 
+  //
+  // TODO: If ingredient doesn't exist, preview price
+  // const previewPrice = (getValues('price') * 100) / getValues('quantity') / 100;
+  // const convertedPreviewPrice = priceConverter(
+  //   previewPrice,
+  //   getValues('unit'),
+  //   oppositeUnit,
+  // );
+
+  // const previewUnit =
+  //   getValues('unit') === Unit.lb || getValues('unit') === Unit.kg
+  //     ? toggledUnit
+  //     : getValues('unit');
+
+  // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
   const onClickHandler = useCallback(() => {
     if (setSearchInput && ingredientInfo && handleSubmit) {
       setValue('name', ingredientInfo?.name);
@@ -278,10 +302,13 @@ const Card: FC<CardProps> = ({ ingredientInfo, searchInput, setSearchInput, hand
           </HomeCardInfoRow>
         )}
 
+        {/* TODO: add preview pricing */}
         <HomeCardInfoRow>
           {ingredientInfo?.lowest
             ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}/${convertedUnit}`
-            : 'to the list'}
+            : getValues('price') && getValues('quantity')
+            ? 'to the list' // `${currencyFormatter.format(convertedPreviewPrice)}/${previewUnit}`
+            : null}
         </HomeCardInfoRow>
       </CardInfoWrapper>
     </CardWrapper>

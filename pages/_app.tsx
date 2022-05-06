@@ -15,11 +15,12 @@ type Props = {
 const App = ({ Component, pageProps }: Props): JSX.Element => {
   const [darkMode, setDarkMode] = useState(false);
   const [toggledUnit, setUnit] = useState(Unit.lb);
+  const [oppositeUnit] = useState(() => (toggledUnit === Unit.lb ? Unit.lb : Unit.kg));
 
   return (
     <ThemeProvider theme={darkModeStyles(darkMode)}>
       <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
-        <UnitContext.Provider value={{ toggledUnit, setUnit }}>
+        <UnitContext.Provider value={{ toggledUnit, setUnit, oppositeUnit }}>
           <Component {...pageProps} />
         </UnitContext.Provider>
       </DarkModeContext.Provider>
