@@ -308,7 +308,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setN
         <HomeCardInfoRow>
           {ingredientInfo?.lowest
             ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}/${convertedUnit}`
-            : newIngredient.price && newIngredient.quantity
+            : newIngredient.price && newIngredient.quantity && newIngredient.unit
             ? `${currencyFormatter.format(convertedPreviewPrice)}/${newIngredient.unit}`
             : null}
         </HomeCardInfoRow>
