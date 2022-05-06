@@ -32,7 +32,7 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
       setLoading(true);
 
-      price = priceConverter((price * 100) / quantity, unit);
+      price = priceConverter((price * 100) / quantity, unit, Unit.lb);
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
