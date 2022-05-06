@@ -74,6 +74,8 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         const convertedUnit =
           currentIngredientInfo?.unit && (unit === Unit.kg || unit === Unit.lb)
             ? Unit.lb
+            : currentIngredientInfo?.unit
+            ? currentIngredientInfo?.unit
             : Unit[unit as keyof typeof Unit];
 
         const ingredientInfo: IngredientInfo = {
