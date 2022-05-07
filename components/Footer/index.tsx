@@ -8,15 +8,24 @@ import { useUnit } from '../../contexts/UnitContext';
 const Footer: FC = () => {
   const router = useRouter();
   const { darkMode, setDarkMode } = useDarkMode();
-  const { unit, setUnit } = useUnit();
+  const { currentUnit, setCurrentUnit, oppositeUnit, setOppositeUnit } = useUnit();
 
   return (
     <FooterInnerWrapper>
       <StripeButton onClick={() => router.push('/')}>Pricey</StripeButton>
       <StripeButton onClick={() => router.push('/about')}>About Us</StripeButton>
       <StripeButton onClick={() => router.push('/functions')}>Functions</StripeButton>
-      <StripeButton onClick={() => setDarkMode(!darkMode)}>Dark Mode</StripeButton>
-      <StripeButton onClick={() => setUnit(unit === 'lb' ? 'kg' : 'lb')}>Unit Mode</StripeButton>
+      <StripeButton onClick={() => setDarkMode(!darkMode)}>
+        {darkMode ? 'Light' : 'Dark'} Mode
+      </StripeButton>
+      <StripeButton
+        onClick={() => {
+          setCurrentUnit(oppositeUnit);
+          setOppositeUnit(currentUnit);
+        }}
+      >
+        Switch to {oppositeUnit}
+      </StripeButton>
     </FooterInnerWrapper>
   );
 };

@@ -13,12 +13,28 @@ import {
 import { firestore } from './index';
 import { CollectionReference } from '@firebase/firestore';
 
+export enum Status {
+  Approved = 'APPROVED',
+  Pending = 'PENDING',
+  Denied = 'DENIED',
+}
+
+export enum Unit {
+  lb = 'lb',
+  kg = 'kg',
+  L = 'L',
+  unit = 'unit',
+}
+
 export interface Ingredient {
   name: string;
+  image?: string;
   price: number;
+  unit: Unit;
   location?: string;
   submitter?: User;
   createdAt: Timestamp | FieldValue;
+  status?: Status;
 }
 
 /* All ingredient names will be placed in collection /ingredientNames within a document named as the first letter of the ingredient name
@@ -26,10 +42,12 @@ export interface Ingredient {
  */
 export interface IngredientInfo {
   name: string;
+  image?: string;
   ids: string[] | FieldValue;
   count: number | FieldValue;
   total: number | FieldValue;
   lowest?: number;
+  unit?: Unit;
 }
 
 export interface User {
