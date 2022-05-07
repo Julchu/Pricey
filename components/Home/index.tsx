@@ -15,7 +15,7 @@ import {
   HomeInputGrid,
   HomeSelect,
 } from './styles';
-import { currencyFormatter, priceConverter } from '../../lib/textFormatters';
+import { currencyFormatter, isMass, priceConverter } from '../../lib/textFormatters';
 import { useUnit } from '../../contexts/UnitContext';
 
 type HomeProps = {
@@ -88,7 +88,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
           <Row>
             <HomeCardGrid>
               {!foundIngredient ? (
-                <Card
+                <NewCard
                   handleSubmit={handleSubmit(onSubmit)}
                   newIngredient={newIngredient}
                   setNewIngredient={setNewIngredient}
@@ -223,49 +223,46 @@ const IngredientForm: FC<{
 type CardProps = {
   ingredientInfo?: IngredientInfo;
   handleSubmit?: () => void;
-  newIngredient: IngredientFormData;
-  setNewIngredient: Dispatch<SetStateAction<IngredientFormData>>;
+  newIngredient?: IngredientFormData;
+  setNewIngredient?: Dispatch<SetStateAction<IngredientFormData>>;
 };
+
 // Search result cards
 const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setNewIngredient }) => {
+  const { setValue } = useFormContext<IngredientFormData>();
+
   // Showing price as unit preference
-  const { toggledUnit, oppositeUnit } = useUnit();
+  const { currentUnit } = useUnit();
 
-  // Setting to toggledUnit allows re-rendering of unit because it's a state
-  // If unit is Unit.lb or Unit.kg, use toggledUnit; else use saved unit, or form unit
+  // Setting to currentUnit allows re-rendering of unit because it's a state
+  // If unit is Unit.lb or Unit.kg, use Unit.lb; else use saved unit, or form unit
   const convertedUnit =
-    ingredientInfo && (ingredientInfo.unit === Unit.lb || ingredientInfo.unit === Unit.kg)
-      ? toggledUnit
-      : ingredientInfo?.unit;
+    ingredientInfo && isMass(ingredientInfo.unit) ? currentUnit : ingredientInfo?.unit;
 
-  const convertedTotal =
-    ingredientInfo && convertedUnit
-      ? priceConverter(ingredientInfo.total as number, convertedUnit, oppositeUnit)
-      : 0;
+  const convertedTotal = ingredientInfo
+    ? priceConverter(ingredientInfo.total as number, ingredientInfo.unit, currentUnit)
+    : 0;
 
-  const convertedLowest =
-    ingredientInfo && convertedUnit
-      ? priceConverter(ingredientInfo.lowest as number, convertedUnit, oppositeUnit)
-      : 0;
+  const convertedLowest = ingredientInfo
+    ? priceConverter(ingredientInfo.lowest as number, ingredientInfo.unit, currentUnit)
+    : 0;
 
   // IngredientInfo fields
   const averagePrice = ingredientInfo?.count
     ? convertedTotal / (ingredientInfo.count as number)
     : 0;
 
-  const highlighted = newIngredient.name === ingredientInfo?.name;
-  const searchedIngredient = newIngredient.name === ingredientInfo?.name || !ingredientInfo;
-
-  const previewPrice = (newIngredient.price * 100) / newIngredient.quantity / 100;
-  const convertedPreviewPrice = priceConverter(previewPrice, newIngredient.unit, oppositeUnit);
+  // Highlighting cards
+  const highlighted = newIngredient?.name === ingredientInfo?.name;
 
   // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
   const onClickHandler = useCallback(() => {
-    if (ingredientInfo && handleSubmit) {
+    if (ingredientInfo && handleSubmit && newIngredient && setNewIngredient) {
+      setValue('name', ingredientInfo?.name);
       setNewIngredient({ ...newIngredient, name: ingredientInfo.name });
       handleSubmit();
     }
-  }, [handleSubmit, ingredientInfo, setNewIngredient, newIngredient]);
+  }, [ingredientInfo, handleSubmit, newIngredient, setNewIngredient, setValue]);
 
   return (
     <CardWrapper highlighted={highlighted}>
@@ -274,10 +271,10 @@ const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setN
         <HomeImageHolder>
           {/* TODO: image uploading */}
           <RoundedImage
-            src={ingredientInfo ? 'media/foodPlaceholder.png' : 'media/imageUploadIcon.png'}
-            alt={ingredientInfo ? 'Food placeholder' : 'Upload image'}
-            width={ingredientInfo ? '577px' : '150px'}
-            height={ingredientInfo ? '433px' : '100px'}
+            src={'media/foodPlaceholder.png'}
+            alt={'Food placeholder'}
+            width={'577px'}
+            height={'433px'}
           />
         </HomeImageHolder>
       </HomeImageDiv>
@@ -285,33 +282,67 @@ const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setN
       <HomeCardLine />
 
       {/* Info */}
-      <CardInfoWrapper onClick={searchedIngredient ? handleSubmit : onClickHandler}>
-        {ingredientInfo ? (
-          <HomeCardInfoRow>
-            <b style={{ color: '#0070f3' }}>{ingredientInfo.name}</b>
-          </HomeCardInfoRow>
-        ) : (
-          <HomeCardInfoRow>Save</HomeCardInfoRow>
-        )}
+      <CardInfoWrapper onClick={onClickHandler}>
+        <HomeCardInfoRow>
+          <b style={{ color: '#0070f3' }}>{ingredientInfo?.name}</b>
+        </HomeCardInfoRow>
 
-        {averagePrice ? (
-          <HomeCardInfoRow>
-            {`Average: ${currencyFormatter.format(averagePrice / 100)}/${convertedUnit}`}
-          </HomeCardInfoRow>
-        ) : (
-          <HomeCardInfoRow>
-            <b style={{ color: '#0070f3' }}>{newIngredient.name || 'an ingredient'}</b>
-          </HomeCardInfoRow>
-        )}
+        <HomeCardInfoRow>
+          Avg: {currencyFormatter.format(averagePrice / 100)}/{convertedUnit}
+        </HomeCardInfoRow>
+
+        <HomeCardInfoRow>
+          Low: {currencyFormatter.format(convertedLowest / 100)}/{convertedUnit}
+        </HomeCardInfoRow>
+      </CardInfoWrapper>
+    </CardWrapper>
+  );
+};
+
+// Search result cards
+const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient }) => {
+  // Showing price as unit preference
+  const { currentUnit } = useUnit();
+
+  // Preview new ingredient information
+  const previewPrice = newIngredient
+    ? (newIngredient?.price * 100) / newIngredient?.quantity / 100
+    : 0;
+
+  const convertedUnit = isMass(newIngredient?.unit) ? currentUnit : newIngredient?.unit;
+  const convertedPreviewPrice = priceConverter(previewPrice, newIngredient?.unit, currentUnit);
+
+  return (
+    <CardWrapper>
+      {/* Image */}
+      <HomeImageDiv>
+        <HomeImageHolder>
+          {/* TODO: image uploading */}
+          <RoundedImage
+            src={'media/imageUploadIcon.png'}
+            alt={'Upload image'}
+            width={'150px'}
+            height={'100px'}
+          />
+        </HomeImageHolder>
+      </HomeImageDiv>
+
+      <HomeCardLine />
+
+      {/* Info */}
+      <CardInfoWrapper onClick={handleSubmit}>
+        <HomeCardInfoRow>Save</HomeCardInfoRow>
+
+        <HomeCardInfoRow>
+          <b style={{ color: '#0070f3' }}>{newIngredient?.name || 'an ingredient'}</b>
+        </HomeCardInfoRow>
 
         {/* TODO: add preview pricing */}
-        <HomeCardInfoRow>
-          {ingredientInfo?.lowest
-            ? `Lowest: ${currencyFormatter.format(convertedLowest / 100)}/${convertedUnit}`
-            : newIngredient.price && newIngredient.quantity && newIngredient.unit
-            ? `${currencyFormatter.format(convertedPreviewPrice)}/${newIngredient.unit}`
-            : null}
-        </HomeCardInfoRow>
+        {newIngredient && newIngredient.price && newIngredient.quantity && newIngredient.unit ? (
+          <HomeCardInfoRow>
+            {currencyFormatter.format(convertedPreviewPrice)}/{convertedUnit}
+          </HomeCardInfoRow>
+        ) : null}
       </CardInfoWrapper>
     </CardWrapper>
   );

@@ -10,7 +10,7 @@ import {
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
 import { db, Ingredient, IngredientInfo, Unit } from '../lib/firebase/interfaces';
-import { priceConverter } from '../lib/textFormatters';
+import { isMass, priceConverter } from '../lib/textFormatters';
 
 type CreateIngredientMethods = {
   createIngredient: (
@@ -33,6 +33,7 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
       setLoading(true);
 
       price = priceConverter((price * 100) / quantity, unit, Unit.lb);
+      unit = isMass(unit) ? Unit.lb : Unit[unit as keyof typeof Unit];
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
@@ -46,7 +47,7 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         name,
         price,
         location,
-        unit: Unit[unit as keyof typeof Unit],
+        unit,
         createdAt: serverTimestamp(),
       };
 
@@ -71,12 +72,8 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
             : currentIngredientInfo?.lowest
           : price;
 
-        const convertedUnit =
-          currentIngredientInfo?.unit && (unit === Unit.kg || unit === Unit.lb)
-            ? Unit.lb
-            : currentIngredientInfo?.unit
-            ? currentIngredientInfo?.unit
-            : Unit[unit as keyof typeof Unit];
+        // Prevent overriding existing ingredient unit
+        const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
 
         const ingredientInfo: IngredientInfo = {
           name: trimmedName,
@@ -84,7 +81,7 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
           count: increment(1),
           total: increment(price),
           lowest,
-          unit: convertedUnit,
+          unit: existingUnit,
         };
 
         // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent)

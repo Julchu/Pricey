@@ -28,6 +28,7 @@ export enum Unit {
 
 export interface Ingredient {
   name: string;
+  image?: string;
   price: number;
   unit: Unit;
   location?: string;
@@ -41,11 +42,12 @@ export interface Ingredient {
  */
 export interface IngredientInfo {
   name: string;
+  image?: string;
   ids: string[] | FieldValue;
   count: number | FieldValue;
   total: number | FieldValue;
   lowest?: number;
-  unit: Unit;
+  unit?: Unit;
 }
 
 export interface User {

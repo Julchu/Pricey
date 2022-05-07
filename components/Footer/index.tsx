@@ -8,7 +8,7 @@ import { useUnit } from '../../contexts/UnitContext';
 const Footer: FC = () => {
   const router = useRouter();
   const { darkMode, setDarkMode } = useDarkMode();
-  const { setUnit, oppositeUnit } = useUnit();
+  const { currentUnit, setCurrentUnit, oppositeUnit, setOppositeUnit } = useUnit();
 
   return (
     <FooterInnerWrapper>
@@ -18,7 +18,14 @@ const Footer: FC = () => {
       <StripeButton onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? 'Light' : 'Dark'} Mode
       </StripeButton>
-      <StripeButton onClick={() => setUnit(oppositeUnit)}>Switch to {oppositeUnit}</StripeButton>
+      <StripeButton
+        onClick={() => {
+          setCurrentUnit(oppositeUnit);
+          setOppositeUnit(currentUnit);
+        }}
+      >
+        Switch to {oppositeUnit}
+      </StripeButton>
     </FooterInnerWrapper>
   );
 };
