@@ -4,12 +4,11 @@ import { StripeButton } from '../UI/Buttons';
 import { FooterInnerWrapper } from './styles';
 import { useDarkMode } from '../../contexts/DarkModeContext';
 import { useUnit } from '../../contexts/UnitContext';
-import { Unit } from '../../lib/firebase/interfaces';
 
 const Footer: FC = () => {
   const router = useRouter();
   const { darkMode, setDarkMode } = useDarkMode();
-  const { toggledUnit, setUnit } = useUnit();
+  const { setUnit, oppositeUnit } = useUnit();
 
   return (
     <FooterInnerWrapper>
@@ -19,9 +18,7 @@ const Footer: FC = () => {
       <StripeButton onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? 'Light' : 'Dark'} Mode
       </StripeButton>
-      <StripeButton onClick={() => setUnit(toggledUnit === Unit.lb ? Unit.kg : Unit.lb)}>
-        Switch to {toggledUnit === Unit.lb ? Unit.kg : Unit.lb}
-      </StripeButton>
+      <StripeButton onClick={() => setUnit(oppositeUnit)}>Switch to {oppositeUnit}</StripeButton>
     </FooterInnerWrapper>
   );
 };
