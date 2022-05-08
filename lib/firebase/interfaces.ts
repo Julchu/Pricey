@@ -22,7 +22,9 @@ export enum Status {
 export enum Unit {
   lb = 'lb',
   kg = 'kg',
-  L = 'L',
+  litre = 'L',
+  squareMeters = 'square meters',
+  squareFeet = 'square feet',
   unit = 'unit',
 }
 

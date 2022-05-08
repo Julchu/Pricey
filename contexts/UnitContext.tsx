@@ -1,18 +1,18 @@
-import { createContext, useContext } from 'react';
+import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 import { Unit } from '../lib/firebase/interfaces';
 
 type UnitType = {
-  currentUnit: Unit;
-  setCurrentUnit: (unit: Unit) => void;
-  oppositeUnit: Unit;
-  setOppositeUnit: (unit: Unit) => void;
+  currentUnit: { mass: Unit; area: Unit };
+  setCurrentUnit: Dispatch<SetStateAction<{ mass: Unit; area: Unit }>>;
+  oppositeUnit: { mass: Unit; area: Unit };
+  setOppositeUnit: Dispatch<SetStateAction<{ mass: Unit; area: Unit }>>;
 };
 
 export const UnitContext = createContext<UnitType>({
-  currentUnit: Unit.lb,
-  setCurrentUnit: () => {},
-  oppositeUnit: Unit.kg,
-  setOppositeUnit: () => {},
+  currentUnit: { mass: Unit.lb, area: Unit.squareFeet },
+  setCurrentUnit: ({}) => {},
+  oppositeUnit: { mass: Unit.kg, area: Unit.squareMeters },
+  setOppositeUnit: ({}) => {},
 });
 
 export const useUnit = (): UnitType => useContext(UnitContext);

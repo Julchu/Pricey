@@ -10,7 +10,7 @@ import {
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Home';
 import { db, Ingredient, IngredientInfo, Unit } from '../lib/firebase/interfaces';
-import { isMass, priceConverter } from '../lib/textFormatters';
+import { isArea, isMass, priceConverter } from '../lib/textFormatters';
 
 type CreateIngredientMethods = {
   createIngredient: (
@@ -32,8 +32,16 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
       setLoading(true);
 
-      price = priceConverter((price * 100) / quantity, unit, Unit.lb);
-      unit = isMass(unit) ? Unit.lb : Unit[unit as keyof typeof Unit];
+      price = priceConverter((price * 100) / quantity, unit, {
+        mass: Unit.lb,
+        area: Unit.squareFeet,
+      });
+
+      unit = isMass(unit)
+        ? Unit.lb
+        : isArea(unit)
+        ? Unit.squareFeet
+        : Unit[unit as keyof typeof Unit];
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
