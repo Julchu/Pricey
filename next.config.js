@@ -34,4 +34,14 @@ const publicRuntimeConfig = {
   firebaseConfig,
 };
 
-module.exports = { nextConfig, typeScript, images, publicRuntimeConfig };
+const experimental = {
+  emotion: true,
+};
+
+module.exports = {
+  nextConfig,
+  typeScript,
+  images,
+  publicRuntimeConfig,
+  experimental,
+};
