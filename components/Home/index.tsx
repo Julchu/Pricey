@@ -151,7 +151,7 @@ const IngredientForm: FC<{
             onChange={e => {
               setNewIngredient({
                 ...newIngredient,
-                name: e.target.value.toLocaleLowerCase('en-US'),
+                name: e.target.value.toLocaleLowerCase('en-US').trim(),
               });
 
               clearErrors('name');
@@ -297,7 +297,7 @@ const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setN
       {/* Info */}
       <CardInfoWrapper onClick={onClickHandler}>
         <HomeCardInfoRow>
-          <b style={{ color: '#0070f3' }}>{ingredientInfo?.name}</b>
+          <b style={{ color: '#0070f3', whiteSpace: 'nowrap' }}>{ingredientInfo?.name}</b>
         </HomeCardInfoRow>
 
         <HomeCardInfoRow>
