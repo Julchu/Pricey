@@ -37,7 +37,19 @@ const firestore = initializeFirestore(app, {
 
 // Ensure emulator flag is off in production env when deploying
 try {
-  if (emulatorEnabled && getApps().length > 0 && firestore !== null) {
+  // Workaround for settings/host emulator crash
+  const EMULATORS_STARTED = 'EMULATORS_STARTED';
+
+  type CacheControlGlobal = typeof global & {
+    [EMULATORS_STARTED]: boolean;
+  };
+  if (
+    !(global as CacheControlGlobal)[EMULATORS_STARTED] &&
+    emulatorEnabled &&
+    getApps().length > 0 &&
+    firestore !== null
+  ) {
+    (global as CacheControlGlobal)[EMULATORS_STARTED] = true;
     connectFirestoreEmulator(firestore, 'localhost', 8080);
   }
 } catch (e) {

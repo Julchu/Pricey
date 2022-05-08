@@ -151,7 +151,7 @@ const IngredientForm: FC<{
             onChange={e => {
               setNewIngredient({
                 ...newIngredient,
-                name: e.target.value.toLocaleLowerCase('en-US'),
+                name: e.target.value.toLocaleLowerCase('en-US').trim(),
               });
 
               clearErrors('name');
