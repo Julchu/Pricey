@@ -4,6 +4,7 @@ import { StripeButton } from '../UI/Buttons';
 import { FooterInnerWrapper } from './styles';
 import { useDarkMode } from '../../contexts/DarkModeContext';
 import { useUnit } from '../../contexts/UnitContext';
+import { Unit } from '../../lib/firebase/interfaces';
 
 const Footer: FC = () => {
   const router = useRouter();
@@ -16,7 +17,7 @@ const Footer: FC = () => {
       <StripeButton onClick={() => router.push('/about')}>About Us</StripeButton>
       <StripeButton onClick={() => router.push('/functions')}>Functions</StripeButton>
       <StripeButton onClick={() => setDarkMode(!darkMode)}>
-        {darkMode ? 'Light' : 'Dark'} Mode
+        {darkMode ? 'Light' : 'Dark'} Theme
       </StripeButton>
       <StripeButton
         onClick={() => {
@@ -24,7 +25,7 @@ const Footer: FC = () => {
           setOppositeUnit(currentUnit);
         }}
       >
-        Switch to {oppositeUnit}
+        {oppositeUnit.mass === Unit.lb ? 'Imperial' : 'Metric'} Units
       </StripeButton>
     </FooterInnerWrapper>
   );

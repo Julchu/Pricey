@@ -15,7 +15,13 @@ import {
   HomeInputGrid,
   HomeSelect,
 } from './styles';
-import { currencyFormatter, isMass, priceConverter } from '../../lib/textFormatters';
+import {
+  currencyFormatter,
+  isArea,
+  isMass,
+  priceConverter,
+  unitFormatter,
+} from '../../lib/textFormatters';
 import { useUnit } from '../../contexts/UnitContext';
 
 type HomeProps = {
@@ -206,10 +212,10 @@ const IngredientForm: FC<{
             <option value="" disabled hidden>
               Unit
             </option>
-            {Object.keys(Unit).map((unit, index) => {
+            {Object.values(Unit).map((unit, index) => {
               return (
                 <option key={`${unit}_${index}`} value={unit}>
-                  {unit}
+                  {unitFormatter(unit)}
                 </option>
               );
             })}
@@ -234,10 +240,17 @@ const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setN
   // Showing price as unit preference
   const { currentUnit } = useUnit();
 
-  // Setting to currentUnit allows re-rendering of unit because it's a state
-  // If unit is Unit.lb or Unit.kg, use Unit.lb; else use saved unit, or form unit
+  /* Setting to currentUnit allows re-rendering of unit because it's a state
+   * If unit is mass, use Unit.lb;
+   * Else if unit is area, use Unit.squareFeet
+   * Else use saved unit or submission form unit
+   */
   const convertedUnit =
-    ingredientInfo && isMass(ingredientInfo.unit) ? currentUnit : ingredientInfo?.unit;
+    ingredientInfo && isMass(ingredientInfo.unit)
+      ? currentUnit.mass
+      : ingredientInfo && isArea(ingredientInfo.unit)
+      ? currentUnit.area
+      : ingredientInfo?.unit;
 
   const convertedTotal = ingredientInfo
     ? priceConverter(ingredientInfo.total as number, ingredientInfo.unit, currentUnit)
@@ -288,11 +301,11 @@ const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setN
         </HomeCardInfoRow>
 
         <HomeCardInfoRow>
-          Avg: {currencyFormatter.format(averagePrice / 100)}/{convertedUnit}
+          Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
         </HomeCardInfoRow>
 
         <HomeCardInfoRow>
-          Low: {currencyFormatter.format(convertedLowest / 100)}/{convertedUnit}
+          Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
         </HomeCardInfoRow>
       </CardInfoWrapper>
     </CardWrapper>
@@ -309,7 +322,12 @@ const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient }) => {
     ? (newIngredient?.price * 100) / newIngredient?.quantity / 100
     : 0;
 
-  const convertedUnit = isMass(newIngredient?.unit) ? currentUnit : newIngredient?.unit;
+  const convertedUnit = isMass(newIngredient?.unit)
+    ? currentUnit.mass
+    : isArea(newIngredient?.unit)
+    ? currentUnit.area
+    : newIngredient?.unit;
+
   const convertedPreviewPrice = priceConverter(previewPrice, newIngredient?.unit, currentUnit);
 
   return (
@@ -340,7 +358,7 @@ const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient }) => {
         {/* TODO: add preview pricing */}
         {newIngredient && newIngredient.price && newIngredient.quantity && newIngredient.unit ? (
           <HomeCardInfoRow>
-            {currencyFormatter.format(convertedPreviewPrice)}/{convertedUnit}
+            {currencyFormatter.format(convertedPreviewPrice)}/{unitFormatter(convertedUnit)}
           </HomeCardInfoRow>
         ) : null}
       </CardInfoWrapper>

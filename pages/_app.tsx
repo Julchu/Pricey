@@ -14,9 +14,11 @@ type Props = {
 
 const App = ({ Component, pageProps }: Props): JSX.Element => {
   const [darkMode, setDarkMode] = useState(false);
-  const [currentUnit, setCurrentUnit] = useState(Unit.lb);
+  const [currentUnit, setCurrentUnit] = useState({ mass: Unit.lb, area: Unit.squareFeet });
   const [oppositeUnit, setOppositeUnit] = useState(() =>
-    currentUnit === Unit.lb ? Unit.kg : Unit.lb,
+    currentUnit.mass === Unit.lb
+      ? { mass: Unit.kg, area: Unit.squareMeters }
+      : { mass: Unit.lb, area: Unit.squareFeet },
   );
 
   return (
