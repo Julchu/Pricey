@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  reactStrictMode: true,
-};
+const nextConfig = {};
 
 // !! WARN !!
 // Dangerously allow production builds to successfully complete even if
@@ -44,4 +42,7 @@ module.exports = {
   images,
   publicRuntimeConfig,
   experimental,
+  swcMinify: true,
+  trailingSlash: true,
+  reactStrictMode: true,
 };
