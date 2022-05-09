@@ -10,7 +10,7 @@ export const Button = styled.button<ButtonProps>(({ disabled }) => {
   }
 });
 
-export const StripeButton = styled.button(() => ({
+export const StripeButton = styled.button(({ theme: { breakpoints } }) => ({
   backgroundColor: '#405cf5',
 
   borderRadius: '5px',

@@ -1,10 +1,10 @@
 import styled from '@emotion/styled';
 
-export const Wrapper = styled.div(({ theme: { backgroundColor, color } }) => ({
+export const Wrapper = styled.div(({ theme: { breakpoints, backgroundColor, color } }) => ({
   backgroundColor,
   color,
-  height: '100vh',
-  width: '100vw',
+  height: '100%',
+  width: '100%',
   display: 'flex',
   flexDirection: 'column',
 
@@ -16,6 +16,11 @@ export const Wrapper = styled.div(({ theme: { backgroundColor, color } }) => ({
 
   // No bottom padding to line up home page with other pages
   paddingBottom: '0px',
+
+  [breakpoints.laptop]: {
+    height: '100vh',
+    width: '100vw',
+  },
 }));
 
 export const HeaderWrapper = styled.div({

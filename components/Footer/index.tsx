@@ -7,15 +7,27 @@ import { useUnit } from '../../contexts/UnitContext';
 import { Unit } from '../../lib/firebase/interfaces';
 
 const Footer: FC = () => {
-  const router = useRouter();
+  const { asPath, ...router } = useRouter();
+
   const { darkMode, setDarkMode } = useDarkMode();
   const { currentUnit, setCurrentUnit, oppositeUnit, setOppositeUnit } = useUnit();
 
+  // List of paths to display and filter out current path
+  const paths = [
+    { label: 'Pricey', path: '/' },
+    { label: 'About Us', path: '/about/' },
+    { label: 'Functions', path: '/functions/' },
+  ];
+
   return (
     <FooterInnerWrapper>
-      <StripeButton onClick={() => router.push('/')}>Pricey</StripeButton>
-      <StripeButton onClick={() => router.push('/about')}>About Us</StripeButton>
-      <StripeButton onClick={() => router.push('/functions')}>Functions</StripeButton>
+      {paths.map(({ label, path }) =>
+        path !== asPath ? (
+          <StripeButton key={label} onClick={() => router.push(path)}>
+            {label}
+          </StripeButton>
+        ) : null,
+      )}
       <StripeButton onClick={() => setDarkMode(!darkMode)}>
         {darkMode ? 'Light' : 'Dark'} Theme
       </StripeButton>
