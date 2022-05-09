@@ -39,9 +39,9 @@ export const Input = styled.input(
 );
 
 export const Select = styled.select(
-  ({ theme: { breakpoints, backgroundColor, color, boxShadows } }) => ({
+  ({ theme: { breakpoints, color, backgroundColor, boxShadows } }) => ({
     backgroundColor,
-    color: 'white',
+    color,
 
     fontFamily: 'Montserrat',
     letterSpacing: '2px',
