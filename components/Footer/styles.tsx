@@ -10,7 +10,7 @@ export const FooterInnerWrapper = styled.div(({ theme: { breakpoints } }) => ({
   marginBottom: '30px',
 
   [breakpoints.desktop]: {
-    gridTemplateColumns: 'auto auto auto auto',
+    gridTemplateColumns: 'repeat(4, 1fr)',
     // gridTemplateColumns: 'repeat(auto-fill, 250px)',
   },
 }));
