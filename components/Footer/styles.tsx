@@ -1,16 +1,20 @@
 import styled from '@emotion/styled';
 
-export const FooterInnerWrapper = styled.div(({ theme: { breakpoints } }) => ({
-  display: 'grid',
-  gridTemplateColumns: '1',
-  columnGap: '30px',
-  rowGap: '30px',
+export const FooterInnerWrapper = styled.div(
+  ({ theme: { breakpoints, backgroundColor, color } }) => ({
+    backgroundColor,
+    color,
 
-  width: '100%',
-  marginBottom: '30px',
+    display: 'grid',
+    columnGap: '30px',
+    rowGap: '30px',
 
-  [breakpoints.desktop]: {
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    // gridTemplateColumns: 'repeat(auto-fill, 250px)',
-  },
-}));
+    width: '100%',
+    marginBottom: '30px',
+
+    [breakpoints.desktop]: {
+      gridTemplateColumns: 'repeat(4, 1fr)',
+      // gridTemplateColumns: 'repeat(auto-fill, 250px)',
+    },
+  }),
+);

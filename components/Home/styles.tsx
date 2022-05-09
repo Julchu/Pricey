@@ -1,23 +1,44 @@
 import styled from '@emotion/styled';
 import { Input, Select } from '../UI/Form';
-import { Grid, Line, Row } from '../UI/Structure';
+import { Column, Grid, Line, Row } from '../UI/Structure';
 
-export const HomeInput = styled(Input)<{ error?: boolean }>(({ disabled, error }) => ({
-  color: disabled || error ? 'red' : 'black',
+export const HomeInputGrid = styled(Grid)(({ theme: { breakpoints } }) => ({
+  gridTemplateColumns: 'auto',
+  columnGap: '30px',
+  rowGap: '30px',
 
-  '::placeholder': {
-    fontWeight: error ? 'normal' : '300',
-    color: error ? 'red' : 'grey',
+  [breakpoints.laptop]: {
+    gridTemplateColumns: 'repeat(5, 1fr)',
   },
 }));
 
+export const HomeInputColumn = styled(Column)<{ index?: number }>(
+  ({ index, theme: { breakpoints } }) => ({
+    [breakpoints.laptop]: {
+      gridColumn: index === 0 ? '1/3' : '',
+      minWidth: !index ? '250px' : '',
+    },
+  }),
+);
+
+export const HomeInput = styled(Input)<{ error?: boolean }>(
+  ({ disabled, error, theme: { color } }) => ({
+    color: disabled || error ? 'red' : color,
+
+    '::placeholder': {
+      fontWeight: error ? 'normal' : '300',
+      color: error ? 'red' : 'grey',
+    },
+  }),
+);
+
 export const HomeSelect = styled(Select)<{ error?: boolean; value?: string }>(
-  ({ error, value }) => ({
+  ({ error, value, theme: { color } }) => ({
     /* If error: red bold ('normal')
      * Else no error, and value: black normal ('400')
      * Else (placeholder): grey lightest (300)
      */
-    color: error ? 'red' : value ? 'black' : 'grey',
+    color: error ? 'red' : value ? color : 'grey',
     fontWeight: error ? 'normal' : value ? '400' : '300',
 
     '::placeholder': {
@@ -27,31 +48,59 @@ export const HomeSelect = styled(Select)<{ error?: boolean; value?: string }>(
   }),
 );
 
+export const CardGrid = styled(Grid)(({ theme: { breakpoints } }) => ({
+  gridAutoFlow: 'column',
+  columnGap: 'calc(100%)',
+
+  overflowX: 'scroll',
+  overflowY: 'hidden',
+  scrollSnapType: 'x mandatory',
+
+  [breakpoints.laptop]: {
+    gridAutoFlow: 'row',
+    gridTemplateColumns: 'repeat(auto-fill, 250px)',
+
+    columnGap: '30px',
+    rowGap: '30px',
+
+    overflowX: 'visible',
+    overflowY: 'visible',
+  },
+}));
+
 export const CardWrapper = styled.div<{ highlighted?: boolean }>(
-  ({ theme: { boxShadows }, highlighted }) => ({
+  ({ theme: { backgroundColor, color, breakpoints, boxShadows }, highlighted }) => ({
     fontFamily: 'Montserrat',
     letterSpacing: '2px',
     fontSize: '16px',
 
-    // Change colors for dark-mode
-    color: 'black',
-    backgroundColor: 'white',
+    scrollSnapAlign: 'center',
 
-    width: '250px',
+    backgroundColor,
+    color,
+
+    width: 'calc(100vw - 60px)',
     height: '300px',
 
     display: 'flex',
     flexDirection: 'column',
 
-    border: 'none',
-    outline: 'none',
+    border: '1px solid grey',
     borderRadius: '5px',
-    boxShadow: !highlighted ? boxShadows?.normal : boxShadows?.under,
-    transition: 'box-shadow 0.2s ease-in-out',
 
-    '&:hover': {
-      boxShadow: !highlighted ? boxShadows?.hover : boxShadows?.focus,
-      // boxShadow: boxShadows?.under,
+    [breakpoints.laptop]: {
+      width: '250px',
+
+      border: 'none',
+      outline: 'none',
+
+      boxShadow: !highlighted ? boxShadows?.normal : boxShadows?.under,
+      transition: 'box-shadow 0.2s ease-in-out',
+
+      '&:hover': {
+        boxShadow: !highlighted ? boxShadows?.hover : boxShadows?.focus,
+        // boxShadow: boxShadows?.under,
+      },
     },
   }),
 );
@@ -63,32 +112,20 @@ export const CardInfoWrapper = styled.div({
   cursor: 'pointer',
 });
 
-export const HomeCardGrid = styled(Grid)({
-  gridTemplateColumns: 'repeat(auto-fill, 250px)',
-  columnGap: '30px',
-  rowGap: '30px',
-});
-
-export const HomeInputGrid = styled(Grid)({
-  gridTemplateColumns: 'repeat(auto-fill, 250px)',
-  columnGap: '30px',
-  rowGap: '30px',
-});
-
-export const HomeImageDiv = styled.div({
+export const CardImageDiv = styled.div({
   minHeight: '180px',
   display: 'flex',
 });
 
-export const HomeImageHolder = styled.div({
+export const CardImageHolder = styled.div({
   margin: 'auto',
 });
 
-export const HomeCardLine = styled(Line)({
+export const CardLine = styled(Line)({
   margin: '0px',
 });
 
-export const HomeCardInfoRow = styled(Row)({
+export const CardInfoRow = styled(Row)({
   textAlign: 'center',
   display: 'block',
   overflow: 'hidden',

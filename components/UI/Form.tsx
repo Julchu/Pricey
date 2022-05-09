@@ -1,57 +1,75 @@
 import styled from '@emotion/styled';
 
-export const Input = styled.input(({ theme: { boxShadows } }) => ({
-  fontFamily: 'Montserrat',
-  letterSpacing: '2px',
-  fontSize: '16px',
-  color: 'black',
+export const Input = styled.input(
+  ({ theme: { breakpoints, backgroundColor, color, boxShadows } }) => ({
+    backgroundColor,
+    color,
 
-  padding: '5px 20px',
-  height: '40px',
-  width: '100%',
+    fontFamily: 'Montserrat',
+    letterSpacing: '2px',
+    fontSize: '16px',
 
-  border: 'none',
-  outline: 'none',
-  borderRadius: '5px',
-  boxShadow: boxShadows?.normal,
-  transition: 'box-shadow 0.2s ease-in-out',
+    padding: '5px 20px',
+    height: '40px',
+    width: '100%',
 
-  '&:hover': {
-    boxShadow: boxShadows?.hover,
-  },
+    border: '1px solid grey',
+    borderRadius: '5px',
 
-  '::placeholder': {
-    fontWeight: '300',
-    color: 'grey',
-  },
+    '::placeholder': {
+      fontWeight: '300',
+      color: 'grey',
+    },
 
-  '&:focus': {
-    boxShadow: boxShadows?.focus,
-  },
-}));
+    [breakpoints.laptop]: {
+      border: 'none',
+      outline: 'none',
+      transition: 'box-shadow 0.2s ease-in-out',
+      boxShadow: boxShadows.normal,
 
-export const Select = styled.select(({ theme: { boxShadows } }) => ({
-  fontFamily: 'Montserrat',
-  letterSpacing: '2px',
-  fontSize: '16px',
+      '&:hover': {
+        boxShadow: boxShadows?.hover,
+      },
 
-  padding: '5px 20px',
-  height: '40px',
-  width: '100%',
+      '&:focus': {
+        boxShadow: boxShadows?.focus,
+      },
+    },
+  }),
+);
 
-  border: 'none',
-  outline: 'none',
-  borderRadius: '5px',
-  boxShadow: boxShadows?.normal,
-  transition: 'box-shadow 0.2s ease-in-out',
+export const Select = styled.select(
+  ({ theme: { breakpoints, backgroundColor, color, boxShadows } }) => ({
+    backgroundColor,
+    color: 'white',
 
-  '&:hover': {
-    boxShadow: boxShadows?.hover,
-  },
+    fontFamily: 'Montserrat',
+    letterSpacing: '2px',
+    fontSize: '16px',
 
-  '&:focus': {
-    boxShadow: boxShadows?.focus,
-  },
-}));
+    padding: '5px 20px',
+    height: '40px',
+    width: '100%',
+
+    border: '1px solid grey',
+
+    borderRadius: '5px',
+    transition: 'box-shadow 0.2s ease-in-out',
+
+    [breakpoints.laptop]: {
+      border: 'none',
+      outline: 'none',
+      boxShadow: boxShadows?.normal,
+
+      '&:hover': {
+        boxShadow: boxShadows?.hover,
+      },
+
+      '&:focus': {
+        boxShadow: boxShadows?.focus,
+      },
+    },
+  }),
+);
 
 /* Box shadow reference: https://getcssscan.com/css-box-shadow-examples */

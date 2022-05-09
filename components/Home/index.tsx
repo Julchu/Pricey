@@ -6,14 +6,15 @@ import { Column, Line, RoundedImage, Row } from '../UI/Structure';
 import {
   CardInfoWrapper,
   CardWrapper,
-  HomeCardGrid,
-  HomeCardInfoRow,
-  HomeCardLine,
-  HomeImageDiv,
-  HomeImageHolder,
+  CardGrid,
+  CardInfoRow,
+  CardLine,
+  CardImageDiv,
+  CardImageHolder,
   HomeInput,
   HomeInputGrid,
   HomeSelect,
+  HomeInputColumn,
 } from './styles';
 import {
   currencyFormatter,
@@ -41,6 +42,7 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
   // submitter: '',
   // location: '',
   // timestamp
+  unit: undefined,
 });
 
 // Page shown at `localhost:3000/`
@@ -64,7 +66,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
 
   /* Live-updating retrieval of specific document and its contents */
   useEffect(() => {
-    const q = query(db.ingredientInfoCollection, where('count', '>', 0), limit(8));
+    const q = query(db.ingredientInfoCollection, where('count', '>', 0) /*limit(8)*/);
 
     onSnapshot(q, querySnapshot => {
       const ingredientInfoList: IngredientInfo[] = [];
@@ -92,7 +94,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
           <Line />
 
           <Row>
-            <HomeCardGrid>
+            <CardGrid>
               {!foundIngredient ? (
                 <NewCard
                   handleSubmit={handleSubmit(onSubmit)}
@@ -112,7 +114,7 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
                   />
                 );
               })}
-            </HomeCardGrid>
+            </CardGrid>
           </Row>
         </>
       </FormProvider>
@@ -138,7 +140,7 @@ const IngredientForm: FC<{
     <>
       <HomeInputGrid>
         {/* Ingredient name input */}
-        <Column style={{ gridColumn: '1/3' }}>
+        <HomeInputColumn index={0}>
           <HomeInput
             type={'search'}
             {...register('name', { required: true })}
@@ -157,10 +159,10 @@ const IngredientForm: FC<{
               clearErrors('name');
             }}
           />
-        </Column>
+        </HomeInputColumn>
 
         {/* Price input */}
-        <Column style={{ minWidth: '250px' }}>
+        <HomeInputColumn>
           <HomeInput
             type={'search'}
             {...register('price', {
@@ -175,10 +177,10 @@ const IngredientForm: FC<{
             placeholder={'Price'}
             error={errors.price?.type === 'required' || errors.price?.type === 'validate'}
           />
-        </Column>
+        </HomeInputColumn>
 
         {/* Quantity input */}
-        <Column style={{ minWidth: '250px' }}>
+        <HomeInputColumn>
           <HomeInput
             type={'search'}
             {...register('quantity', {
@@ -193,11 +195,11 @@ const IngredientForm: FC<{
             placeholder={'Quantity'}
             error={errors.quantity?.type === 'required' || errors.quantity?.type === 'validate'}
           />
-        </Column>
+        </HomeInputColumn>
 
         {/* TODO: create custom dropdown menu styling */}
         {/* Unit selector */}
-        <Column style={{ minWidth: '250px' }}>
+        <HomeInputColumn>
           <HomeSelect
             {...register('unit', {
               required: true,
@@ -220,7 +222,7 @@ const IngredientForm: FC<{
               );
             })}
           </HomeSelect>
-        </Column>
+        </HomeInputColumn>
       </HomeInputGrid>
     </>
   );
@@ -235,7 +237,11 @@ type CardProps = {
 
 // Search result cards
 const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setNewIngredient }) => {
-  const { setValue } = useFormContext<IngredientFormData>();
+  const {
+    setValue,
+    resetField,
+    formState: { errors },
+  } = useFormContext<IngredientFormData>();
 
   // Showing price as unit preference
   const { currentUnit } = useUnit();
@@ -269,51 +275,65 @@ const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setN
   const highlighted = newIngredient?.name === ingredientInfo?.name;
 
   // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
-  const onClickHandler = useCallback(() => {
+  const onClickHandler = useCallback(async () => {
     if (ingredientInfo && handleSubmit && newIngredient && setNewIngredient) {
-      setValue('name', ingredientInfo?.name);
-      setNewIngredient({ ...newIngredient, name: ingredientInfo.name });
-      handleSubmit();
+      setValue('name', ingredientInfo.name);
+
+      await handleSubmit();
+
+      if (Object.keys(errors).length === 0) {
+        resetField('name');
+        resetField('price');
+        resetField('quantity');
+
+        setNewIngredient({ ...newIngredient, name: ingredientInfo.name, unit: '' as Unit });
+      }
     }
-  }, [ingredientInfo, handleSubmit, newIngredient, setNewIngredient, setValue]);
+  }, [ingredientInfo, handleSubmit, newIngredient, setNewIngredient, setValue, errors, resetField]);
 
   return (
     <CardWrapper highlighted={highlighted}>
       {/* Image */}
-      <HomeImageDiv>
-        <HomeImageHolder>
+      <CardImageDiv>
+        <CardImageHolder>
           {/* TODO: image uploading */}
           <RoundedImage
             src={'media/foodPlaceholder.png'}
             alt={'Food placeholder'}
-            width={'577px'}
-            height={'433px'}
+            width={'300px'}
+            height={'200px'}
           />
-        </HomeImageHolder>
-      </HomeImageDiv>
+        </CardImageHolder>
+      </CardImageDiv>
 
-      <HomeCardLine />
+      <CardLine />
 
       {/* Info */}
       <CardInfoWrapper onClick={onClickHandler}>
-        <HomeCardInfoRow>
+        <CardInfoRow>
           <b style={{ color: '#0070f3', whiteSpace: 'nowrap' }}>{ingredientInfo?.name}</b>
-        </HomeCardInfoRow>
+        </CardInfoRow>
 
-        <HomeCardInfoRow>
+        <CardInfoRow>
           Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
-        </HomeCardInfoRow>
+        </CardInfoRow>
 
-        <HomeCardInfoRow>
+        <CardInfoRow>
           Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
-        </HomeCardInfoRow>
+        </CardInfoRow>
       </CardInfoWrapper>
     </CardWrapper>
   );
 };
 
 // Search result cards
-const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient }) => {
+const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient, setNewIngredient }) => {
+  const {
+    setValue,
+    resetField,
+    formState: { errors },
+  } = useFormContext<IngredientFormData>();
+
   // Showing price as unit preference
   const { currentUnit } = useUnit();
 
@@ -330,11 +350,28 @@ const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient }) => {
 
   const convertedPreviewPrice = priceConverter(previewPrice, newIngredient?.unit, currentUnit);
 
+  // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
+  const onClickHandler = useCallback(async () => {
+    if (handleSubmit && newIngredient && setNewIngredient) {
+      setValue('name', newIngredient.name);
+
+      await handleSubmit();
+
+      if (Object.keys(errors).length === 0) {
+        resetField('name');
+        resetField('price');
+        resetField('quantity');
+
+        setNewIngredient({ ...newIngredient, name: newIngredient.name, unit: '' as Unit });
+      }
+    }
+  }, [handleSubmit, newIngredient, setNewIngredient, setValue, errors, resetField]);
+
   return (
     <CardWrapper>
       {/* Image */}
-      <HomeImageDiv>
-        <HomeImageHolder>
+      <CardImageDiv>
+        <CardImageHolder>
           {/* TODO: image uploading */}
           <RoundedImage
             src={'media/imageUploadIcon.png'}
@@ -342,24 +379,24 @@ const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient }) => {
             width={'150px'}
             height={'100px'}
           />
-        </HomeImageHolder>
-      </HomeImageDiv>
+        </CardImageHolder>
+      </CardImageDiv>
 
-      <HomeCardLine />
+      <CardLine />
 
       {/* Info */}
-      <CardInfoWrapper onClick={handleSubmit}>
-        <HomeCardInfoRow>Save</HomeCardInfoRow>
+      <CardInfoWrapper onClick={onClickHandler}>
+        <CardInfoRow>Save</CardInfoRow>
 
-        <HomeCardInfoRow>
+        <CardInfoRow>
           <b style={{ color: '#0070f3' }}>{newIngredient?.name || 'an ingredient'}</b>
-        </HomeCardInfoRow>
+        </CardInfoRow>
 
         {/* TODO: add preview pricing */}
         {newIngredient && newIngredient.price && newIngredient.quantity && newIngredient.unit ? (
-          <HomeCardInfoRow>
+          <CardInfoRow>
             {currencyFormatter.format(convertedPreviewPrice)}/{unitFormatter(convertedUnit)}
-          </HomeCardInfoRow>
+          </CardInfoRow>
         ) : null}
       </CardInfoWrapper>
     </CardWrapper>
