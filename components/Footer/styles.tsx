@@ -12,7 +12,7 @@ export const FooterInnerWrapper = styled.div(
     width: '100%',
     marginBottom: '30px',
 
-    [breakpoints.desktop]: {
+    [breakpoints.laptop]: {
       gridTemplateColumns: 'repeat(4, 1fr)',
       // gridTemplateColumns: 'repeat(auto-fill, 250px)',
     },
