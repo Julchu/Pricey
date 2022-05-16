@@ -3,7 +3,7 @@ import { openInNewTab } from '../../lib/openLink';
 import { GithubLogo } from '../Icons/Github';
 import { Hyperlink } from '../UI/Buttons';
 import { RoundedImage, Row } from '../UI/Structure';
-import { ProfileGrid, ProfileWrapper } from './styles';
+import { ProfileGrid, ProfileImageWrapper, ProfileWrapper } from './styles';
 
 type GithubUser = {
   name: string;
@@ -19,6 +19,9 @@ const contributors = [
     name: 'Julian',
     link: 'https://github.com/julchu/',
     imageSrc: 'https://avatars.githubusercontent.com/u/17052350?v=4',
+  },
+  {
+    name: 'Lili',
   },
   {
     name: 'Justin',
@@ -43,13 +46,13 @@ const Profile: FC<GithubUser> = ({ name, link, imageSrc, alt, width, height }) =
       style={{ width, cursor: link ? 'pointer' : 'not-allowed' }}
       onClick={() => link && openInNewTab(link)}
     >
-      <Row>
+      <ProfileImageWrapper width={width} height={height}>
         {imageSrc ? (
           <RoundedImage src={imageSrc} alt={alt} width={width} height={height} />
         ) : (
           <GithubLogo style={{ width, height }} />
         )}
-      </Row>
+      </ProfileImageWrapper>
       <Row>
         <h3 style={{ margin: '10px auto 20px', fontWeight: 'normal' }}>{name}</h3>
       </Row>
@@ -93,18 +96,16 @@ const About: FC = () => {
         }}
       >
         <ProfileGrid>
-          <>
-            {contributors.map(({ name, link, imageSrc }, index) => (
-              <Profile
-                key={`contributor_${index}`}
-                name={name}
-                link={link}
-                imageSrc={imageSrc}
-                width="200px"
-                height="200px"
-              />
-            ))}
-          </>
+          {contributors.map(({ name, link, imageSrc }, index) => (
+            <Profile
+              key={`contributor_${index}`}
+              name={name}
+              link={link}
+              imageSrc={imageSrc}
+              width="200px"
+              height="200px"
+            />
+          ))}
         </ProfileGrid>
       </div>
     </>
