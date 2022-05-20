@@ -26,6 +26,7 @@ const firebaseConfig = {
   emulatorEnabled: process.env.firebaseEmulatorEnabled,
 };
 
+// Needed to pass firebase config
 const publicRuntimeConfig = {
   // Will be available on both server and client
   staticFolder: '/static',
