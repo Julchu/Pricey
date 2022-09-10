@@ -55,10 +55,22 @@ export interface IngredientInfo {
 export interface User {
   name: string;
   location?: string;
-
+  email?: string;
   createdAt?: Timestamp;
   // Preferences
 }
+
+// export interface Auth {
+//   uid: string;
+//   name: string;
+//   email: string;
+//   photoURL: string;
+//   // claims?: {
+//   //   isMyWayCafeAdmin?: boolean;
+//   // };
+//   // preferences?: UserPreferences | ChefPreferences;
+//   role?: UserRole;
+// }
 
 // Firestore data converters
 export const converter = <T>(): FirestoreDataConverter<T> => ({

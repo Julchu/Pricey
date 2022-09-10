@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { FC } from 'react';
 import { StripeButton } from '../UI/Buttons';
 import { FooterInnerWrapper } from './styles';
-import { useDarkMode } from '../../contexts/DarkModeContext';
+import { useDarkMode } from '../../contexts/ThemeContext';
 import { useUnit } from '../../contexts/UnitContext';
 import { Unit } from '../../lib/firebase/interfaces';
 

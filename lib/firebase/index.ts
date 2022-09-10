@@ -3,6 +3,7 @@ import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
 import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
 import getConfig from 'next/config';
+import { getAuth } from '@firebase/auth';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -25,6 +26,7 @@ const app = createFirebaseApp(firebaseConfig);
 
 // const analytics = getAnalytics(app);
 // const storage = getStorage(app);
+const authorization = getAuth(app);
 
 /* getFirestore returns existing Firestore or creates a new one with default settings
  * initializeFirestore creates a new one with optional settings
@@ -56,4 +58,4 @@ try {
   console.log(e);
 }
 
-export { firestore };
+export { firestore, authorization };

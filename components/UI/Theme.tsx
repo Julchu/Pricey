@@ -1,4 +1,4 @@
-export const darkModeStyles = (mode: boolean): {} => {
+export const theme = (mode: boolean): {} => {
   const invert = (r: number, g: number, b: number, a: number): string =>
     mode ? `${255 - r}, ${255 - g}, ${255 - b}, ${1 - a}` : `${r}, ${g}, ${b}, ${a}`;
 
@@ -13,11 +13,12 @@ export const darkModeStyles = (mode: boolean): {} => {
       bold: 700,
     },
     breakpoints: {
-      mobile: '@media (min-width: 320px)',
-      tablet: '@media (min-width: 481px)',
-      laptop: '@media (min-width: 769px)',
-      desktop: '@media (min-width: 1025px)',
-      television: '@media (min-width: 1201px)',
+      tablet: '@media (min-width: 600px)',
+      laptop: '@media (min-width: 905px)',
+      largeLaptop: '@media (min-width: 1240px)',
+      desktop: '@media (min-width: 1440px)',
+      largeDesktop: '@media (min-width: 1728px)',
+      ultraWideDesktop: '@media (min-width: 2560px)',
     },
     boxShadows: {
       normal: `rgba(${invert(99, 99, 99, 0.2)} ) 0px 2px 8px 0px`,
@@ -33,4 +34,4 @@ export const darkModeStyles = (mode: boolean): {} => {
   };
 };
 
-export type ThemeType = typeof darkModeStyles;
+export type ThemeType = typeof theme;

@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react';
 
-// Theme types that need to be adjusted to add fields in DarkMode.tsx/darkModeStyles
+// Theme types that need to be adjusted to add fields in Theme.tsx/darkModeStyles
 declare module '@emotion/react' {
   export interface Theme {
     test: string;
@@ -33,9 +33,9 @@ type DarkModeType = {
   setDarkMode: (mode: boolean) => void;
 };
 
-export const DarkModeContext = createContext<DarkModeType>({
+export const ThemeContext = createContext<DarkModeType>({
   darkMode: false,
   setDarkMode: () => {},
 });
 
-export const useDarkMode = (): DarkModeType => useContext(DarkModeContext);
+export const useDarkMode = (): DarkModeType => useContext(ThemeContext);
