@@ -1,11 +1,10 @@
-import React, { ComponentType, useState } from 'react';
-import { ThemeContext } from '../contexts/ThemeContext';
-import '../styles/globals.css';
-import { ThemeProvider } from '@emotion/react';
-import { theme } from '../components/UI/Theme';
+import { ComponentType, useState } from 'react';
 import { UnitContext } from '../contexts/UnitContext';
 import { Unit } from '../lib/firebase/interfaces';
 import { AuthContext, useProvideAuth } from '../contexts/AuthContext';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import '@fontsource/montserrat';
+import { theme } from '../components/UI/Theme';
 
 type Props = {
   Component: ComponentType;
@@ -14,7 +13,6 @@ type Props = {
 };
 
 const App = ({ Component, pageProps }: Props): JSX.Element => {
-  const [darkMode, setDarkMode] = useState(false);
   const [currentUnit, setCurrentUnit] = useState({ mass: Unit.lb, area: Unit.squareFeet });
   const [oppositeUnit, setOppositeUnit] = useState(() =>
     currentUnit.mass === Unit.lb
@@ -23,22 +21,20 @@ const App = ({ Component, pageProps }: Props): JSX.Element => {
   );
 
   return (
-    <AuthContext.Provider value={useProvideAuth()}>
-      <ThemeProvider theme={theme(darkMode)}>
-        <ThemeContext.Provider value={{ darkMode, setDarkMode }}>
-          <UnitContext.Provider
-            value={{
-              currentUnit,
-              setCurrentUnit,
-              oppositeUnit,
-              setOppositeUnit,
-            }}
-          >
-            <Component {...pageProps} />
-          </UnitContext.Provider>
-        </ThemeContext.Provider>
-      </ThemeProvider>
-    </AuthContext.Provider>
+    <ChakraProvider theme={extendTheme(theme)}>
+      <AuthContext.Provider value={useProvideAuth()}>
+        <UnitContext.Provider
+          value={{
+            currentUnit,
+            setCurrentUnit,
+            oppositeUnit,
+            setOppositeUnit,
+          }}
+        >
+          <Component {...pageProps} />
+        </UnitContext.Provider>
+      </AuthContext.Provider>
+    </ChakraProvider>
   );
 };
 

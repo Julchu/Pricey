@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Button } from '../UI/Buttons';
+// import { Button } from '../UI/Buttons';
 
 /* Props in the form of a TypeScript { object }
  * Props1 is a required string
@@ -21,8 +21,8 @@ const ChildTemplate: FC<TemplateProps> = ({ props1, props2 }) => {
 
   return (
     <>
-      <Button>Test button</Button>
-      <Button disabled>Disabled test button</Button>
+      {/* <Button>Test button</Button>
+      <Button disabled>Disabled test button</Button> */}
       <p>Child template component</p>
     </>
   );

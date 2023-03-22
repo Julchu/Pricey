@@ -1,21 +1,29 @@
-import React, { FC, ReactNode } from 'react';
-import Footer from '../Footer';
-import { FooterWrapper, HeaderWrapper, InnerWrapper, Wrapper } from './styles';
-import Header from '../Header';
+import { FC, ReactNode, useEffect, useState } from 'react';
+import Sidebar from '../Sidebar';
+import { Box, Flex, IconButton, Portal } from '@chakra-ui/react';
+import { CloseIcon } from '../Icons/Objects';
 
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  useEffect(() => {});
+
+  const toggleOpen = (): void => {
+    setIsOpen(current => !current);
+  };
+
   return (
-    <Wrapper>
-      <HeaderWrapper>
-        <Header />
-      </HeaderWrapper>
+    <Flex flexDirection={'column'} height={{ base: '100dvh', sm: '100vh' }} width={{ sm: '100vw' }}>
+      {children}
+      <Box position={'relative'}>
+        <IconButton onClick={toggleOpen} icon={<CloseIcon />} aria-label={'Close sidepanel'} />
+      </Box>
 
-      <InnerWrapper>{children}</InnerWrapper>
-
-      <FooterWrapper>
-        <Footer />
-      </FooterWrapper>
-    </Wrapper>
+      {isOpen ? (
+        <Portal>
+          <Sidebar />
+        </Portal>
+      ) : null}
+    </Flex>
   );
 };
 

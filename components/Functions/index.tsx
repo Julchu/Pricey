@@ -1,12 +1,12 @@
 import { FC } from 'react';
-import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-import { Hyperlink } from '../UI/Buttons';
-import { Row } from '../UI/Structure';
+// import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
+// import { Hyperlink } from '../UI/Buttons';
+// import { Row } from '../UI/Structure';
 
 const Functions: FC = () => {
   return (
     <>
-      <Row>
+      {/* <Row>
         <Hyperlink
           onClick={async () => {
             // await getDocuments('ingredients');
@@ -27,7 +27,7 @@ const Functions: FC = () => {
         >
           Delete Ingredients
         </Hyperlink>
-      </Row>
+      </Row> */}
     </>
   );
 };

@@ -1,33 +1,20 @@
 import { onSnapshot, query, where } from 'firebase/firestore';
-import { Dispatch, FC, SetStateAction, useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ChangeEvent,
+  Dispatch,
+  FC,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { FormProvider, useForm, useFormContext } from 'react-hook-form';
 import { db, IngredientInfo, Unit } from '../../lib/firebase/interfaces';
-import { Line, RoundedImage, Row } from '../UI/Structure';
-import {
-  CardGrid,
-  CardImageDiv,
-  CardImageHolder,
-  CardInfoRow,
-  CardInfoWrapper,
-  CardLine,
-  CardWrapper,
-  HomeInput,
-  HomeInputColumn,
-  HomeInputGrid,
-  HomeSelect,
-} from './styles';
-import {
-  currencyFormatter,
-  isArea,
-  isMass,
-  priceConverter,
-  unitFormatter,
-} from '../../lib/textFormatters';
-import { useUnit } from '../../contexts/UnitContext';
-
-type HomeProps = {
-  onSubmit: (data: IngredientFormData) => Promise<void>;
-};
+import { Box, Grid, Input, Select } from '@chakra-ui/react';
+import useCreateIngredient from '../../hooks/useCreateIngredient';
+import { IngredientCard, NewIngredientCard } from '../IngredientCards';
+import { unitFormatter } from '../../lib/textFormatters';
 
 export type IngredientFormData = {
   name: string;
@@ -45,8 +32,29 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
   unit: undefined,
 });
 
-// Page shown at `localhost:3000/`
-const Home: FC<HomeProps> = ({ onSubmit }) => {
+const IngredientList: FC = () => {
+  const [{ createIngredient }, _loading, _error] = useCreateIngredient();
+
+  const onSubmit = useCallback(
+    async (data: IngredientFormData): Promise<void> => {
+      await createIngredient(data);
+    },
+    [createIngredient],
+  );
+
+  // const onSubmit = useCallback(
+  //   async (data: RecipeFormData, cb): Promise<void> => {
+  //     const ref = await updateRecipe(data);
+  //     cb ? cb(ref) : router.push('/recipes');
+  //   },
+  //   [updateRecipe, router],
+  // );
+
+  // const onDelete = useCallback(async (): Promise<void> => {
+  //   await remove();
+  //   router.push('/recipes');
+  // }, [remove, router]);
+
   // React Hook Form
   const methods = useForm<IngredientFormData>({ defaultValues: defaultFormValues() });
   const { handleSubmit } = methods;
@@ -91,37 +99,49 @@ const Home: FC<HomeProps> = ({ onSubmit }) => {
         <>
           <IngredientForm newIngredient={newIngredient} setNewIngredient={setNewIngredient} />
 
-          <Line />
+          {/* Line separating header form and cards */}
+          <Box my={'20px'} borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
 
-          <Row>
-            <CardGrid>
-              {!foundIngredient ? (
-                <NewCard
+          <Grid
+            mx={'30px'}
+            gridAutoFlow={{ base: 'column', sm: 'row' }}
+            rowGap={'30px'}
+            columnGap={{ base: '100%', sm: '30px' }}
+            overflowX={{ base: 'scroll', sm: 'visible' }}
+            overflowY={{ base: 'hidden', sm: 'visible' }}
+            scrollSnapType={['x mandatory', 'none']}
+            gridTemplateColumns={{
+              base: 'repeat(auto-fill, 150px)',
+              sm: 'repeat(auto-fill, 250px)',
+            }}
+          >
+            {!foundIngredient ? (
+              <NewIngredientCard
+                handleSubmit={handleSubmit(onSubmit)}
+                newIngredient={newIngredient}
+                setNewIngredient={setNewIngredient}
+              />
+            ) : null}
+
+            {filteredResults?.map((ingredientInfo, index) => {
+              return (
+                <IngredientCard
+                  key={`${ingredientInfo.name}_${index}`}
+                  ingredientInfo={ingredientInfo}
                   handleSubmit={handleSubmit(onSubmit)}
                   newIngredient={newIngredient}
                   setNewIngredient={setNewIngredient}
                 />
-              ) : null}
-
-              {filteredResults?.map((ingredientInfo, index) => {
-                return (
-                  <Card
-                    key={`${ingredientInfo.name}_${index}`}
-                    ingredientInfo={ingredientInfo}
-                    handleSubmit={handleSubmit(onSubmit)}
-                    newIngredient={newIngredient}
-                    setNewIngredient={setNewIngredient}
-                  />
-                );
-              })}
-            </CardGrid>
-          </Row>
+              );
+            })}
+          </Grid>
         </>
       </FormProvider>
     </form>
   );
 };
 
+// TODO: after submitting an ingredient, reset search to empty
 const IngredientForm: FC<{
   newIngredient: IngredientFormData;
   setNewIngredient: Dispatch<SetStateAction<IngredientFormData>>;
@@ -138,269 +158,155 @@ const IngredientForm: FC<{
 
   return (
     <>
-      <HomeInputGrid>
+      <Grid
+        m={'30px 30px 0px'}
+        gridTemplateColumns={{ base: 'auto', sm: 'repeat(5, 1fr)' }}
+        gap={'30px'}
+      >
         {/* Ingredient name input */}
-        <HomeInputColumn index={0}>
-          <HomeInput
-            type={'search'}
-            {...register('name', { required: true })}
-            placeholder={
-              errors.name?.type === 'required'
-                ? 'Ingredient name is required'
-                : 'Search for an ingredient'
-            }
-            error={errors.name?.type === 'required'}
-            onChange={e => {
-              setNewIngredient({
-                ...newIngredient,
-                name: e.target.value.toLocaleLowerCase('en-US').trim(),
-              });
+        <Input
+          gridColumn={{ sm: '1/3' }}
+          letterSpacing={'2px'}
+          fontSize={'16px'}
+          padding={'5px 20px'}
+          height={'40px'}
+          width={'100%'}
+          transition={'box-shadow 0.2s ease-in-out'}
+          border={{ base: '1px solid grey', sm: 'none' }}
+          outline={{ sm: 'none' }}
+          borderRadius={'5px'}
+          boxShadow={{ sm: 'normal' }}
+          _hover={{ boxShadow: { sm: 'hover' } }}
+          _focus={{ boxShadow: { sm: 'focus' } }}
+          _placeholder={{
+            fontWeight: 300,
+            color: errors.name?.type === 'required' ? 'red' : 'grey',
+          }}
+          type={'search'}
+          {...register('name', { required: true })}
+          placeholder={
+            errors.name?.type === 'required'
+              ? 'Ingredient name is required'
+              : 'Search for an ingredient'
+          }
+          onChange={(e: ChangeEvent<HTMLInputElement>) => {
+            setNewIngredient({
+              ...newIngredient,
+              name: e.target.value.toLocaleLowerCase('en-US').trim(),
+            });
 
-              clearErrors('name');
-            }}
-          />
-        </HomeInputColumn>
+            clearErrors('name');
+          }}
+        />
 
         {/* Price input */}
-        <HomeInputColumn>
-          <HomeInput
-            type={'search'}
-            {...register('price', {
-              valueAsNumber: true,
-              required: true,
-              validate: price => validateIsNumber(price),
-            })}
-            onChange={e => {
-              setNewIngredient({ ...newIngredient, price: parseFloat(e.target.value) });
-              clearErrors('price');
-            }}
-            placeholder={'Price'}
-            error={errors.price?.type === 'required' || errors.price?.type === 'validate'}
-          />
-        </HomeInputColumn>
+        {/* TODO: aria-invalid with isInvalid in Chakra: errors.price?.type === 'required' || errors.price?.type === 'validate' */}
+
+        <Input
+          minWidth={{ sm: '250px' }}
+          letterSpacing={'2px'}
+          fontSize={'16px'}
+          padding={'5px 20px'}
+          height={'40px'}
+          transition={'box-shadow 0.2s ease-in-out'}
+          border={{ base: '1px solid grey', sm: 'none' }}
+          outline={{ sm: 'none' }}
+          borderRadius={'5px'}
+          boxShadow={{ sm: 'normal' }}
+          _hover={{ boxShadow: { sm: 'hover' } }}
+          _focus={{ boxShadow: { sm: 'focus' } }}
+          _placeholder={{
+            fontWeight: 300,
+            color:
+              errors.price?.type === 'required' || errors.price?.type === 'validate'
+                ? 'red'
+                : 'grey',
+          }}
+          type={'search'}
+          {...register('price', {
+            valueAsNumber: true,
+            required: true,
+            validate: price => validateIsNumber(price),
+          })}
+          onChange={e => {
+            setNewIngredient({ ...newIngredient, price: parseFloat(e.target.value) });
+            clearErrors('price');
+          }}
+          placeholder={'Price'}
+        />
 
         {/* Quantity input */}
-        <HomeInputColumn>
-          <HomeInput
-            type={'search'}
-            {...register('quantity', {
-              valueAsNumber: true,
-              required: true,
-              validate: price => validateIsNumber(price),
-            })}
-            onChange={e => {
-              setNewIngredient({ ...newIngredient, quantity: parseFloat(e.target.value) });
-              clearErrors('quantity');
-            }}
-            placeholder={'Quantity'}
-            error={errors.quantity?.type === 'required' || errors.quantity?.type === 'validate'}
-          />
-        </HomeInputColumn>
+
+        <Input
+          minWidth={{ sm: '250px' }}
+          letterSpacing={'2px'}
+          fontSize={'16px'}
+          padding={'5px 20px'}
+          height={'40px'}
+          transition={'box-shadow 0.2s ease-in-out'}
+          border={{ base: '1px solid grey', sm: 'none' }}
+          outline={{ sm: 'none' }}
+          borderRadius={'5px'}
+          boxShadow={{ sm: 'normal' }}
+          _hover={{ boxShadow: { sm: 'hover' } }}
+          _focus={{ boxShadow: { sm: 'focus' } }}
+          _placeholder={{
+            fontWeight: 300,
+            color:
+              errors.quantity?.type === 'required' || errors.quantity?.type === 'validate'
+                ? 'red'
+                : 'grey',
+          }}
+          type={'search'}
+          {...register('quantity', {
+            valueAsNumber: true,
+            required: true,
+            validate: price => validateIsNumber(price),
+          })}
+          onChange={e => {
+            setNewIngredient({ ...newIngredient, quantity: parseFloat(e.target.value) });
+            clearErrors('quantity');
+          }}
+          placeholder={'Quantity'}
+        />
 
         {/* TODO: create custom dropdown menu styling */}
         {/* Unit selector */}
-        <HomeInputColumn>
-          <HomeSelect
-            {...register('unit', {
-              required: true,
-            })}
-            error={errors.unit?.type === 'required'}
-            onChange={e => {
-              setNewIngredient({ ...newIngredient, unit: e.target.value as Unit });
-              clearErrors('unit');
-            }}
-            value={newIngredient.unit}
-          >
-            <option value="" disabled hidden>
-              Unit
-            </option>
-            {Object.values(Unit).map((unit, index) => {
-              return (
-                <option key={`${unit}_${index}`} value={unit}>
-                  {unitFormatter(unit)}
-                </option>
-              );
-            })}
-          </HomeSelect>
-        </HomeInputColumn>
-      </HomeInputGrid>
+
+        <Select
+          minWidth={{ sm: '250px' }}
+          letterSpacing={'2px'}
+          color={
+            errors.unit?.type === 'required' || errors.unit?.type === 'validate' ? 'red' : 'grey'
+          }
+          border={{ base: '1px solid grey', sm: 'none' }}
+          outline={{ sm: 'none' }}
+          boxShadow={{ sm: 'normal' }}
+          borderRadius={'5px'}
+          transition={'box-shadow 0.2s ease-in-out'}
+          _hover={{ boxShadow: { sm: 'hover' } }}
+          _focus={{ boxShadow: { sm: 'focus' } }}
+          {...register('unit', {
+            required: true,
+          })}
+          onChange={e => {
+            setNewIngredient({ ...newIngredient, unit: e.target.value as Unit });
+            clearErrors('unit');
+          }}
+          value={newIngredient.unit}
+          placeholder={'Unit'}
+        >
+          {Object.values(Unit).map((unit, index) => {
+            return (
+              <option key={`${unit}_${index}`} value={unit}>
+                {unitFormatter(unit)}
+              </option>
+            );
+          })}
+        </Select>
+      </Grid>
     </>
   );
 };
 
-type CardProps = {
-  ingredientInfo?: IngredientInfo;
-  handleSubmit?: () => void;
-  newIngredient?: IngredientFormData;
-  setNewIngredient?: Dispatch<SetStateAction<IngredientFormData>>;
-};
-
-// Search result cards
-const Card: FC<CardProps> = ({ ingredientInfo, handleSubmit, newIngredient, setNewIngredient }) => {
-  const {
-    setValue,
-    resetField,
-    formState: { errors },
-  } = useFormContext<IngredientFormData>();
-
-  // Showing price as unit preference
-  const { currentUnit } = useUnit();
-
-  /* Setting to currentUnit allows re-rendering of unit because it's a state
-   * If unit is mass, use Unit.lb;
-   * Else if unit is area, use Unit.squareFeet
-   * Else use saved unit or submission form unit
-   */
-  const convertedUnit =
-    ingredientInfo && isMass(ingredientInfo.unit)
-      ? currentUnit.mass
-      : ingredientInfo && isArea(ingredientInfo.unit)
-      ? currentUnit.area
-      : ingredientInfo?.unit;
-
-  const convertedTotal = ingredientInfo
-    ? priceConverter(ingredientInfo.total as number, ingredientInfo.unit, currentUnit)
-    : 0;
-
-  const convertedLowest = ingredientInfo
-    ? priceConverter(ingredientInfo.lowest as number, ingredientInfo.unit, currentUnit)
-    : 0;
-
-  // IngredientInfo fields
-  const averagePrice = ingredientInfo?.count
-    ? convertedTotal / (ingredientInfo.count as number)
-    : 0;
-
-  // Highlighting cards
-  const highlighted = newIngredient?.name === ingredientInfo?.name;
-
-  // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
-  const onClickHandler = useCallback(async () => {
-    if (ingredientInfo && handleSubmit && newIngredient && setNewIngredient) {
-      setValue('name', ingredientInfo.name);
-
-      await handleSubmit();
-
-      if (Object.keys(errors).length === 0) {
-        resetField('name');
-        resetField('price');
-        resetField('quantity');
-
-        setNewIngredient({ ...newIngredient, name: ingredientInfo.name, unit: '' as Unit });
-      }
-    }
-  }, [ingredientInfo, handleSubmit, newIngredient, setNewIngredient, setValue, errors, resetField]);
-
-  return (
-    <CardWrapper highlighted={highlighted}>
-      {/* Image */}
-      <CardImageDiv>
-        <CardImageHolder>
-          {/* TODO: image uploading */}
-          <RoundedImage
-            src={'media/foodPlaceholder.png'}
-            alt={'Food placeholder'}
-            width={'300px'}
-            height={'200px'}
-          />
-        </CardImageHolder>
-      </CardImageDiv>
-
-      <CardLine />
-
-      {/* Info */}
-      <CardInfoWrapper onClick={onClickHandler}>
-        <CardInfoRow>
-          <b style={{ color: '#0070f3', whiteSpace: 'nowrap' }}>{ingredientInfo?.name}</b>
-        </CardInfoRow>
-
-        <CardInfoRow>
-          Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
-        </CardInfoRow>
-
-        <CardInfoRow>
-          Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
-        </CardInfoRow>
-      </CardInfoWrapper>
-    </CardWrapper>
-  );
-};
-
-// Search result cards
-const NewCard: FC<CardProps> = ({ handleSubmit, newIngredient, setNewIngredient }) => {
-  const {
-    setValue,
-    resetField,
-    formState: { errors },
-  } = useFormContext<IngredientFormData>();
-
-  // Showing price as unit preference
-  const { currentUnit } = useUnit();
-
-  // Preview new ingredient information
-  const previewPrice = newIngredient
-    ? (newIngredient?.price * 100) / newIngredient?.quantity / 100
-    : 0;
-
-  const convertedUnit = isMass(newIngredient?.unit)
-    ? currentUnit.mass
-    : isArea(newIngredient?.unit)
-    ? currentUnit.area
-    : newIngredient?.unit;
-
-  const convertedPreviewPrice = priceConverter(previewPrice, newIngredient?.unit, currentUnit);
-
-  // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
-  const onClickHandler = useCallback(async () => {
-    if (handleSubmit && newIngredient && setNewIngredient) {
-      setValue('name', newIngredient.name);
-
-      await handleSubmit();
-
-      if (Object.keys(errors).length === 0) {
-        resetField('name');
-        resetField('price');
-        resetField('quantity');
-
-        setNewIngredient({ ...newIngredient, name: newIngredient.name, unit: '' as Unit });
-      }
-    }
-  }, [handleSubmit, newIngredient, setNewIngredient, setValue, errors, resetField]);
-
-  return (
-    <CardWrapper>
-      {/* Image */}
-      <CardImageDiv>
-        <CardImageHolder>
-          {/* TODO: image uploading */}
-          <RoundedImage
-            src={'media/imageUploadIcon.png'}
-            alt={'Upload image'}
-            width={'150px'}
-            height={'100px'}
-          />
-        </CardImageHolder>
-      </CardImageDiv>
-
-      <CardLine />
-
-      {/* Info */}
-      <CardInfoWrapper onClick={onClickHandler}>
-        <CardInfoRow>Save</CardInfoRow>
-
-        <CardInfoRow>
-          <b style={{ color: '#0070f3' }}>{newIngredient?.name || 'an ingredient'}</b>
-        </CardInfoRow>
-
-        {/* TODO: add preview pricing */}
-        {newIngredient && newIngredient.price && newIngredient.quantity && newIngredient.unit ? (
-          <CardInfoRow>
-            {currencyFormatter.format(convertedPreviewPrice)}/{unitFormatter(convertedUnit)}
-          </CardInfoRow>
-        ) : null}
-      </CardInfoWrapper>
-    </CardWrapper>
-  );
-};
-
-export default Home;
+export default IngredientList;

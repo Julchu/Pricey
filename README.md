@@ -6,6 +6,7 @@ Automatically converts unit prices when stores (like grocery stores) purposefull
 different units.
 
 # TODO
+
 - [TODO Board](https://github.com/Julchu/Pricey/projects/2)
 
 # Setup
@@ -56,7 +57,7 @@ yarn dev
 
 # Launching the Firebase/Firestore emulator
 # You can open the emulator at localhost:4000/firestore
-firebase --project <projectId> emulators:start --only firestore
+firebase --project <projectId> emulators:start --only auth,firestore,storage
 
 # Sometimes emulator port is in use, this command will kill that port
 sudo kill -9 $(sudo lsof -t -i:8080)
