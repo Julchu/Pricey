@@ -11,7 +11,7 @@ import {
   currencyFormatter,
   unitFormatter,
 } from '../../lib/textFormatters';
-import { IngredientFormData } from '../Home';
+import { IngredientFormData } from '../IngredientList';
 
 type CardProps = {
   ingredientInfo?: IngredientInfo;
@@ -112,27 +112,28 @@ export const IngredientCard: FC<CardProps> = ({
       </Flex>
 
       {/* Card line */}
-      <Box borderTop={'1px solid lightgrey'} boxShadow={'rgba(0, 0, 0, 0.35) 0px 5px 15px'} />
+      <Box borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
 
       {/* Info */}
       <Box onClick={onClickHandler} h={'100%'} w={'100%'} padding={'15px 30px'} cursor={'pointer'}>
-        <Box display={'block'} textAlign={'center'} overflow={'hidden'}>
-          <Text as="b" color={'#0070f3'} whiteSpace={'nowrap'}>
-            {ingredientInfo?.name}
-          </Text>
-        </Box>
+        <Text
+          as="b"
+          color={'#0070f3'}
+          whiteSpace={'nowrap'}
+          display={'block'}
+          textAlign={'center'}
+          overflow={'hidden'}
+        >
+          {ingredientInfo?.name}
+        </Text>
 
-        <Box display={'block'} textAlign={'center'} overflow={'hidden'}>
-          <Text>
-            Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
-          </Text>
-        </Box>
+        <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
+          Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
+        </Text>
 
-        <Box display={'block'} textAlign={'center'} overflow={'hidden'}>
-          <Text>
-            Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
-          </Text>
-        </Box>
+        <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
+          Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
+        </Text>
       </Box>
     </Box>
   );
@@ -190,10 +191,10 @@ export const NewIngredientCard: FC<CardProps> = ({
       border={{ base: '1px solid grey', sm: 'none' }}
       borderRadius={'5px'}
       outline={{ sm: 'none' }}
-      boxShadow={'normal'}
       h={{ sm: '300px' }}
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
+      boxShadow={'normal'}
       _hover={{ boxShadow: 'hover' }}
     >
       {/* Image */}

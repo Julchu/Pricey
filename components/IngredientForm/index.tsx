@@ -3,7 +3,7 @@ import { FC, Dispatch, SetStateAction, ChangeEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Unit } from '../../lib/firebase/interfaces';
 import { unitFormatter } from '../../lib/textFormatters';
-import { IngredientFormData } from '../Home';
+import { IngredientFormData } from '../IngredientList';
 
 // TODO: after submitting an ingredient, reset search to empty
 const IngredientForm: FC<{

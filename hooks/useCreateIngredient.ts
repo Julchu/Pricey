@@ -8,7 +8,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { IngredientFormData } from '../components/Home';
+import { IngredientFormData } from '../components/IngredientList';
 import { db, Ingredient, IngredientInfo, Unit } from '../lib/firebase/interfaces';
 import { isArea, isMass, priceConverter } from '../lib/textFormatters';
 
@@ -41,7 +41,9 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
         ? Unit.lb
         : isArea(unit)
         ? Unit.squareFeet
-        : Unit[unit as keyof typeof Unit];
+        : unit in Unit
+        ? unit
+        : Unit.unit;
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
