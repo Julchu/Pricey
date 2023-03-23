@@ -20,6 +20,7 @@ type CardProps = {
   setNewIngredient?: Dispatch<SetStateAction<IngredientFormData>>;
 };
 
+// TODO: hovering over existing cards should show detailed information
 // Search result cards
 export const IngredientCard: FC<CardProps> = ({
   ingredientInfo,

@@ -28,6 +28,16 @@ export enum Unit {
   unit = 'unit',
 }
 
+/* Ingredient
+  name: 
+  variety: 
+  commodity: 
+  category: 
+  PLU: 
+  image: 
+
+*/
+
 export interface Ingredient {
   name: string;
   image?: string;
@@ -39,9 +49,6 @@ export interface Ingredient {
   status?: Status;
 }
 
-/* All ingredient names will be placed in collection /ingredientNames within a document named as the first letter of the ingredient name
- * Ex: /ingredientNames/a/almond: { ingredientIds[]: list of id used in /ingredients for almond }
- */
 export interface IngredientInfo {
   name: string;
   image?: string;
@@ -73,7 +80,12 @@ export interface User {
 // }
 
 // Firestore data converters
-export const converter = <T>(): FirestoreDataConverter<T> => ({
+// toFirestore({ id, ...data }: PartialWithFieldValue<T>): DocumentData {
+//   return data
+// },
+export const converter = <
+  T extends Ingredient | IngredientInfo | User,
+>(): FirestoreDataConverter<T> => ({
   toFirestore: (data: T) => data,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
     snapshot.data(options) as T,
@@ -102,3 +114,8 @@ export const db = {
     docPoint<IngredientInfo>('ingredientInfos', ...extraPaths),
   userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
 };
+
+// Test
+/* All ingredient names will be placed in collection /ingredientNames within a document named as the first letter of the ingredient name
+ * Ex: /ingredientNames/a/almond: { ingredientIds[]: list of id used in /ingredients for almond }
+ */

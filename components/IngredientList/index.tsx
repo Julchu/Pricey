@@ -3,7 +3,7 @@ import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, IngredientInfo, Unit } from '../../lib/firebase/interfaces';
 import { Box, Grid } from '@chakra-ui/react';
-import useCreateIngredient from '../../hooks/useCreateIngredient';
+import useIngredient from '../../hooks/useCreateIngredient';
 import { IngredientCard, NewIngredientCard } from '../IngredientCards';
 import IngredientForm from '../IngredientForm';
 
@@ -24,7 +24,7 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
 });
 
 const IngredientList: FC = () => {
-  const [{ createIngredient }, _loading, _error] = useCreateIngredient();
+  const [{ createIngredient }, _loading, _error] = useIngredient();
 
   const onSubmit = useCallback(
     async (data: IngredientFormData): Promise<void> => {
@@ -33,6 +33,7 @@ const IngredientList: FC = () => {
     [createIngredient],
   );
 
+  // // Template onSubmit callback from TheFoodWorks
   // const onSubmit = useCallback(
   //   async (data: RecipeFormData, cb): Promise<void> => {
   //     const ref = await updateRecipe(data);

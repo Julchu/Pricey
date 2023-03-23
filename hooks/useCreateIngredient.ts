@@ -12,17 +12,22 @@ import { IngredientFormData } from '../components/IngredientList';
 import { db, Ingredient, IngredientInfo, Unit } from '../lib/firebase/interfaces';
 import { isArea, isMass, priceConverter } from '../lib/textFormatters';
 
-type CreateIngredientMethods = {
+type IngredientMethods = {
   createIngredient: (
     ingredientData: IngredientFormData,
   ) => Promise<CollectionReference<Ingredient>>;
+
+  updateIngredient: () => void;
+  // updateIngredient: (
+  //   ingredientData: IngredientFormData,
+  // ) => Promise<CollectionReference<Ingredient>>;
 };
 
-const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undefined] => {
+const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
 
-  const createIngredient = useCallback<CreateIngredientMethods['createIngredient']>(
+  const createIngredient = useCallback<IngredientMethods['createIngredient']>(
     async ({
       name,
       price,
@@ -106,10 +111,12 @@ const useCreateIngredient = (): [CreateIngredientMethods, boolean, Error | undef
     [],
   );
 
-  return [{ createIngredient }, loading, error];
+  const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(() => {}, []);
+
+  return [{ createIngredient, updateIngredient }, loading, error];
 };
 
-export default useCreateIngredient;
+export default useIngredient;
 
 // Examples
 /* If you want to auto generate an ID, use addDoc() + collection()
