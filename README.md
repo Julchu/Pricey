@@ -57,7 +57,8 @@ yarn dev
 
 # Launching the Firebase/Firestore emulator
 # You can open the emulator at localhost:4000/firestore
-firebase --project <projectId> emulators:start --only auth,firestore,storage
+firebase --project="<projectId>" emulators:start --only auth,firestore,storage --export-on-exit ./emulatorData --import ./emulatorData
+
 
 # Sometimes emulator port is in use, this command will kill that port
 sudo kill -9 $(sudo lsof -t -i:8080)

@@ -13,7 +13,5 @@ const buildTypeCheckCommand = filenames => {
 };
 
 module.exports = {
-  '**/*.{js,jsx,ts,tsx}?(x)': [
-    /* buildEslintCommand, buildTypeCheckCommand */
-  ],
+  '**/*.{js,jsx,ts,tsx}?(x)': [buildEslintCommand /* buildTypeCheckCommand */],
 };

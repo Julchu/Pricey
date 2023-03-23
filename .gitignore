@@ -44,3 +44,6 @@ yarn-error.log*
 
 # Webstorm
 .idea
+
+# Emulator data
+localdata

@@ -1,34 +1,36 @@
+import { Flex, Link } from '@chakra-ui/react';
 import { FC } from 'react';
+import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
 // import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-// import { Hyperlink } from '../UI/Buttons';
-// import { Row } from '../UI/Structure';
 
 const Functions: FC = () => {
   return (
-    <>
-      {/* <Row>
-        <Hyperlink
-          onClick={async () => {
-            // await getDocuments('ingredients');
-            await getDocuments('ingredientInfos');
-          }}
-        >
-          Get Ingredients
-        </Hyperlink>
-      </Row>
+    <Flex flexDir={'row'}>
+      <Link
+        color={'#0070f3'}
+        cursor={'pointer'}
+        _hover={{ textDecoration: 'underline' }}
+        onClick={async () => {
+          await getDocuments('ingredients');
+          await getDocuments('ingredientInfos');
+        }}
+      >
+        Get Ingredients
+      </Link>
 
-      <Row>
-        <Hyperlink
-          onClick={async () => {
-            await deleteCollection('ingredients');
-            await deleteCollection('ingredientInfo');
-            await deleteCollection('ingredientInfos');
-          }}
-        >
-          Delete Ingredients
-        </Hyperlink>
-      </Row> */}
-    </>
+      <Link
+        color={'#0070f3'}
+        cursor={'pointer'}
+        _hover={{ textDecoration: 'underline' }}
+        onClick={async () => {
+          await deleteCollection('ingredients');
+          await deleteCollection('ingredientInfo');
+          await deleteCollection('ingredientInfos');
+        }}
+      >
+        Delete Ingredients
+      </Link>
+    </Flex>
   );
 };
 
