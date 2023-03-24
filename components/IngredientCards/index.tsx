@@ -186,7 +186,7 @@ export const NewIngredientCard: FC<CardProps> = ({
 
   return (
     <Box
-      ml={'30px'}
+      ml={{ base: '30px', sm: 'unset' }}
       letterSpacing={'2px'}
       fontSize={'16px'}
       scrollSnapAlign={'center'}

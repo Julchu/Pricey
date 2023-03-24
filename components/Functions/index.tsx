@@ -60,6 +60,7 @@ const Functions: FC = () => {
           {...register('file', { required: false })}
           placeholder="Choose ingredients CSV"
           type="file"
+          accept="csv"
         />
         <Button onClick={handleSubmit(onSubmit)}>Upload ingredients</Button>
       </form>

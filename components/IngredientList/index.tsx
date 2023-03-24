@@ -95,6 +95,7 @@ const IngredientList: FC = () => {
           <Box my={'20px'} borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
 
           <Grid
+            mx={{ base: 'unset', sm: '30px' }}
             gridAutoFlow={{ base: 'column', sm: 'row' }}
             rowGap={'30px'}
             columnGap={{ base: '100%', sm: '30px' }}
@@ -119,7 +120,8 @@ const IngredientList: FC = () => {
             {filteredResults?.map((ingredientInfo, index) => {
               return (
                 <GridItem
-                  mr={index === filteredResults.length - 1 ? '30px' : ''}
+                  ml={{ base: foundIngredient ? '30px' : '', sm: 'unset' }}
+                  mr={{ base: index === filteredResults.length - 1 ? '30px' : '', sm: 'unset' }}
                   key={`${ingredientInfo.name}_${index}`}
                 >
                   <IngredientCard

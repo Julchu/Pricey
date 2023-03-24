@@ -46,7 +46,6 @@ const IngredientForm: FC<{
             fontWeight: 300,
             color: errors.name?.type === 'required' ? 'red' : 'grey',
           }}
-          type={'search'}
           {...register('name', { required: true })}
           placeholder={
             errors.name?.type === 'required'
@@ -85,7 +84,6 @@ const IngredientForm: FC<{
                 ? 'red'
                 : 'grey',
           }}
-          type={'search'}
           {...register('price', {
             valueAsNumber: true,
             required: true,
@@ -120,7 +118,6 @@ const IngredientForm: FC<{
                 ? 'red'
                 : 'grey',
           }}
-          type={'search'}
           {...register('quantity', {
             valueAsNumber: true,
             required: true,
@@ -135,7 +132,6 @@ const IngredientForm: FC<{
 
         {/* TODO: create custom dropdown menu styling */}
         {/* Unit selector */}
-
         <Select
           minWidth={{ sm: '250px' }}
           letterSpacing={'2px'}
