@@ -65,7 +65,6 @@ const IngredientForm: FC<{
 
         {/* Price input */}
         {/* TODO: aria-invalid with isInvalid in Chakra: errors.price?.type === 'required' || errors.price?.type === 'validate' */}
-
         <Input
           minWidth={{ sm: '250px' }}
           letterSpacing={'2px'}

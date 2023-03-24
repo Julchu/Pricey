@@ -37,6 +37,8 @@ export const deleteCollection = async (collectionName: string): Promise<void> =>
   });
 };
 
+export const buildIngredientsDb = async (): Promise<void> => {};
+
 /*
 
 const storageRef = ref(storage, 'some-child');

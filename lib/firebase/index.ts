@@ -2,6 +2,7 @@
 import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
 import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
+import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import getConfig from 'next/config';
 import { getAuth } from '@firebase/auth';
 
@@ -10,7 +11,7 @@ import { getAuth } from '@firebase/auth';
 
 const { publicRuntimeConfig } = getConfig();
 const firebaseConfig = publicRuntimeConfig.firebaseConfig;
-const emulatorEnabled = firebaseConfig.emulatorEnabled;
+// const emulatorEnabled = firebaseConfig.emulatorEnabled;
 
 // Initialize Firebase
 // const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
@@ -33,29 +34,35 @@ const authorization = getAuth(app);
  * Ex: const db = initializeFirestore(app, { experimentalForceLongPolling: true });
  */
 const firestore = initializeFirestore(app, {
-  experimentalAutoDetectLongPolling: true,
   ignoreUndefinedProperties: true,
 });
 
+// const functions = getFunctions(app);
+
 // Ensure emulator flag is off in production env when deploying
-try {
-  // Workaround for settings/host emulator crash
-  const EMULATORS_STARTED = 'EMULATORS_STARTED';
+// try {
+//   // Workaround for settings/host emulator crash
+//   const EMULATORS_STARTED = 'EMULATORS_STARTED';
 
-  type CacheControlGlobal = typeof global & {
-    [EMULATORS_STARTED]: boolean;
-  };
-  if (
-    !(global as CacheControlGlobal)[EMULATORS_STARTED] &&
-    emulatorEnabled &&
-    getApps().length > 0 &&
-    firestore !== null
-  ) {
-    (global as CacheControlGlobal)[EMULATORS_STARTED] = true;
-    connectFirestoreEmulator(firestore, 'localhost', 8080);
-  }
-} catch (e) {
-  console.log(e);
-}
+//   type CacheControlGlobal = typeof global & {
+//     [EMULATORS_STARTED]: boolean;
+//   };
+//   if (
+//     !(global as CacheControlGlobal)[EMULATORS_STARTED] &&
+//     emulatorEnabled &&
+//     getApps().length > 0 &&
+//     firestore !== null
+//   ) {
+//     (global as CacheControlGlobal)[EMULATORS_STARTED] = true;
+//     connectFirestoreEmulator(firestore, 'localhost', 8080);
+//     connectFunctionsEmulator(functions, 'localhost', 5001);
+//   }
+// } catch (e) {
+//   console.log(e);
+// }
 
-export { firestore, authorization };
+// TODO: use computer's local Wi-Fi IP instead of localhost to test Firebase on LAN devices
+connectFirestoreEmulator(firestore, '10.88.111.5', 8080);
+// connectFunctionsEmulator(functions, 'localhost', 5001);
+
+export { firestore, authorization /* functions */ };

@@ -19,7 +19,7 @@
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
     "@fontsource/montserrat": "^4.5.14",
-    "firebase": "^9.6.10",
+    "firebase": "^9.18.0",
     "firebase-tools": "^11.0.0",
     "framer-motion": "^10.0.0",
     "global": "^4.4.0",
