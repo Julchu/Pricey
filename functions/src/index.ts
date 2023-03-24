@@ -8,13 +8,4 @@ const helloWorld = functions.https.onRequest((request, response) => {
   response.send('Hello from Firebase!');
 });
 
-// fs.createReadStream
-// export const parseCSV = (fileName: string): void => {
-//   // csvStream.on('close', () => {
-//   //   if (!hasError) fs.unlink(`${fileName}.csv`);
-//   // });
-// };
-
-// parseCSV('Commodities_20230323060327');
-
 export { helloWorld };

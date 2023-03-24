@@ -11,8 +11,8 @@ type FileFormData = {
 };
 
 const Functions: FC = () => {
-  const uploadFileAndRed = useCallback((data: FileFormData): void => {
-    readFile(data.file[0]).then(data => console.log(parseCSV(data)));
+  const uploadFileAndRed = useCallback((files: FileFormData): void => {
+    readFile(files.file[0]).then(async fileData => console.log(await parseCSV(fileData)));
   }, []);
 
   const onSubmit = useCallback(

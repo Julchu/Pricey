@@ -48,3 +48,8 @@ uploadBytes(storageRef, file).then(snapshot => {
   console.log('Uploaded a blob or file!');
 });
 */
+
+// Compares ingredients from sheets to Firestore using their unique PLU code
+export const compareIngredients = async (): Promise<void> => {
+  // 16 columns: PLU, CATEGORY, COMMODITY, VARIETY, SIZE, MEASUREMENTS (NA), MEASUREMENTS (GLOBAL), RESTRICTIONS/NOTES, BOTNICAL NAME, AKA, NOTES, REVISION DATE, DATE ADDED, GPC, IMAGE, IMAGE_SOURCE
+};
