@@ -8,7 +8,7 @@ import {
   setDoc,
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { IngredientFormData } from '../components/IngredientList';
+import { IngredientFormData } from '../components/Dashboard';
 import { db, Ingredient, IngredientInfo, Unit } from '../lib/firebase/interfaces';
 import { isArea, isMass, priceConverter } from '../lib/textFormatters';
 

@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { Ingredient } from '../../lib/firebase/interfaces';
-import { IngredientFormData } from '../IngredientList';
+import { IngredientFormData } from '../Dashboard';
 
 export type GroceryListFormData = {
   ingredients: Ingredient[];

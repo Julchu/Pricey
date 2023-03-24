@@ -11,7 +11,7 @@ import {
   currencyFormatter,
   unitFormatter,
 } from '../../lib/textFormatters';
-import { IngredientFormData } from '../IngredientList';
+import { IngredientFormData } from '../Dashboard';
 
 type CardProps = {
   ingredientInfo?: IngredientInfo;
