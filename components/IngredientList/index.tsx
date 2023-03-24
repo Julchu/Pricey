@@ -2,7 +2,7 @@ import { onSnapshot, query, where } from 'firebase/firestore';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, IngredientInfo, Unit } from '../../lib/firebase/interfaces';
-import { Box, Grid } from '@chakra-ui/react';
+import { Box, Grid, GridItem } from '@chakra-ui/react';
 import useIngredient from '../../hooks/useCreateIngredient';
 import { IngredientCard, NewIngredientCard } from '../IngredientCards';
 import IngredientForm from '../IngredientForm';
@@ -95,7 +95,6 @@ const IngredientList: FC = () => {
           <Box my={'20px'} borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
 
           <Grid
-            mx={'30px'}
             gridAutoFlow={{ base: 'column', sm: 'row' }}
             rowGap={'30px'}
             columnGap={{ base: '100%', sm: '30px' }}
@@ -108,22 +107,28 @@ const IngredientList: FC = () => {
             }}
           >
             {!foundIngredient ? (
-              <NewIngredientCard
-                handleSubmit={handleSubmit(onSubmit)}
-                newIngredient={newIngredient}
-                setNewIngredient={setNewIngredient}
-              />
-            ) : null}
-
-            {filteredResults?.map((ingredientInfo, index) => {
-              return (
-                <IngredientCard
-                  key={`${ingredientInfo.name}_${index}`}
-                  ingredientInfo={ingredientInfo}
+              <GridItem>
+                <NewIngredientCard
                   handleSubmit={handleSubmit(onSubmit)}
                   newIngredient={newIngredient}
                   setNewIngredient={setNewIngredient}
                 />
+              </GridItem>
+            ) : null}
+
+            {filteredResults?.map((ingredientInfo, index) => {
+              return (
+                <GridItem
+                  mr={index === filteredResults.length - 1 ? '30px' : ''}
+                  key={`${ingredientInfo.name}_${index}`}
+                >
+                  <IngredientCard
+                    ingredientInfo={ingredientInfo}
+                    handleSubmit={handleSubmit(onSubmit)}
+                    newIngredient={newIngredient}
+                    setNewIngredient={setNewIngredient}
+                  />
+                </GridItem>
               );
             })}
           </Grid>
