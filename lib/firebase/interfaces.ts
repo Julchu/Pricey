@@ -23,8 +23,8 @@ export enum Unit {
   lb = 'lb',
   kg = 'kg',
   litre = 'L',
-  squareMeters = 'square meters',
-  squareFeet = 'square feet',
+  quart = 'qt',
+  oz = 'oz',
   unit = 'unit',
 }
 
@@ -38,33 +38,55 @@ export enum Unit {
 
 */
 
-export interface Ingredient {
-  name: string;
+// Record of every instance that an ingredient is saved
+export interface Submission {
+  ingredientId: string;
   image?: string;
   price: number;
   unit: Unit;
-  location?: string;
   submitter?: User;
+  location: Address;
   createdAt: Timestamp | FieldValue;
   status?: Status;
 }
 
-export interface IngredientInfo {
+// Ingredient info
+export interface Ingredient {
+  ingredientId: string;
   name: string;
   image?: string;
-  ids: string[] | FieldValue;
+  plu: number;
+  category: string;
+  submissions: string[] | FieldValue;
   count: number | FieldValue;
-  total: number | FieldValue;
-  lowest?: number;
-  unit?: Unit;
+  lastUpdated: Timestamp | FieldValue;
 }
 
 export interface User {
   name: string;
-  location?: string;
+  location?: Address;
   email?: string;
   createdAt?: Timestamp;
+  submissions: Submission[];
   // Preferences
+}
+
+/* Public features:
+ * Create Time-to-live (TTL) grocery list w/ ingredients
+ *
+ */
+
+/* Logged in user features:
+ * Save grocery list
+ * Save price thresholds per ingredient
+ *
+ */
+
+// City, province/state, country
+export interface Address {
+  locality: string;
+  administrative_area_level_1: string;
+  country: string;
 }
 
 // export interface Auth {
@@ -84,7 +106,7 @@ export interface User {
 //   return data
 // },
 export const converter = <
-  T extends Ingredient | IngredientInfo | User,
+  T extends Submission | Ingredient | User,
 >(): FirestoreDataConverter<T> => ({
   toFirestore: (data: T) => data,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
@@ -104,14 +126,14 @@ const docPoint = <T>(collectionPath: string, ...extraPaths: string[]): DocumentR
  */
 export const db = {
   // Collections
-  ingredientCollection: collectionPoint<Ingredient>('ingredients'),
-  ingredientInfoCollection: collectionPoint<IngredientInfo>('ingredientInfos'),
+  ingredientCollection: collectionPoint<Submission>('ingredients'),
+  ingredientInfoCollection: collectionPoint<Ingredient>('ingredientInfos'),
   userCollection: collectionPoint<User>('users'),
 
   // Docs
-  ingredientDoc: (...extraPaths: string[]) => docPoint<Ingredient>('ingredients', ...extraPaths),
+  ingredientDoc: (...extraPaths: string[]) => docPoint<Submission>('ingredients', ...extraPaths),
   ingredientInfoDoc: (...extraPaths: string[]) =>
-    docPoint<IngredientInfo>('ingredientInfos', ...extraPaths),
+    docPoint<Ingredient>('ingredientInfos', ...extraPaths),
   userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
 };
 

@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
 import { useUnit } from '../../contexts/UnitContext';
-import { IngredientInfo, Unit } from '../../lib/firebase/interfaces';
+import { Ingredient, Unit } from '../../lib/firebase/interfaces';
 import {
   isMass,
   isArea,
@@ -14,7 +14,7 @@ import {
 import { IngredientFormData } from '../Dashboard';
 
 type CardProps = {
-  ingredientInfo?: IngredientInfo;
+  ingredientInfo?: Ingredient;
   handleSubmit?: () => Promise<void>;
   newIngredient?: IngredientFormData;
   setNewIngredient?: Dispatch<SetStateAction<IngredientFormData>>;

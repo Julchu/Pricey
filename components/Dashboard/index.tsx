@@ -1,7 +1,7 @@
 import { onSnapshot, query, where } from 'firebase/firestore';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { db, IngredientInfo, Unit } from '../../lib/firebase/interfaces';
+import { db, Ingredient, Unit } from '../../lib/firebase/interfaces';
 import { Box, Grid, GridItem } from '@chakra-ui/react';
 import useIngredient from '../../hooks/useCreateIngredient';
 import { IngredientCard, NewIngredientCard } from '../IngredientCards';
@@ -62,14 +62,14 @@ const IngredientList: FC = () => {
     unit: '' as Unit,
   });
   const [foundIngredient, setFoundIngredient] = useState(false);
-  const [searchResults, setSearchResults] = useState<IngredientInfo[]>([]);
+  const [searchResults, setSearchResults] = useState<Ingredient[]>([]);
 
   /* Live-updating retrieval of specific document and its contents */
   useEffect(() => {
     const q = query(db.ingredientInfoCollection, where('count', '>', 0) /*limit(8)*/);
 
     onSnapshot(q, querySnapshot => {
-      const ingredientInfoList: IngredientInfo[] = [];
+      const ingredientInfoList: Ingredient[] = [];
       querySnapshot.forEach(doc => {
         ingredientInfoList.push(doc.data());
       });

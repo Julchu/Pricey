@@ -1,6 +1,6 @@
-import { collection, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 import { firestore } from '.';
-import { db, IngredientInfo } from './interfaces';
+import { db, Ingredient } from './interfaces';
 
 // Retrieves list of documents
 export const getDocuments = async (collectionName: string): Promise<void> => {
@@ -14,7 +14,7 @@ export const getDocuments = async (collectionName: string): Promise<void> => {
 export const getIngredientNames = async (
   collectionName: string,
   documentId: string,
-  callback: (arg0: IngredientInfo) => void,
+  callback: (arg0: Ingredient) => void,
 ): Promise<void> => {
   const snap = await getDoc(
     // Retrieve single document with known id
@@ -52,4 +52,19 @@ uploadBytes(storageRef, file).then(snapshot => {
 // Compares ingredients from sheets to Firestore using their unique PLU code
 export const compareIngredients = async (): Promise<void> => {
   // 16 columns: PLU, CATEGORY, COMMODITY, VARIETY, SIZE, MEASUREMENTS (NA), MEASUREMENTS (GLOBAL), RESTRICTIONS/NOTES, BOTNICAL NAME, AKA, NOTES, REVISION DATE, DATE ADDED, GPC, IMAGE, IMAGE_SOURCE
+};
+
+export const test = async (): Promise<void> => {
+  const ingredientDocumentRef = db.ingredientInfoDoc('banana');
+
+  const ingredientInfo: Ingredient = {
+    name: trimmedName,
+    submissions: arrayUnion(docRef.id),
+    count: increment(1),
+    total: increment(price),
+    lowest,
+    unit: existingUnit,
+  };
+
+  await setDoc(ingredientDocumentRef, ingredientInfo, { merge: true });
 };

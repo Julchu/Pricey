@@ -9,13 +9,13 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Dashboard';
-import { db, Ingredient, IngredientInfo, Unit } from '../lib/firebase/interfaces';
+import { db, Submission, Ingredient, Unit } from '../lib/firebase/interfaces';
 import { isArea, isMass, priceConverter } from '../lib/textFormatters';
 
 type IngredientMethods = {
   createIngredient: (
     ingredientData: IngredientFormData,
-  ) => Promise<CollectionReference<Ingredient>>;
+  ) => Promise<CollectionReference<Submission>>;
 
   updateIngredient: () => void;
   // updateIngredient: (
@@ -34,7 +34,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       quantity,
       unit,
       location,
-    }: IngredientFormData): Promise<CollectionReference<Ingredient>> => {
+    }: IngredientFormData): Promise<CollectionReference<Submission>> => {
       setLoading(true);
 
       price = priceConverter((price * 100) / quantity, unit, {
@@ -58,7 +58,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       const ingredientDocumentRef = db.ingredientInfoDoc(trimmedName);
 
       // Ensuring all fields are passed by typechecking Ingredient
-      const newIngredient: Ingredient = {
+      const newIngredient: Submission = {
         name,
         price,
         location,
@@ -90,9 +90,9 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         // Prevent overriding existing ingredient unit
         const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
 
-        const ingredientInfo: IngredientInfo = {
+        const ingredientInfo: Ingredient = {
           name: trimmedName,
-          ids: arrayUnion(docRef.id),
+          submissions: arrayUnion(docRef.id),
           count: increment(1),
           total: increment(price),
           lowest,
@@ -106,7 +106,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       }
 
       setLoading(false);
-      return ingredientsCollectionRef as CollectionReference<Ingredient>;
+      return ingredientsCollectionRef as CollectionReference<Submission>;
     },
     [],
   );

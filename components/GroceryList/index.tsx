@@ -1,10 +1,9 @@
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
-import { Ingredient } from '../../lib/firebase/interfaces';
-import { IngredientFormData } from '../Dashboard';
+import { Submission } from '../../lib/firebase/interfaces';
 
 export type GroceryListFormData = {
-  ingredients: Ingredient[];
+  ingredients: Submission[];
   price: number;
   quantity: number;
   unit: Unit;
