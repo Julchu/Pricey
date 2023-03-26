@@ -54,17 +54,17 @@ export const compareIngredients = async (): Promise<void> => {
   // 16 columns: PLU, CATEGORY, COMMODITY, VARIETY, SIZE, MEASUREMENTS (NA), MEASUREMENTS (GLOBAL), RESTRICTIONS/NOTES, BOTNICAL NAME, AKA, NOTES, REVISION DATE, DATE ADDED, GPC, IMAGE, IMAGE_SOURCE
 };
 
-export const test = async (): Promise<void> => {
-  const ingredientDocumentRef = db.ingredientInfoDoc('banana');
+// export const test = async (): Promise<void> => {
+//   const ingredientDocumentRef = db.ingredientInfoDoc('banana');
 
-  const ingredientInfo: Ingredient = {
-    name: trimmedName,
-    submissions: arrayUnion(docRef.id),
-    count: increment(1),
-    total: increment(price),
-    lowest,
-    unit: existingUnit,
-  };
+//   const ingredientInfo: Ingredient = {
+//     name: trimmedName,
+//     submissions: arrayUnion(docRef.id),
+//     count: increment(1),
+//     total: increment(price),
+//     lowest,
+//     unit: existingUnit,
+//   };
 
-  await setDoc(ingredientDocumentRef, ingredientInfo, { merge: true });
-};
+//   await setDoc(ingredientDocumentRef, ingredientInfo, { merge: true });
+// };
