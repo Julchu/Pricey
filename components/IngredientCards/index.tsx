@@ -6,7 +6,7 @@ import { useUnit } from '../../contexts/UnitContext';
 import { Ingredient, Unit } from '../../lib/firebase/interfaces';
 import {
   isMass,
-  isArea,
+  isLiquid,
   priceConverter,
   currencyFormatter,
   unitFormatter,
@@ -35,32 +35,32 @@ export const IngredientCard: FC<CardProps> = ({
   } = useFormContext<IngredientFormData>();
 
   // Showing price as unit preference
-  const { currentUnit } = useUnit();
+  // const { currentUnit } = useUnit();
 
   /* Setting to currentUnit allows re-rendering of unit because it's a state
    * If unit is mass, use Unit.lb;
    * Else if unit is area, use Unit.squareFeet
    * Else use saved unit or submission form unit
    */
-  const convertedUnit =
-    ingredientInfo && isMass(ingredientInfo.unit)
-      ? currentUnit.mass
-      : ingredientInfo && isArea(ingredientInfo.unit)
-      ? currentUnit.area
-      : ingredientInfo?.unit;
+  // const convertedUnit =
+  //   ingredientInfo && isMass(ingredientInfo.unit)
+  //     ? currentUnit.mass
+  //     : ingredientInfo && isLiquid(ingredientInfo.unit)
+  //     ? currentUnit.liquid
+  //     : ingredientInfo?.unit;
 
-  const convertedTotal = ingredientInfo
-    ? priceConverter(ingredientInfo.total as number, ingredientInfo.unit, currentUnit)
-    : 0;
+  // const convertedTotal = ingredientInfo
+  //   ? priceConverter(ingredientInfo.total as number, ingredientInfo.unit, currentUnit)
+  //   : 0;
 
-  const convertedLowest = ingredientInfo
-    ? priceConverter(ingredientInfo.lowest as number, ingredientInfo.unit, currentUnit)
-    : 0;
+  // const convertedLowest = ingredientInfo
+  //   ? priceConverter(ingredientInfo.lowest as number, ingredientInfo.unit, currentUnit)
+  //   : 0;
 
   // IngredientInfo fields
-  const averagePrice = ingredientInfo?.count
-    ? convertedTotal / (ingredientInfo.count as number)
-    : 0;
+  // const averagePrice = ingredientInfo?.count
+  //   ? convertedTotal / (ingredientInfo.count as number)
+  //   : 0;
 
   // Highlighting cards
   const highlighted = newIngredient?.name === ingredientInfo?.name;
@@ -128,13 +128,13 @@ export const IngredientCard: FC<CardProps> = ({
           {ingredientInfo?.name}
         </Text>
 
-        <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
+        {/* <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
           Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
         </Text>
 
         <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
           Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
-        </Text>
+        </Text> */}
       </Box>
     </Box>
   );
@@ -162,8 +162,8 @@ export const NewIngredientCard: FC<CardProps> = ({
 
   const convertedUnit = isMass(newIngredient?.unit)
     ? currentUnit.mass
-    : isArea(newIngredient?.unit)
-    ? currentUnit.area
+    : isLiquid(newIngredient?.unit)
+    ? currentUnit.liquid
     : newIngredient?.unit;
 
   const convertedPreviewPrice = priceConverter(previewPrice, newIngredient?.unit, currentUnit);

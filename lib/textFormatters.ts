@@ -8,9 +8,9 @@ export const currencyFormatter = new Intl.NumberFormat(undefined, {
 });
 
 export const unitFormatter = (unit?: Unit): string => {
-  if (unit === Unit.squareFeet) return 'ft²';
-  else if (unit === Unit.squareMeters) return 'm²';
-  else return unit || '';
+  // if (unit === Unit.squareFeet) return 'ft²';
+  // else if (unit === Unit.squareMeters) return 'm²';
+  return unit || '';
 };
 
 /* Prices are /lb by default; switch to kg if needed
@@ -28,21 +28,19 @@ export const unitFormatter = (unit?: Unit): string => {
 export const priceConverter = (
   price: number,
   currentUnit?: Unit,
-  toUnit?: { mass: Unit; area: Unit },
+  toUnit?: { mass: Unit; liquid: Unit },
 ): number => {
-  if (currentUnit === Unit.lb && toUnit?.mass === Unit.kg) return price * 2.2046;
-  else if (currentUnit === Unit.kg && toUnit?.mass === Unit.lb) return price / 2.2046;
-  else if (currentUnit === Unit.squareFeet && toUnit?.area === Unit.squareMeters)
-    return price * 10.764;
-  else if (currentUnit === Unit.squareMeters && toUnit?.area === Unit.squareFeet)
-    return price / 10.764;
+  if (currentUnit === Unit.pound && toUnit?.mass === Unit.kilogram) return price * 2.2046;
+  else if (currentUnit === Unit.kilogram && toUnit?.mass === Unit.pound) return price / 2.2046;
+  else if (currentUnit === Unit.litre && toUnit?.liquid === Unit.quart) return price * 1.05669;
+  else if (currentUnit === Unit.quart && toUnit?.liquid === Unit.litre) return price / 1.05669;
   else return price;
 };
 
 export const isMass = (unit?: Unit): boolean => {
-  return unit === Unit.lb || unit === Unit.kg;
+  return unit === Unit.pound || unit === Unit.kilogram;
 };
 
-export const isArea = (unit?: Unit): boolean => {
-  return unit === Unit.squareFeet || unit === Unit.squareMeters;
+export const isLiquid = (unit?: Unit): boolean => {
+  return unit === Unit.litre || unit === Unit.quart;
 };

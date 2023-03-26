@@ -2,16 +2,16 @@ import { createContext, Dispatch, SetStateAction, useContext } from 'react';
 import { Unit } from '../lib/firebase/interfaces';
 
 type UnitType = {
-  currentUnit: { mass: Unit; area: Unit };
-  setCurrentUnit: Dispatch<SetStateAction<{ mass: Unit; area: Unit }>>;
-  oppositeUnit: { mass: Unit; area: Unit };
-  setOppositeUnit: Dispatch<SetStateAction<{ mass: Unit; area: Unit }>>;
+  currentUnit: { mass: Unit; liquid: Unit };
+  setCurrentUnit: Dispatch<SetStateAction<{ mass: Unit; liquid: Unit }>>;
+  oppositeUnit: { mass: Unit; liquid: Unit };
+  setOppositeUnit: Dispatch<SetStateAction<{ mass: Unit; liquid: Unit }>>;
 };
 
 export const UnitContext = createContext<UnitType>({
-  currentUnit: { mass: Unit.lb, area: Unit.squareFeet },
+  currentUnit: { mass: Unit.pound, liquid: Unit.litre },
   setCurrentUnit: ({}) => {},
-  oppositeUnit: { mass: Unit.kg, area: Unit.squareMeters },
+  oppositeUnit: { mass: Unit.kilogram, liquid: Unit.quart },
   setOppositeUnit: ({}) => {},
 });
 

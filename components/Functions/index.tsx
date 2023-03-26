@@ -11,16 +11,16 @@ type FileFormData = {
 };
 
 const Functions: FC = () => {
-  const uploadFileAndRed = useCallback((files: FileFormData): void => {
-    readFile(files.file[0]).then(async fileData => console.log(await parseCSV(fileData)));
-  }, []);
+  // const uploadFileAndRed = useCallback((files: FileFormData): void => {
+  //   readFile(files.file[0]).then(async fileData => console.log(await parseCSV(fileData)));
+  // }, []);
 
-  const onSubmit = useCallback(
-    (data: FileFormData) => {
-      uploadFileAndRed(data);
-    },
-    [uploadFileAndRed],
-  );
+  // const onSubmit = useCallback(
+  //   (data: FileFormData) => {
+  //     uploadFileAndRed(data);
+  //   },
+  //   [uploadFileAndRed],
+  // );
 
   const {
     handleSubmit,
@@ -55,15 +55,15 @@ const Functions: FC = () => {
         Delete Ingredients
       </Link>
 
-      <form>
+      {/* <form>
         <Input
           {...register('file', { required: false })}
           placeholder="Choose ingredients CSV"
           type="file"
           accept="csv"
         />
-        <Button onClick={handleSubmit(onSubmit)}>Upload ingredients</Button>
-      </form>
+        <Button onClick={() => handleSubmit(onSubmit)}>Upload ingredients</Button>
+      </form> */}
     </Flex>
   );
 };

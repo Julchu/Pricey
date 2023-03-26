@@ -13,11 +13,11 @@ type Props = {
 };
 
 const App = ({ Component, pageProps }: Props): JSX.Element => {
-  const [currentUnit, setCurrentUnit] = useState({ mass: Unit.lb, area: Unit.squareFeet });
+  const [currentUnit, setCurrentUnit] = useState({ mass: Unit.pound, liquid: Unit.litre });
   const [oppositeUnit, setOppositeUnit] = useState(() =>
-    currentUnit.mass === Unit.lb
-      ? { mass: Unit.kg, area: Unit.squareMeters }
-      : { mass: Unit.lb, area: Unit.squareFeet },
+    currentUnit.mass === Unit.pound
+      ? { mass: Unit.kilogram, liquid: Unit.litre }
+      : { mass: Unit.pound, liquid: Unit.quart },
   );
 
   return (

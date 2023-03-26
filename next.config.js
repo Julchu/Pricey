@@ -44,6 +44,6 @@ module.exports = {
   publicRuntimeConfig,
   experimental,
   swcMinify: true,
-  trailingSlash: true,
+  trailingSlash: false,
   reactStrictMode: true,
 };

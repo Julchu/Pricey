@@ -3,9 +3,11 @@
 import {
   collection,
   doc,
+  DocumentData,
   DocumentReference,
   FieldValue,
   FirestoreDataConverter,
+  PartialWithFieldValue,
   QueryDocumentSnapshot,
   SnapshotOptions,
   Timestamp,
@@ -20,8 +22,8 @@ export enum Status {
 }
 
 export enum Unit {
-  lb = 'lb',
-  kg = 'kg',
+  pound = 'lb',
+  kilogram = 'kg',
   litre = 'L',
   quart = 'qt',
   oz = 'oz',
@@ -40,26 +42,26 @@ export enum Unit {
 
 // Record of every instance that an ingredient is saved
 export interface Submission {
-  ingredientId: string;
+  ingredientId?: string;
   image?: string;
   price: number;
   unit: Unit;
   submitter?: User;
-  location: Address;
+  location?: Address;
   createdAt: Timestamp | FieldValue;
   status?: Status;
 }
 
 // Ingredient info
 export interface Ingredient {
-  ingredientId: string;
+  ingredientId?: string;
   name: string;
   image?: string;
-  plu: number;
-  category: string;
+  plu?: number;
+  category?: string;
   submissions: string[] | FieldValue;
   count: number | FieldValue;
-  lastUpdated: Timestamp | FieldValue;
+  lastUpdated?: Timestamp | FieldValue;
 }
 
 export interface User {
@@ -67,7 +69,7 @@ export interface User {
   location?: Address;
   email?: string;
   createdAt?: Timestamp;
-  submissions: Submission[];
+  submissions?: Submission[];
   // Preferences
 }
 
@@ -105,10 +107,8 @@ export interface Address {
 // toFirestore({ id, ...data }: PartialWithFieldValue<T>): DocumentData {
 //   return data
 // },
-export const converter = <
-  T extends Submission | Ingredient | User,
->(): FirestoreDataConverter<T> => ({
-  toFirestore: (data: T) => data,
+export const converter = <T>(): FirestoreDataConverter<T> => ({
+  toFirestore: (data: PartialWithFieldValue<T>) => data as DocumentData,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
     snapshot.data(options) as T,
 });

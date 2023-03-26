@@ -10,7 +10,7 @@ import {
 import { useCallback, useState } from 'react';
 import { IngredientFormData } from '../components/Dashboard';
 import { db, Submission, Ingredient, Unit } from '../lib/firebase/interfaces';
-import { isArea, isMass, priceConverter } from '../lib/textFormatters';
+import { isLiquid, isMass, priceConverter } from '../lib/textFormatters';
 
 type IngredientMethods = {
   createIngredient: (
@@ -38,14 +38,14 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       setLoading(true);
 
       price = priceConverter((price * 100) / quantity, unit, {
-        mass: Unit.lb,
-        area: Unit.squareFeet,
+        mass: Unit.pound,
+        liquid: Unit.quart,
       });
 
       unit = isMass(unit)
-        ? Unit.lb
-        : isArea(unit)
-        ? Unit.squareFeet
+        ? Unit.pound
+        : isLiquid(unit)
+        ? Unit.litre
         : unit in Unit
         ? unit
         : Unit.unit;
@@ -59,9 +59,9 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
 
       // Ensuring all fields are passed by typechecking Ingredient
       const newIngredient: Submission = {
-        name,
+        // name,
         price,
-        location,
+        // location,
         unit,
         createdAt: serverTimestamp(),
       };
@@ -74,29 +74,29 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         const docRef = await addDoc(ingredientsCollectionRef, newIngredient);
 
         // Getting current summary to compare lowest
-        const currentIngredientInfo = await getDoc(ingredientDocumentRef).then(doc => doc.data());
+        // const currentIngredientInfo = await getDoc(ingredientDocumentRef).then(doc => doc.data());
 
         /* If lowest exists:
          * * If lowest > price: price
          * * Else: lowest
          * Else price
          */
-        const lowest = currentIngredientInfo?.lowest
-          ? currentIngredientInfo?.lowest > price
-            ? price
-            : currentIngredientInfo?.lowest
-          : price;
+        // const lowest = currentIngredientInfo?.lowest
+        //   ? currentIngredientInfo?.lowest > price
+        //     ? price
+        //     : currentIngredientInfo?.lowest
+        //   : price;
 
         // Prevent overriding existing ingredient unit
-        const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
+        // const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
 
         const ingredientInfo: Ingredient = {
           name: trimmedName,
           submissions: arrayUnion(docRef.id),
           count: increment(1),
-          total: increment(price),
-          lowest,
-          unit: existingUnit,
+          // total: increment(price),
+          // lowest,
+          // unit: existingUnit,
         };
 
         // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent)

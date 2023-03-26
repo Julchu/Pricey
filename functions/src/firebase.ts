@@ -1,4 +1,4 @@
-// // eslint-disable-next-line import/named
+// eslint-disable-next-line import/named
 // import admin, { firestore } from 'firebase-admin';
 // import * as functions from 'firebase-functions';
 
@@ -32,3 +32,4 @@
 //   });
 
 // export { db, storage, logger, config, admin, functions, FieldValue, FieldPath };
+export {};
