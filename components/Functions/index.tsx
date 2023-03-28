@@ -1,6 +1,7 @@
-import { Button, Flex, Input, Link } from '@chakra-ui/react';
-import { FC, useCallback } from 'react';
+import { Button, Flex, Input, Link, Spinner, useEditable } from '@chakra-ui/react';
+import { FC, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { useAuth } from '../../hooks/useAuth';
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
 import { parseCSV, readFile } from '../../lib/parseCSV';
 // import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
@@ -21,6 +22,12 @@ const Functions: FC = () => {
   //   },
   //   [uploadFileAndRed],
   // );
+
+  const { authUser, loading, login, logout } = useAuth();
+
+  useEffect(() => {
+    if (authUser) console.log('dashboard useAuth:', authUser);
+  }, [authUser]);
 
   const {
     handleSubmit,
@@ -53,6 +60,30 @@ const Functions: FC = () => {
         }}
       >
         Delete Ingredients
+      </Link>
+
+      <Link
+        color={'#0070f3'}
+        cursor={'pointer'}
+        _hover={{ textDecoration: 'underline' }}
+        onClick={() => {
+          login();
+        }}
+      >
+        Login
+      </Link>
+
+      {loading ? <Spinner /> : authUser ? <h1>Authed</h1> : <h1>Not authed</h1>}
+
+      <Link
+        color={'#0070f3'}
+        cursor={'pointer'}
+        _hover={{ textDecoration: 'underline' }}
+        onClick={() => {
+          logout();
+        }}
+      >
+        Logout
       </Link>
 
       {/* <form>

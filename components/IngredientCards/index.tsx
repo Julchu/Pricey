@@ -2,7 +2,6 @@ import { Dispatch, SetStateAction, FC, useCallback } from 'react';
 import Image from 'next/image';
 import { Box, Flex, Text } from '@chakra-ui/react';
 import { useFormContext } from 'react-hook-form';
-import { useUnit } from '../../contexts/UnitContext';
 import { Ingredient, Unit } from '../../lib/firebase/interfaces';
 import {
   isMass,
@@ -12,6 +11,7 @@ import {
   unitFormatter,
 } from '../../lib/textFormatters';
 import { IngredientFormData } from '../Dashboard';
+import { useUnit } from '../../hooks/useUnit';
 
 type CardProps = {
   ingredientInfo?: Ingredient;

@@ -64,13 +64,22 @@ export interface Ingredient {
   lastUpdated?: Timestamp | FieldValue;
 }
 
+// Public user data (aka not private auth data)
 export interface User {
-  name: string;
+  uid: string;
+  email: string;
+  photoURL?: string;
+  name?: string;
   location?: Address;
-  email?: string;
   createdAt?: Timestamp;
   submissions?: Submission[];
   // Preferences
+}
+
+export interface Auth {
+  id?: string;
+  name: string;
+  email: string;
 }
 
 /* Public features:
