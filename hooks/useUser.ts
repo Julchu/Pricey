@@ -10,6 +10,7 @@ type AuthData = {
 };
 
 interface UseUserMethods {
+  getUser: (uid: string) => Promise<User | undefined>;
   createUser: (authData: AuthData) => Promise<User | undefined>;
   // updateUser: (userData: Partial<User>) => Promise<User | undefined>;
 }
@@ -18,35 +19,44 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   const [error, setError] = useState<Error>();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const getUser = useCallback<UseUserMethods['getUser']>(async uid => {
+    try {
+      setLoading(true);
+      // Associate auth info to a specific user in db for public data:
+      const existingUser = await getDocs(query(db.userCollection, where('uid', '==', uid)));
+
+      if (existingUser.docs.length) {
+        setLoading(false);
+        const user = existingUser.docs[0].data();
+        return {
+          uid: user.uid,
+          name: user.name,
+          email: user.email,
+          photoURL: user.photoURL,
+        };
+      }
+    } catch (error) {
+      setError(error as Error);
+    }
+  }, []);
+
   const createUser = useCallback<UseUserMethods['createUser']>(
     async ({ uid, displayName, email, photoURL }) => {
       try {
-        // if (!authUser) throw new Error('Invalid user');
-
         setLoading(true);
-        // Associate auth info to a specific user in db for public data:
-        const existingUser = await getDocs(query(db.userCollection, where('uid', '==', uid)));
+        const newUserRef = await addDoc(db.userCollection, {
+          uid,
+          email,
+          photoURL,
+          name: displayName,
+          createdAt: serverTimestamp(),
+          submissions: [],
+        });
 
-        const createNewUserData = async (): Promise<User | undefined> => {
-          const newUserRef = await addDoc(db.userCollection, {
-            uid,
-            email,
-            photoURL,
-            name: displayName,
-            createdAt: serverTimestamp(),
-            submissions: [],
-          });
-          const userDoc = await getDoc(newUserRef);
-          if (userDoc.exists()) {
-            return userDoc.data();
-          }
-        };
-
-        const user = existingUser.docs.length
-          ? existingUser.docs[0].data()
-          : await createNewUserData();
-        if (user) {
+        const userDoc = await getDoc(newUserRef);
+        if (userDoc.exists()) {
           setLoading(false);
+          const user = userDoc.data();
           return {
             uid: user.uid,
             name: user.name,
@@ -80,6 +90,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
 
   return [
     {
+      getUser,
       createUser,
       // updateUser,
     },

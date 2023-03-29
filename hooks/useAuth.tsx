@@ -3,8 +3,9 @@ import {
   getAuth,
   onAuthStateChanged,
   GoogleAuthProvider,
-  signInWithPopup,
   signOut,
+  signInWithRedirect,
+  getRedirectResult,
 } from '@firebase/auth';
 
 import { User } from '../lib/firebase/interfaces';
@@ -20,17 +21,15 @@ type AuthContextType = {
 
 export const useProvideAuth = (): AuthContextType => {
   const [authUser, setAuthUser] = useState<User | null>(null);
-  const [{ createUser }, createUserLoading, error] = useUser();
-  const [loading, setLoading] = useState<boolean>(false);
+  const [{ getUser, createUser }, _createUserLoading] = useUser();
+  const [loading, _setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  useEffect(() => {
-    setLoading(createUserLoading);
-  }, [createUserLoading]);
+  // useEffect(() => {
+  //   setLoading(loading || createUserLoading);
+  // }, [createUserLoading, loading]);
 
   const login = async (): Promise<void> => {
-    setLoading(true);
-
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -40,80 +39,77 @@ export const useProvideAuth = (): AuthContextType => {
     // provider.addScope('email');
 
     const auth = getAuth();
-    signInWithPopup(auth, provider)
-      .then(async result => {
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
-
-        // The signed-in user info; at this point they are authenticated
-        const { uid, email, photoURL, displayName } = result.user;
-
-        setAuthUser(
-          (await createUser({
-            uid,
-            email: email || '',
-            photoURL: photoURL || '',
-            displayName: displayName || '',
-          })) || null,
-        );
-      })
-      .catch(error => {
-        // Handle Errors here.
-        console.error(error);
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        // ...
-      });
-
-    setLoading(false);
+    signInWithRedirect(auth, provider);
   };
 
   const logout = async (): Promise<void> => {
-    setLoading(true);
     const auth = getAuth();
     signOut(auth)
       .then(() => {
         // Sign-out successful.
         setAuthUser(null);
         console.log('Signed out');
-        router.push('/functions');
+        router.push('/');
       })
       .catch(error => {
         // An error happened.
         console.log('Sign out error:', error);
       });
-    setLoading(false);
   };
 
-  /* Auth persistence: detect if user is authenticated or not
-   * Do not redirect with router.push(), will cause infinite state changes
-   */
+  // Auth persistence: detect if user is authenticated or not
   useEffect(() => {
     const auth = getAuth();
     onAuthStateChanged(auth, async user => {
       if (user) {
         /* The signed-in user info; at this point they are authenticated
-         * Auth state will update to existing user or create new user here
+         * Auth state will update to existing user; dont create a new user here
          */
-        const { uid, email, photoURL, displayName } = user;
-        setAuthUser(
-          (await createUser({
-            uid,
-            email: email || '',
-            photoURL: photoURL || '',
-            displayName: displayName || '',
-          })) || null,
-        );
+        setAuthUser((await getUser(user.uid)) || null);
       } else {
         console.log('User is not logged');
       }
     });
-  }, [createUser, router]);
+
+    /* When user signs in, they're redirected (instead of using Google popup signin flow)
+     * if user doesn't exist in database, save public version of their user (rather than using exposing their auth info)
+     * Only create user here, otherwise multiple users will be saved
+     */
+    getRedirectResult(auth)
+      .then(async result => {
+        if (result) {
+          // This gives you a Google Access Token. You can use it to access Google APIs.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const _token = credential?.accessToken;
+
+          // The signed-in user info; at this point they are authenticated
+          const { uid, email, photoURL, displayName } = result.user;
+
+          setAuthUser(
+            (await getUser(uid)) ||
+              (await createUser({
+                uid,
+                email: email || '',
+                photoURL: photoURL || '',
+                displayName: displayName || '',
+              })) ||
+              null,
+          );
+        }
+      })
+      .catch(error => {
+        // Handle Errors here.
+        console.error(error);
+
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        // The email of the user's account used.
+        const email = error.customData.email;
+        // The AuthCredential type that was used.
+        const credential = GoogleAuthProvider.credentialFromError(error);
+        console.error(errorCode, errorMessage, email, credential);
+      });
+  }, [createUser, getUser, router]);
 
   return { authUser, loading, login, logout };
 };

@@ -2,10 +2,11 @@ import { onSnapshot, query, where } from 'firebase/firestore';
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, Ingredient, Unit } from '../../lib/firebase/interfaces';
-import { Box, Grid, GridItem } from '@chakra-ui/react';
+import { Box, Grid, GridItem, Spinner } from '@chakra-ui/react';
 import useIngredient from '../../hooks/useCreateIngredient';
 import { IngredientCard, NewIngredientCard } from '../IngredientCards';
 import IngredientForm from '../IngredientForm';
+import { useAuth } from '../../hooks/useAuth';
 
 export type IngredientFormData = {
   name: string;
@@ -25,6 +26,7 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
 
 const IngredientList: FC = () => {
   const [{ createIngredient }, _loading, _error] = useIngredient();
+  const { loading } = useAuth();
 
   const onSubmit = useCallback(
     async (data: IngredientFormData): Promise<void> => {
@@ -136,6 +138,7 @@ const IngredientList: FC = () => {
           </Grid>
         </>
       </FormProvider>
+      {loading ? <Spinner /> : null}
     </form>
   );
 };

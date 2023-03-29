@@ -66,9 +66,7 @@ const Functions: FC = () => {
         color={'#0070f3'}
         cursor={'pointer'}
         _hover={{ textDecoration: 'underline' }}
-        onClick={() => {
-          login();
-        }}
+        onClick={login}
       >
         Login
       </Link>
@@ -79,9 +77,7 @@ const Functions: FC = () => {
         color={'#0070f3'}
         cursor={'pointer'}
         _hover={{ textDecoration: 'underline' }}
-        onClick={() => {
-          logout();
-        }}
+        onClick={logout}
       >
         Logout
       </Link>
