@@ -39,9 +39,8 @@ const firestore = initializeFirestore(app, {
   ignoreUndefinedProperties: true,
 });
 
-// Ensure emulator flag is off in production env when deploying
+// Workaround for settings/host emulator crash
 try {
-  // Workaround for settings/host emulator crash
   const EMULATORS_STARTED = 'EMULATORS_STARTED';
 
   type CacheControlGlobal = typeof global & {
@@ -54,7 +53,9 @@ try {
     firestore !== null
   ) {
     (global as CacheControlGlobal)[EMULATORS_STARTED] = true;
-    // TODO: use computer's local Wi-Fi IP instead of localhost to test Firebase on LAN devices
+    /* Note: `next build` doesn't account for environment variables (doesn't use .env.production)
+     * Need to comment out emulator connections when pushing to production
+     */
     connectFirestoreEmulator(firestore, '10.88.111.5', 8080);
     connectAuthEmulator(authentication, 'http://10.88.111.5:9099');
   }
