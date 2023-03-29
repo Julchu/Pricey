@@ -60,7 +60,7 @@ firebase --project="<projectId>" emulators:start --only auth,firestore,storage -
 # Sometimes emulator port is in use, this command will kill that port
 sudo kill -9 $(sudo lsof -t -i:8080)
 
-# TODO: Installing Firebase functions
+# TODO: Installing Firebase functions; can probably skip this for now
 cd functions
 yarn install
 

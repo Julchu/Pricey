@@ -19,19 +19,17 @@ const Functions: FC = () => {
     if (authUser) console.log('dashboard useAuth:', authUser);
   }, [authUser]);
 
-  const uploadFileAndRed = useCallback((files: FileFormData): void => {
+  //  TODO: fix crash on production for this function
+  const uploadFileAndRed = (files: FileFormData): void => {
     readFile(files.file[0]).then(async fileData => {
       console.log(await parseCSV(fileData, setFileReading));
     });
-  }, []);
+  };
 
-  const onSubmit = useCallback(
-    (data: FileFormData) => {
-      setFileReading(true);
-      uploadFileAndRed(data);
-    },
-    [uploadFileAndRed],
-  );
+  const onSubmit = (data: FileFormData): void => {
+    setFileReading(true);
+    uploadFileAndRed(data);
+  };
 
   return (
     <Flex flexDir={'column'}>
@@ -96,7 +94,7 @@ const Functions: FC = () => {
           type="file"
           accept="csv"
         />
-        <Button onClick={handleSubmit(onSubmit)}>Upload ingredients</Button>
+        <Button onClick={() => handleSubmit(onSubmit)}>Upload ingredients</Button>
       </form>
 
       {fileReading ? (
