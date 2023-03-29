@@ -1,39 +1,37 @@
-import { Button, Flex, Input, Link, Spinner, useEditable } from '@chakra-ui/react';
-import { FC, useCallback, useEffect } from 'react';
+import { Button, Flex, Input, Link, Spinner, Text } from '@chakra-ui/react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
+
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
 import { parseCSV, readFile } from '../../lib/parseCSV';
-// import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-// import { parseCSV } from '../../lib/parseCSV';
 
 type FileFormData = {
   file: File[];
 };
 
 const Functions: FC = () => {
-  // const uploadFileAndRed = useCallback((files: FileFormData): void => {
-  //   readFile(files.file[0]).then(async fileData => console.log(await parseCSV(fileData)));
-  // }, []);
-
-  // const onSubmit = useCallback(
-  //   (data: FileFormData) => {
-  //     uploadFileAndRed(data);
-  //   },
-  //   [uploadFileAndRed],
-  // );
-
-  const { authUser, loading, login, logout } = useAuth();
+  const { authUser, loading: userLoading, login, logout } = useAuth();
+  const [fileReading, setFileReading] = useState(false);
+  const { handleSubmit, register } = useForm<FileFormData>();
 
   useEffect(() => {
     if (authUser) console.log('dashboard useAuth:', authUser);
   }, [authUser]);
 
-  const {
-    handleSubmit,
-    register,
-    formState: { errors, isSubmitting },
-  } = useForm<FileFormData>();
+  const uploadFileAndRed = useCallback((files: FileFormData): void => {
+    readFile(files.file[0]).then(async fileData => {
+      console.log(await parseCSV(fileData, setFileReading));
+    });
+  }, []);
+
+  const onSubmit = useCallback(
+    (data: FileFormData) => {
+      setFileReading(true);
+      uploadFileAndRed(data);
+    },
+    [uploadFileAndRed],
+  );
 
   return (
     <Flex flexDir={'column'}>
@@ -62,35 +60,53 @@ const Functions: FC = () => {
         Delete Ingredients
       </Link>
 
-      <Link
-        color={'#0070f3'}
-        cursor={'pointer'}
-        _hover={{ textDecoration: 'underline' }}
-        onClick={login}
-      >
-        Login
-      </Link>
+      {authUser ? (
+        <Link
+          color={'#0070f3'}
+          cursor={'pointer'}
+          _hover={{ textDecoration: 'underline' }}
+          onClick={logout}
+        >
+          Logout
+        </Link>
+      ) : (
+        <Link
+          color={'#0070f3'}
+          cursor={'pointer'}
+          _hover={{ textDecoration: 'underline' }}
+          onClick={login}
+        >
+          Login
+        </Link>
+      )}
 
-      {loading ? <Spinner /> : authUser ? <h1>Authed</h1> : <h1>Not authed</h1>}
+      {userLoading ? (
+        <>
+          <Spinner />
+          <Text>User loading</Text>
+        </>
+      ) : (
+        <Text>User not loading</Text>
+      )}
 
-      <Link
-        color={'#0070f3'}
-        cursor={'pointer'}
-        _hover={{ textDecoration: 'underline' }}
-        onClick={logout}
-      >
-        Logout
-      </Link>
-
-      {/* <form>
+      <form>
         <Input
           {...register('file', { required: false })}
           placeholder="Choose ingredients CSV"
           type="file"
           accept="csv"
         />
-        <Button onClick={() => handleSubmit(onSubmit)}>Upload ingredients</Button>
-      </form> */}
+        <Button onClick={handleSubmit(onSubmit)}>Upload ingredients</Button>
+      </form>
+
+      {fileReading ? (
+        <>
+          <Spinner />
+          <Text>File reading</Text>
+        </>
+      ) : (
+        <Text>File not reading</Text>
+      )}
     </Flex>
   );
 };

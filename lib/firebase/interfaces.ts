@@ -30,16 +30,6 @@ export enum Unit {
   unit = 'unit',
 }
 
-/* Ingredient
-  name: 
-  variety: 
-  commodity: 
-  category: 
-  PLU: 
-  image: 
-
-*/
-
 // Record of every instance that an ingredient is saved
 export interface Submission {
   ingredientId?: string;
@@ -52,7 +42,14 @@ export interface Submission {
   status?: Status;
 }
 
-// Ingredient info
+/* Ingredient info
+ * name:
+ * variety:
+ * commodity:
+ * category:
+ * PLU:
+ * image:
+ */
 export interface Ingredient {
   ingredientId?: string;
   name: string;
@@ -76,12 +73,6 @@ export interface User {
   // Preferences
 }
 
-export interface Auth {
-  id?: string;
-  name: string;
-  email: string;
-}
-
 /* Public features:
  * Create Time-to-live (TTL) grocery list w/ ingredients
  *
@@ -100,22 +91,7 @@ export interface Address {
   country: string;
 }
 
-// export interface Auth {
-//   uid: string;
-//   name: string;
-//   email: string;
-//   photoURL: string;
-//   // claims?: {
-//   //   isMyWayCafeAdmin?: boolean;
-//   // };
-//   // preferences?: UserPreferences | ChefPreferences;
-//   role?: UserRole;
-// }
-
 // Firestore data converters
-// toFirestore({ id, ...data }: PartialWithFieldValue<T>): DocumentData {
-//   return data
-// },
 export const converter = <T>(): FirestoreDataConverter<T> => ({
   toFirestore: (data: PartialWithFieldValue<T>) => data as DocumentData,
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
@@ -151,7 +127,7 @@ export const db = {
  * Ex: /ingredientNames/a/almond: { ingredientIds[]: list of id used in /ingredients for almond }
  */
 
-/* Google Maps reverse Geolocation
+/* TODO: Google Maps reverse Geolocation for Ingredient submission location
 // https://maps.googleapis.com/maps/api/geocode/json?latlng=43.639900,-79.390511&key=
 
 latlong: 43.639900,-79.390511
