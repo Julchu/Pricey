@@ -20,7 +20,7 @@ const Functions: FC = () => {
   }, [authUser]);
 
   //  TODO: fix crash on production for this function
-  const uploadFileAndRed = (files: FileFormData): void => {
+  const uploadFileAndRead = (files: FileFormData): void => {
     readFile(files.file[0]).then(async fileData => {
       console.log(await parseCSV(fileData, setFileReading));
     });
@@ -28,7 +28,7 @@ const Functions: FC = () => {
 
   const onSubmit = (data: FileFormData): void => {
     setFileReading(true);
-    uploadFileAndRed(data);
+    // uploadFileAndRed(data);
   };
 
   return (
