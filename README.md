@@ -39,24 +39,22 @@ yarn global add firebase-tools
 
 ```zsh
 # Copy and setup your environment
-cp .env.example .env.development
+cp .env.example .env.development .env.production
 ```
 
 ### Cloning and installing the app
 
 ```zsh
-# Go to your preferred project directory
-# A folder called Pricey will be added
+# Go to your preferred project directory; a folder called Pricey will be added
 git clone https://github.com/Julchu/Pricey.git
 cd Pricey
 
-# Installing the React app
-# A browser tab should open at localhost:3000
+# Installing the React app; a browser tab should open at localhost:3000
 yarn install
 yarn dev
 
-# Launching the Firebase/Firestore emulator
-# You can open the emulator at localhost:4000/firestore
+# Launching the Firebase/Firestore emulator: open the emulator at localhost:4000/firestore
+# Also exports/imports emulator data to ./emulatorData
 firebase --project="<projectId>" emulators:start --only auth,firestore,storage --export-on-exit ./emulatorData --import ./emulatorData
 
 # Sometimes emulator port is in use, this command will kill that port
@@ -66,7 +64,7 @@ sudo kill -9 $(sudo lsof -t -i:8080)
 cd functions
 yarn install
 
-# Deploying app to live:
+# Deploying app to live; make sure to comment out lines to connect emulators in /lib/firebase/index.ts before deploying
 yarn export && firebase --project <projectId> deploy
 # Optional flag: --except functions
 
