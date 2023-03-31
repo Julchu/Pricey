@@ -2,7 +2,6 @@ import { ComponentType, useState } from 'react';
 import { Unit } from '../lib/firebase/interfaces';
 import { AuthContext, useProvideAuth } from '../hooks/useAuth';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
-import '@fontsource/montserrat';
 import { theme } from '../components/UI/Theme';
 import { UnitContext } from '../hooks/useUnit';
 

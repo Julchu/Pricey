@@ -1,3 +1,11 @@
+import { Montserrat } from 'next/font/google';
+
+// Import the weights and subsets, add any other config here as well
+const nextFont = Montserrat({
+  weight: ['400'],
+  subsets: ['latin'],
+});
+
 export const theme = {
   colors: {
     blue: '#0000FF',
@@ -5,8 +13,8 @@ export const theme = {
     rb: '#002366',
   },
   fonts: {
-    heading: `'Montserrat'`,
-    body: `'Montserrat'`,
+    heading: nextFont.style.fontFamily,
+    body: nextFont.style.fontFamily,
   },
   fontWeights: {
     regular: 400,
