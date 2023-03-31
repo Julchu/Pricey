@@ -1,10 +1,9 @@
 import { Button, Flex, Input, Link, Spinner, Text } from '@chakra-ui/react';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
-
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-import { parseCSV, readFile } from '../../lib/parseCSV';
+import useIngredient from '../../hooks/useCreateIngredient';
 
 type FileFormData = {
   file: File[];
@@ -12,23 +11,17 @@ type FileFormData = {
 
 const Functions: FC = () => {
   const { authUser, loading: userLoading, login, logout } = useAuth();
-  const [fileReading, setFileReading] = useState(false);
+
+  const [{ csvToIngredient }, ingredientLoading, error] = useIngredient();
+
   const { handleSubmit, register } = useForm<FileFormData>();
 
   useEffect(() => {
     if (authUser) console.log('dashboard useAuth:', authUser);
   }, [authUser]);
 
-  //  TODO: fix crash on production for this function
-  const uploadFileAndRead = (files: FileFormData): void => {
-    readFile(files.file[0]).then(async fileData => {
-      console.log(await parseCSV(fileData, setFileReading));
-    });
-  };
-
   const onSubmit = (data: FileFormData): void => {
-    setFileReading(true);
-    // uploadFileAndRed(data);
+    if (data.file[0]) csvToIngredient(data.file[0]);
   };
 
   return (
@@ -39,7 +32,7 @@ const Functions: FC = () => {
         _hover={{ textDecoration: 'underline' }}
         onClick={async () => {
           await getDocuments('ingredients');
-          await getDocuments('ingredientInfos');
+          await getDocuments('submissions');
         }}
       >
         Get Ingredients
@@ -51,8 +44,7 @@ const Functions: FC = () => {
         _hover={{ textDecoration: 'underline' }}
         onClick={async () => {
           await deleteCollection('ingredients');
-          await deleteCollection('ingredientInfo');
-          await deleteCollection('ingredientInfos');
+          await deleteCollection('submissions');
         }}
       >
         Delete Ingredients
@@ -87,24 +79,28 @@ const Functions: FC = () => {
         <Text>User not loading</Text>
       )}
 
-      <form>
-        <Input
-          {...register('file', { required: false })}
-          placeholder="Choose ingredients CSV"
-          type="file"
-          accept="csv"
-        />
-        <Button onClick={() => handleSubmit(onSubmit)}>Upload ingredients</Button>
-      </form>
-
-      {fileReading ? (
+      {authUser ? (
         <>
-          <Spinner />
-          <Text>File reading</Text>
+          <form>
+            <Input
+              {...register('file', { required: false })}
+              placeholder="Choose ingredients CSV"
+              type="file"
+              accept="csv"
+            />
+            <Button onClick={handleSubmit(onSubmit)}>Upload ingredients</Button>
+          </form>
+
+          {ingredientLoading ? (
+            <>
+              <Spinner />
+              <Text>File reading</Text>
+            </>
+          ) : (
+            <Text>File not reading</Text>
+          )}
         </>
-      ) : (
-        <Text>File not reading</Text>
-      )}
+      ) : null}
     </Flex>
   );
 };

@@ -18,7 +18,7 @@ export const getIngredientNames = async (
 ): Promise<void> => {
   const snap = await getDoc(
     // Retrieve single document with known id
-    db.ingredientInfoDoc(documentId),
+    db.ingredientDoc(documentId),
   );
   if (snap.exists()) {
     callback(snap.data());

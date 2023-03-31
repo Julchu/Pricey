@@ -9,7 +9,7 @@ import IngredientForm from '../IngredientForm';
 import { useAuth } from '../../hooks/useAuth';
 
 export type IngredientFormData = {
-  name: string;
+  variety: string;
   price: number;
   quantity: number;
   unit: Unit;
@@ -25,14 +25,14 @@ const defaultFormValues = (): Partial<IngredientFormData> => ({
 });
 
 const IngredientList: FC = () => {
-  const [{ createIngredient }, _loading, _error] = useIngredient();
+  const [{ submitIngredient }, _loading, _error] = useIngredient();
   const { loading } = useAuth();
 
   const onSubmit = useCallback(
     async (data: IngredientFormData): Promise<void> => {
-      await createIngredient(data);
+      await submitIngredient(data);
     },
-    [createIngredient],
+    [submitIngredient],
   );
 
   // // Template onSubmit callback from TheFoodWorks
@@ -58,7 +58,7 @@ const IngredientList: FC = () => {
    * searchResults holds array of streamed results
    */
   const [newIngredient, setNewIngredient] = useState<IngredientFormData>({
-    name: '',
+    variety: '',
     price: NaN,
     quantity: NaN,
     unit: '' as Unit,
@@ -68,7 +68,7 @@ const IngredientList: FC = () => {
 
   /* Live-updating retrieval of specific document and its contents */
   useEffect(() => {
-    const q = query(db.ingredientInfoCollection, where('count', '>', 0) /*limit(8)*/);
+    const q = query(db.ingredientCollection, where('count', '>', 0) /*limit(8)*/);
 
     onSnapshot(q, querySnapshot => {
       const ingredientInfoList: Ingredient[] = [];
@@ -79,12 +79,12 @@ const IngredientList: FC = () => {
     });
   }, []);
 
-  const filteredResults = useMemo(() => {
-    setFoundIngredient(searchResults.some(({ name }) => newIngredient.name === name));
-    return searchResults
-      .filter(ingredientInfo => ingredientInfo.name.includes(newIngredient.name || ''))
-      .sort();
-  }, [searchResults, newIngredient.name]);
+  // const filteredResults = useMemo(() => {
+  //   setFoundIngredient(searchResults.some(({ variety }) => newIngredient.variety === variety));
+  //   return searchResults
+  //     .filter(ingredientInfo => ingredientInfo?.variety.includes(newIngredient.variety || ''))
+  //     .sort();
+  // }, [searchResults, newIngredient.variety]);
 
   return (
     <form>
@@ -119,12 +119,12 @@ const IngredientList: FC = () => {
               </GridItem>
             ) : null}
 
-            {filteredResults?.map((ingredientInfo, index) => {
+            {/* {filteredResults?.map((ingredientInfo, index) => {
               return (
                 <GridItem
                   ml={{ base: foundIngredient ? '30px' : '', sm: 'unset' }}
                   mr={{ base: index === filteredResults.length - 1 ? '30px' : '', sm: 'unset' }}
-                  key={`${ingredientInfo.name}_${index}`}
+                  key={`${ingredientInfo.variety}_${index}`}
                 >
                   <IngredientCard
                     ingredientInfo={ingredientInfo}
@@ -134,7 +134,7 @@ const IngredientList: FC = () => {
                   />
                 </GridItem>
               );
-            })}
+            })} */}
           </Grid>
         </>
       </FormProvider>

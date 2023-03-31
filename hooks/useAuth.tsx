@@ -15,14 +15,14 @@ import { useRouter } from 'next/router';
 import useUser from './useUser';
 
 type AuthContextType = {
-  authUser: User | null;
+  authUser: User | undefined;
   loading: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
 };
 
 export const useProvideAuth = (): AuthContextType => {
-  const [authUser, setAuthUser] = useState<User | null>(null);
+  const [authUser, setAuthUser] = useState<User | undefined>(undefined);
   const [{ getUser, createUser }, _createUserLoading] = useUser();
   const [loading, _setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -49,9 +49,9 @@ export const useProvideAuth = (): AuthContextType => {
     signOut(auth)
       .then(() => {
         // Sign-out successful.
-        setAuthUser(null);
+        setAuthUser(undefined);
         console.log('Signed out');
-        router.push('/');
+        router.push('/functions');
       })
       .catch(error => {
         // An error happened.
@@ -72,6 +72,7 @@ export const useProvideAuth = (): AuthContextType => {
             const credential = GoogleAuthProvider.credentialFromResult(result);
             const _token = credential?.accessToken;
             const user = result.user;
+
             // The signed-in user info; at this point they are authenticated
             setAuthUser(
               (await getUser(user.uid)) ||
@@ -81,7 +82,7 @@ export const useProvideAuth = (): AuthContextType => {
                   photoURL: user.photoURL || '',
                   displayName: user.displayName || '',
                 })) ||
-                null,
+                undefined,
             );
           }
         })
@@ -111,10 +112,10 @@ export const useProvideAuth = (): AuthContextType => {
           email: user.email || '',
           photoURL: user.photoURL || '',
           name: user.displayName || '',
-        } || null,
+        } || undefined,
       );
     } else {
-      setAuthUser(null);
+      setAuthUser(undefined);
       console.log('User is not logged');
     }
   };
@@ -122,15 +123,16 @@ export const useProvideAuth = (): AuthContextType => {
   // Auth persistence: detect if user is authenticated or not
   useEffect(() => {
     const auth = getAuth();
-    onAuthStateChanged(auth, handleAuthChange);
+    const unsubscribe = onAuthStateChanged(auth, handleAuthChange);
     handleRedirect(auth);
+    return () => unsubscribe();
   }, [handleRedirect]);
 
   return { authUser, loading, login, logout };
 };
 
 export const AuthContext = createContext<AuthContextType>({
-  authUser: null,
+  authUser: undefined,
   loading: true,
   login: async () => void 0,
   logout: async () => void 0,

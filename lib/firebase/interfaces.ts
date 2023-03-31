@@ -33,6 +33,7 @@ export enum Unit {
 // Record of every instance that an ingredient is saved
 export interface Submission {
   ingredientId?: string;
+  name?: string;
   image?: string;
   price: number;
   unit: Unit;
@@ -51,13 +52,13 @@ export interface Submission {
  * image:
  */
 export interface Ingredient {
-  ingredientId?: string;
-  name: string;
-  image?: string;
   plu?: number;
   category?: string;
-  submissions: string[] | FieldValue;
-  count: number | FieldValue;
+  commodity?: string;
+  variety?: string;
+  image?: string;
+  submissions?: string[] | FieldValue;
+  count?: number | FieldValue;
   lastUpdated?: Timestamp | FieldValue;
 }
 
@@ -111,14 +112,13 @@ const docPoint = <T>(collectionPath: string, ...extraPaths: string[]): DocumentR
  */
 export const db = {
   // Collections
-  ingredientCollection: collectionPoint<Submission>('ingredients'),
-  ingredientInfoCollection: collectionPoint<Ingredient>('ingredientInfos'),
+  submissionCollection: collectionPoint<Submission>('submissions'),
+  ingredientCollection: collectionPoint<Ingredient>('ingredients'),
   userCollection: collectionPoint<User>('users'),
 
   // Docs
-  ingredientDoc: (...extraPaths: string[]) => docPoint<Submission>('ingredients', ...extraPaths),
-  ingredientInfoDoc: (...extraPaths: string[]) =>
-    docPoint<Ingredient>('ingredientInfos', ...extraPaths),
+  submissionDoc: (...extraPaths: string[]) => docPoint<Submission>('submissions', ...extraPaths),
+  ingredientDoc: (...extraPaths: string[]) => docPoint<Ingredient>('ingredients', ...extraPaths),
   userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
 };
 
