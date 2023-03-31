@@ -1,21 +1,26 @@
 # Pricey
 
-Tracking historically-lowest price of items we purchase on a recurring basis.
+Tracking personal price thresholds and lowest price of items we purchase on a recurring basis.
 
-Automatically converts unit prices when stores (like grocery stores) purposefully hide unit prices or display them in
-different units.
+Convert prices per unit when grocery stores purposefully hide them or markup and discount them while hiding their actual prices per unit
 
-# TODO
+# TODO:
 
 - [TODO Board](https://github.com/Julchu/Pricey/projects/2)
 
 # Setup
 
-### NodeJS, npm, Yarn
+### NodeJS, `npm`, `yarn`
 
 - You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that you can run commands to download packages used to create React projects.
 
-- The main package you'll need is a separate package manager called `Yarn`, which functions similarly (like a super layer) to `npm`
+- The main package you'll need is a separate package manager called `yarn`, which functions similarly (like a super layer) to `npm`
+
+### Why `yarn`
+
+- NextJS uses `yarn` over `npm` by default
+- `yarn` installs packages in parallel rather than one-by-one, like `npm` does
+- `yarn`'s lockfile is a lot more sturdy than `npm`'s lockfile
 
 ```bash
 npm install --global yarn
@@ -55,6 +60,7 @@ yarn dev
 
 # Launching the Firebase/Firestore emulator: open the emulator at localhost:4000/firestore
 # Also exports/imports emulator data to ./emulatorData
+# projectId will be the one in your .env.development
 firebase --project="<projectId>" emulators:start --only auth,firestore,storage --export-on-exit ./emulatorData --import ./emulatorData
 
 # Sometimes emulator port is in use, this command will kill that port
@@ -65,8 +71,8 @@ cd functions
 yarn install
 
 # Deploying app to live; make sure to comment out lines to connect emulators in /lib/firebase/index.ts before deploying
-yarn export && firebase --project <projectId> deploy
 # Optional flag: --except functions
+yarn export && firebase --project <projectId> deploy
 
 ```
 
@@ -76,6 +82,7 @@ yarn export && firebase --project <projectId> deploy
 - Go to your VSCode JSON settings:
   - Command Palette -> Preferences: Open Settings (JSON)
 - Add the following code to the JSON object
+- Whenever you save a file, it'll run automatic formatting based on rules defined in `/.prettierrc.json`
 
 ```json
 // settings.json
@@ -90,7 +97,13 @@ yarn export && firebase --project <projectId> deploy
 }
 ```
 
-- Whenever you save a file, it'll run automatic formatting based on rules defined in `/.prettierrc.json`
+- I also use file autosave whenever I switch to a different page/window, mimicking Webstorm
+
+```json
+{
+  "files.autoSave": "onFocusChange"
+}
+```
 
 ## Testing
 
@@ -104,13 +117,7 @@ yarn lint
 yarn type-check
 ```
 
-Our project also will automatically run these commands on staged files whenever you're committing them. It'll block the commits if errors are thrown, with our installation of Husky and Lint-Staged
-
-## Why Yarn
-
-- NextJS uses Yarn over NPM by default
-- Yarn installs packages in parallel rather than one-by-one, like NPM does
-- Yarn's lockfile is a lot more sturdy than NPM's lockfile
+- With Husky and Lint-Staged, project will automatically run these basic checks when trying to commit changes or deploy the project, and will block the commit/deployment on errors (not warnings)
 
 # Notes
 
@@ -181,4 +188,53 @@ If you understand `getters` and `setters`, we can also pass down `setter` functi
   - Required for devs to install when building app
   - Ex: linters, formatters
 
+## Basic Emotion styled components
+
+Emotion allows you to style components in a function/object format, similar to how we build normal React components
+
+Our base styled components will go into `/UI`, and each specific component's styles can either build unique styled components, or inherit from one in `/UI`
+
+- Ex: `/components/UI/buttons.tsx`
+
+Syntax is similar to CSS but with camelCase instead of kebab-case
+
+- Ex: `fontSize` instead of `font-size`
+
+Every non-numeric value is a string in single quotes
+
+- Ex: `fontSize: '24px'`, `fontSize: 24`
+
+## Chakra UI: advanced version of Emotion styled components
+
+Chakra UI is built on Emotion, but with various nuances, attempting to solve inconsistent theming from building every component from scratch (like I did in V1 of this app)
+
+Chakra UI offers basic components with the idea for us to elaborately customize them into different varients to call in our app
+
+Rather than lose track of every single kind of button we built per page in Emotion, we'll just use Chakra UI Buttons with a specific variant
+
+## CSS Notes
+
+`display: 'flex'`: displays content relative to other content
+
+- Content will be displayed in order
+
+`position: 'fixed'`: positions content relative to browser
+
+- Ex: `bottom: '0px'`, will position content at bottom of browser regardless of any content, on top of the content displayed
+
 ## Firestore
+
+```ts
+const newUserRef = await addDoc(db.userCollection, { userData });
+
+const userDoc = await getDoc(newUserRef);
+if (userDoc.exists()) {
+  const user = userDoc.data();
+}
+
+const existingUser = await getDocs(query(db.userCollection, where('uid', '==', uid)));
+
+if (existingUser.docs.length) {
+  const user = existingUser.docs[0].data();
+}
+```
