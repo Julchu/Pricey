@@ -48,6 +48,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
     Papa.parse(file, {
       header: true,
       dynamicTyping: true,
+      worker: true,
 
       // Streaming and modifying row by row
       step: async (row: { data: CSVIngredient }) => {
@@ -92,7 +93,6 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         setLoading(false);
       },
     });
-    // setLoading(true);
   }, []);
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
