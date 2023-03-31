@@ -44,21 +44,21 @@ const IngredientForm: FC<{
           _focus={{ boxShadow: { sm: 'focus' } }}
           _placeholder={{
             fontWeight: 300,
-            color: errors.name?.type === 'required' ? 'red' : 'grey',
+            color: errors.variety?.type === 'required' ? 'red' : 'grey',
           }}
-          {...register('name', { required: true })}
+          {...register('variety', { required: true })}
           placeholder={
-            errors.name?.type === 'required'
+            errors.variety?.type === 'required'
               ? 'Ingredient name is required'
               : 'Search for an ingredient'
           }
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
             setNewIngredient({
               ...newIngredient,
-              name: e.target.value.toLocaleLowerCase('en-US').trim(),
+              variety: e.target.value.toLocaleLowerCase('en-US').trim(),
             });
 
-            clearErrors('name');
+            clearErrors('variety');
           }}
         />
 

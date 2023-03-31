@@ -5,7 +5,7 @@ const nextConfig = {};
 // Dangerously allow production builds to successfully complete even if
 // your project has type errors.
 // !! WARN !!
-const typeScript = {
+const typescript = {
   ignoreBuildErrors: false,
 };
 
@@ -34,15 +34,20 @@ const publicRuntimeConfig = {
 };
 
 const experimental = {
+  // emotion: true,
+};
+
+const compiler = {
   emotion: true,
 };
 
 module.exports = {
-  nextConfig,
-  typeScript,
+  // nextConfig,
+  typescript,
   images,
   publicRuntimeConfig,
-  experimental,
+  // experimental,
+  compiler,
   swcMinify: true,
   trailingSlash: false,
   reactStrictMode: true,
