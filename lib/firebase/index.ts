@@ -56,8 +56,8 @@ try {
     /* Note: `next build` doesn't account for environment variables (doesn't use .env.production)
      * Need to comment out emulator connections when pushing to production
      */
-    // connectFirestoreEmulator(firestore, '10.88.111.5', 8080);
-    // connectAuthEmulator(authentication, 'http://10.88.111.5:9099');
+    connectFirestoreEmulator(firestore, '10.88.111.5', 8080);
+    connectAuthEmulator(authentication, 'http://10.88.111.5:9099');
   }
 } catch (e) {
   console.log(e);
