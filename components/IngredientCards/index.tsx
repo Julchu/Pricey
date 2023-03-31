@@ -63,18 +63,22 @@ export const IngredientCard: FC<CardProps> = ({
   //   : 0;
 
   // Highlighting cards
-  const highlighted = newIngredient?.name === ingredientInfo?.name;
+  const highlighted = newIngredient?.variety === ingredientInfo?.variety;
 
   // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
   const onClickHandler = useCallback(async () => {
     if (ingredientInfo && handleSubmit && newIngredient && setNewIngredient) {
-      setValue('name', ingredientInfo.name);
+      setValue('variety', ingredientInfo.variety || '');
       // setValue('unit', ingredientInfo.unit);
 
       await handleSubmit();
 
       if (Object.keys(errors).length === 0) {
-        setNewIngredient({ ...newIngredient, name: ingredientInfo.name, unit: '' as Unit });
+        setNewIngredient({
+          ...newIngredient,
+          variety: ingredientInfo.variety || '',
+          unit: '' as Unit,
+        });
 
         resetField('price');
         resetField('quantity');
@@ -106,8 +110,8 @@ export const IngredientCard: FC<CardProps> = ({
           <Image
             src={'media/foodPlaceholder.png'}
             alt={'Food placeholder'}
-            width={'300px'}
-            height={'200px'}
+            // width={'300px'}
+            // height={'200px'}
           />
         </Box>
       </Flex>
@@ -125,7 +129,7 @@ export const IngredientCard: FC<CardProps> = ({
           textAlign={'center'}
           overflow={'hidden'}
         >
-          {ingredientInfo?.name}
+          {ingredientInfo?.variety}
         </Text>
 
         {/* <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
@@ -171,12 +175,12 @@ export const NewIngredientCard: FC<CardProps> = ({
   // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
   const onClickHandler = useCallback(async () => {
     if (handleSubmit && newIngredient && setNewIngredient) {
-      setValue('name', newIngredient.name);
+      setValue('variety', newIngredient.variety);
 
       await handleSubmit();
 
       if (Object.keys(errors).length === 0) {
-        setNewIngredient({ ...newIngredient, name: newIngredient.name, unit: '' as Unit });
+        setNewIngredient({ ...newIngredient, variety: newIngredient.variety, unit: '' as Unit });
 
         resetField('price');
         resetField('quantity');
@@ -209,8 +213,8 @@ export const NewIngredientCard: FC<CardProps> = ({
           <Image
             src={'media/imageUploadIcon.png'}
             alt={'Upload image'}
-            width={'150px'}
-            height={'100px'}
+            // width={'150px'}
+            // height={'100px'}
           />
         </Box>
       </Flex>
@@ -225,7 +229,7 @@ export const NewIngredientCard: FC<CardProps> = ({
         </Text>
 
         <Text as={'b'} display={'block'} textAlign={'center'} overflow={'hidden'} color={'#0070f3'}>
-          {newIngredient?.name || 'an ingredient'}
+          {newIngredient?.variety || 'an ingredient'}
         </Text>
 
         {/* TODO: add preview pricing */}

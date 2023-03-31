@@ -41,7 +41,7 @@ type CSVIngredient = {
 const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
-  const { authUser } = useAuth();
+  // const { authUser } = useAuth();
 
   const csvToIngredient = useCallback<IngredientMethods['csvToIngredient']>((file: File): void => {
     setLoading(true);
@@ -96,55 +96,52 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   }, []);
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
-    async ({
-      name,
-      price,
-      quantity,
-      unit,
-      location,
-    }: IngredientFormData): Promise<CollectionReference<Submission>> => {
+    async ({}: // variety,
+    // price,
+    // quantity,
+    // unit,
+    // location,
+    IngredientFormData): Promise<CollectionReference<Submission>> => {
       setLoading(true);
 
-      price = priceConverter((price * 100) / quantity, unit, {
-        mass: Unit.pound,
-        liquid: Unit.quart,
-      });
+      // price = priceConverter((price * 100) / quantity, unit, {
+      //   mass: Unit.pound,
+      //   liquid: Unit.quart,
+      // });
 
-      unit = isMass(unit)
-        ? Unit.pound
-        : isLiquid(unit)
-        ? Unit.litre
-        : unit in Unit
-        ? unit
-        : Unit.unit;
+      // unit = isMass(unit)
+      //   ? Unit.pound
+      //   : isLiquid(unit)
+      //   ? Unit.litre
+      //   : unit in Unit
+      //   ? unit
+      //   : Unit.unit;
 
-      const trimmedName = name.trim().toLocaleLowerCase('en-US');
+      // const trimmedName = variety.trim().toLocaleLowerCase('en-US');
 
       const submissionCollectionRef = db.submissionCollection;
 
       // Ex: /ingredientInfo/almond: { info }
-      const submissionDocumentRef = db.ingredientDoc(trimmedName);
+      // const submissionDocumentRef = db.ingredientDoc(trimmedName);
 
       // Ensuring all fields are passed by typechecking Ingredient
-      const newSubmission: Submission = {
-        // name,
-        price,
-        // location,
-        unit,
-        createdAt: serverTimestamp(),
-      };
+      // const newSubmission: Submission = {
+      //   // name,
+      //   price,
+      //   // location,
+      //   unit,
+      //   createdAt: serverTimestamp(),
+      // };
 
       /* If you want to auto generate an ID, use addDoc() + collection()
        * If you want to manually set the ID, use setDoc() + doc()
        */
       try {
         // /ingredients collection
-        const docRef = await addDoc(submissionCollectionRef, newSubmission);
-
+        // const docRef = await addDoc(submissionCollectionRef, newSubmission);
         // Getting current summary to compare lowest
         // const existingIngredient = await getDoc(ingredientDocumentRef).then(doc => doc.data());
         // await getDocs(query(db.ingredientCollection, where('plu', '==', uid)));
-
         /* If lowest exists:
          * * If lowest > price: price
          * * Else: lowest
@@ -155,10 +152,8 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         //     ? price
         //     : currentIngredientInfo?.lowest
         //   : price;
-
         // Prevent overriding existing ingredient unit
         // const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
-
         // Update existing ingredient
         // const submissionInfo: Ingredient = {
         //   name: 'cheese',
@@ -174,7 +169,6 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         //   submitter: authUser,
         //   createdAt: serverTimestamp(),
         // };
-
         // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent)
         // await setDoc(submissionDocumentRef, submissionInfo, { merge: true });
       } catch (e) {
@@ -184,7 +178,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       setLoading(false);
       return submissionCollectionRef as CollectionReference<Submission>;
     },
-    [authUser],
+    [],
   );
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(() => {}, []);
