@@ -10,14 +10,14 @@ import {
   currencyFormatter,
   unitFormatter,
 } from '../../lib/textFormatters';
-import { IngredientFormData } from '../Dashboard';
+import { SubmissionFormData } from '../Dashboard';
 import { useUnit } from '../../hooks/useUnit';
 
 type CardProps = {
   ingredientInfo?: Ingredient;
   handleSubmit?: () => Promise<void>;
-  newIngredient?: IngredientFormData;
-  setNewIngredient?: Dispatch<SetStateAction<IngredientFormData>>;
+  newIngredient?: SubmissionFormData;
+  setNewIngredient?: Dispatch<SetStateAction<SubmissionFormData>>;
 };
 
 // TODO: hovering over existing cards should show detailed information
@@ -32,7 +32,7 @@ export const IngredientCard: FC<CardProps> = ({
     setValue,
     resetField,
     formState: { errors },
-  } = useFormContext<IngredientFormData>();
+  } = useFormContext<SubmissionFormData>();
 
   // Showing price as unit preference
   // const { currentUnit } = useUnit();
@@ -154,7 +154,7 @@ export const NewIngredientCard: FC<CardProps> = ({
     setValue,
     resetField,
     formState: { errors },
-  } = useFormContext<IngredientFormData>();
+  } = useFormContext<SubmissionFormData>();
 
   // Showing price as unit preference
   const { currentUnit } = useUnit();

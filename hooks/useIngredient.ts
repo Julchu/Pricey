@@ -12,7 +12,7 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import Papa from 'papaparse';
-import { IngredientFormData } from '../components/Dashboard';
+import { SubmissionFormData } from '../components/Dashboard';
 import { db, Submission, Ingredient, Unit } from '../lib/firebase/interfaces';
 import { isLiquid, isMass, priceConverter } from '../lib/textFormatters';
 import { useAuth } from './useAuth';
@@ -20,9 +20,7 @@ import { firestore } from '../lib/firebase';
 
 type IngredientMethods = {
   csvToIngredient: (file: File) => void;
-  submitIngredient: (
-    ingredientData: IngredientFormData,
-  ) => Promise<CollectionReference<Submission>>;
+  submitIngredient: (ingredientData: SubmissionFormData) => void; //Promise<CollectionReference<Submission>>;
 
   updateIngredient: () => void;
   // updateIngredient: (
@@ -30,44 +28,39 @@ type IngredientMethods = {
   // ) => Promise<CollectionReference<Ingredient>>;
 };
 
-type CSVIngredient = {
-  PLU: number;
-  CATEGORY: string;
-  COMMODITY: string;
-  VARIETY: string;
-  IMAGE: string;
-};
-
 const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
-  // const { authUser } = useAuth();
+  const { authUser } = useAuth();
 
   const csvToIngredient = useCallback<IngredientMethods['csvToIngredient']>((file: File): void => {
     setLoading(true);
     Papa.parse(file, {
       header: true,
-      dynamicTyping: true,
       worker: true,
 
       // Streaming and modifying row by row
-      step: async (row: { data: CSVIngredient }) => {
-        const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, ..._rest } = row.data;
+      step: async (row: { data: Record<string, string> }) => {
+        const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, SIZE, ..._rest } = row.data;
 
         // Get a new write batch
         const batch = writeBatch(firestore);
 
-        const ingredientRef = doc(db.ingredientCollection);
-        batch.set(ingredientRef, {
-          plu: PLU,
-          category: CATEGORY,
-          commodity: COMMODITY,
-          variety: VARIETY,
-          image: IMAGE,
-          submissions: [],
-          count: 0,
+        // const ingredientRef = doc(db.ingredientCollection);
+        const ingredientDocRef = doc(db.ingredientCollection, PLU);
+
+        const ingredientInfo = {
+          plu: PLU.trim(),
+          category: CATEGORY ? CATEGORY.trim().toLocaleLowerCase() : '',
+          commodity: COMMODITY ? COMMODITY.trim().toLocaleLowerCase() : '',
+          variety: VARIETY ? VARIETY.trim().toLocaleLowerCase() : '',
+          image: IMAGE ? IMAGE.trim().toLocaleLowerCase() : '',
+          size: SIZE ? SIZE.trim().toLocaleLowerCase() : '',
+          count: increment(0),
           lastUpdated: serverTimestamp(),
-        } as PartialWithFieldValue<Ingredient>);
+        };
+
+        batch.set(ingredientDocRef, ingredientInfo as PartialWithFieldValue<Ingredient>);
 
         // Commit the batch
         await batch.commit();
@@ -101,8 +94,12 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
     // quantity,
     // unit,
     // location,
-    IngredientFormData): Promise<CollectionReference<Submission>> => {
+    SubmissionFormData) => {
+      if (!authUser) return;
       setLoading(true);
+
+      // Get a new write batch
+      const batch = writeBatch(firestore);
 
       // price = priceConverter((price * 100) / quantity, unit, {
       //   mass: Unit.pound,
@@ -119,7 +116,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
 
       // const trimmedName = variety.trim().toLocaleLowerCase('en-US');
 
-      const submissionCollectionRef = db.submissionCollection;
+      // const submissionDocRef = doc(db.submissionCollection);
 
       // Ex: /ingredientInfo/almond: { info }
       // const submissionDocumentRef = db.ingredientDoc(trimmedName);
@@ -178,7 +175,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       setLoading(false);
       return submissionCollectionRef as CollectionReference<Submission>;
     },
-    [],
+    [authUser],
   );
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(() => {}, []);

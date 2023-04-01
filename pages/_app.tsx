@@ -1,17 +1,12 @@
-import { ComponentType, useState } from 'react';
+import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { FC, useState } from 'react';
+import type { AppProps } from 'next/app';
 import { Unit } from '../lib/firebase/interfaces';
 import { AuthContext, useProvideAuth } from '../hooks/useAuth';
-import { ChakraProvider, extendTheme } from '@chakra-ui/react';
 import { theme } from '../components/UI/Theme';
 import { UnitContext } from '../hooks/useUnit';
 
-type Props = {
-  Component: ComponentType;
-  /* eslint-disable  @typescript-eslint/no-explicit-any */
-  pageProps: any;
-};
-
-const App = ({ Component, pageProps }: Props): JSX.Element => {
+const App: FC<AppProps> = ({ Component, pageProps }) => {
   const [currentUnit, setCurrentUnit] = useState({ mass: Unit.pound, liquid: Unit.litre });
   const [oppositeUnit, setOppositeUnit] = useState(() =>
     currentUnit.mass === Unit.pound

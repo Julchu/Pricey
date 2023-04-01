@@ -31,28 +31,21 @@ export enum Unit {
 }
 
 // Record of every instance that an ingredient is saved
+// TODO: allow submission of other materials that aren't part of ingredients
 export interface Submission {
-  ingredientId?: string;
-  name?: string;
+  plu?: string;
   image?: string;
   price: number;
+  quantity: number;
   unit: Unit;
-  submitter?: User;
+  submitter: string;
   location?: Address;
   createdAt: Timestamp | FieldValue;
-  status?: Status;
 }
 
-/* Ingredient info
- * name:
- * variety:
- * commodity:
- * category:
- * PLU:
- * image:
- */
+// PLU code is the
 export interface Ingredient {
-  plu?: number;
+  plu: string;
   category?: string;
   commodity?: string;
   variety?: string;

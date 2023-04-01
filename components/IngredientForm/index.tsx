@@ -3,18 +3,20 @@ import { FC, Dispatch, SetStateAction, ChangeEvent } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Unit } from '../../lib/firebase/interfaces';
 import { unitFormatter } from '../../lib/textFormatters';
-import { IngredientFormData } from '../Dashboard';
+import { SubmissionFormData } from '../Dashboard';
 
 // TODO: after submitting an ingredient, reset search to empty
 const IngredientForm: FC<{
-  newIngredient: IngredientFormData;
-  setNewIngredient: Dispatch<SetStateAction<IngredientFormData>>;
-}> = ({ newIngredient, setNewIngredient }) => {
+  searchIngredient: string;
+  setSearchIngredient: Dispatch<SetStateAction<string>>;
+  newIngredient: SubmissionFormData;
+  setNewIngredient: Dispatch<SetStateAction<SubmissionFormData>>;
+}> = ({ searchIngredient, setSearchIngredient, newIngredient, setNewIngredient }) => {
   const {
     register,
     clearErrors,
     formState: { errors },
-  } = useFormContext<IngredientFormData>();
+  } = useFormContext<SubmissionFormData>();
 
   const validateIsNumber = (value: number): boolean => {
     return !!value;
@@ -44,21 +46,23 @@ const IngredientForm: FC<{
           _focus={{ boxShadow: { sm: 'focus' } }}
           _placeholder={{
             fontWeight: 300,
-            color: errors.variety?.type === 'required' ? 'red' : 'grey',
+            color: errors.plu?.type === 'required' ? 'red' : 'grey',
           }}
-          {...register('variety', { required: true })}
+          {...register('plu', { required: true })}
           placeholder={
-            errors.variety?.type === 'required'
+            errors.plu?.type === 'required'
               ? 'Ingredient name is required'
               : 'Search for an ingredient'
           }
           onChange={(e: ChangeEvent<HTMLInputElement>) => {
-            setNewIngredient({
-              ...newIngredient,
-              variety: e.target.value.toLocaleLowerCase('en-US').trim(),
-            });
+            setSearchIngredient(e.target.value.toLocaleLowerCase('en-US').trim());
 
-            clearErrors('variety');
+            // setNewIngredient({
+            //   ...newIngredient,
+            //   plu: e.target.value.toLocaleLowerCase('en-US').trim(),
+            // });
+
+            clearErrors('plu');
           }}
         />
 

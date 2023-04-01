@@ -3,7 +3,7 @@ import { FC, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-import useIngredient from '../../hooks/useCreateIngredient';
+import useIngredient from '../../hooks/useIngredient';
 
 type FileFormData = {
   file: File[];

@@ -1,4 +1,4 @@
-import { addDoc, getDoc, getDocs, query, serverTimestamp, where } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { db, User } from '../lib/firebase/interfaces';
 
@@ -23,13 +23,13 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
     try {
       setLoading(true);
       // Associate auth info to a specific user in db for public data:
-      const existingUser = await getDocs(query(db.userCollection, where('uid', '==', uid)));
+      const existingUser = await getDoc(doc(db.userCollection, uid));
 
-      if (existingUser.docs.length) {
+      if (existingUser.exists()) {
+        const user = existingUser.data();
         setLoading(false);
-        const user = existingUser.docs[0].data();
         return {
-          uid: user.uid,
+          uid: uid,
           name: user.name,
           email: user.email,
           photoURL: user.photoURL,
@@ -44,7 +44,10 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
     async ({ uid, displayName, email, photoURL }) => {
       try {
         setLoading(true);
-        const newUserRef = await addDoc(db.userCollection, {
+
+        const newUserDocRef = doc(db.userCollection, uid);
+
+        await setDoc(newUserDocRef, {
           uid,
           email,
           photoURL,
@@ -53,12 +56,12 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
           submissions: [],
         });
 
-        const userDoc = await getDoc(newUserRef);
-        if (userDoc.exists()) {
+        const newUserDoc = await getDoc(newUserDocRef);
+        if (newUserDoc.exists()) {
+          const user = newUserDoc.data();
           setLoading(false);
-          const user = userDoc.data();
           return {
-            uid: user.uid,
+            uid: uid,
             name: user.name,
             email: user.email,
             photoURL: user.photoURL,

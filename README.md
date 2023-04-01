@@ -1,5 +1,7 @@
 # Pricey
 
+> https://thepriceyapp.web.app/functions
+
 Tracking personal price thresholds and lowest price of items we purchase on a recurring basis.
 
 Convert prices per unit when grocery stores purposefully hide them or markup and discount them while hiding their actual prices per unit
@@ -238,3 +240,14 @@ if (existingUser.docs.length) {
   const user = existingUser.docs[0].data();
 }
 ```
+
+Types or Interfaces?
+
+- Interface for public API's definition when authoring a library or 3rd party ambient type definitions, as this allows a consumer to extend them via declaration merging if some definitions are missing.
+
+- Type for your React Component Props and State, for consistency and because it is more constrained.
+
+  > https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/basic_type_example/#types-or-interfaces
+
+- Use Interface until You Need Type
+  > https://www.typescriptlang.org/docs/handbook/2/everyday-types.html#differences-between-type-aliases-and-interfaces
