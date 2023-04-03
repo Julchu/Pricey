@@ -12,6 +12,7 @@ import {
 } from '../../lib/textFormatters';
 import { SubmissionFormData } from '../Dashboard';
 import { useUnit } from '../../hooks/useUnit';
+import foodPlaceholder from 'public/media/foodPlaceholder.png';
 
 type CardProps = {
   ingredientInfo?: Ingredient;
@@ -63,84 +64,86 @@ export const IngredientCard: FC<CardProps> = ({
   //   : 0;
 
   // Highlighting cards
-  const highlighted = newIngredient?.variety === ingredientInfo?.variety;
+  // const highlighted = newIngredient?.variety === ingredientInfo?.variety;
 
   // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
-  const onClickHandler = useCallback(async () => {
-    if (ingredientInfo && handleSubmit && newIngredient && setNewIngredient) {
-      setValue('variety', ingredientInfo.variety || '');
-      // setValue('unit', ingredientInfo.unit);
+  // const onClickHandler = useCallback(async () => {
+  //   if (ingredientInfo && handleSubmit && newIngredient && setNewIngredient) {
+  //     setValue('variety', ingredientInfo.variety || '');
+  //     // setValue('unit', ingredientInfo.unit);
 
-      await handleSubmit();
+  //     await handleSubmit();
 
-      if (Object.keys(errors).length === 0) {
-        setNewIngredient({
-          ...newIngredient,
-          variety: ingredientInfo.variety || '',
-          unit: '' as Unit,
-        });
+  //     if (Object.keys(errors).length === 0) {
+  //       setNewIngredient({
+  //         ...newIngredient,
+  //         variety: ingredientInfo.variety || '',
+  //         unit: '' as Unit,
+  //       });
 
-        resetField('price');
-        resetField('quantity');
-      }
-    }
-  }, [errors, handleSubmit, ingredientInfo, newIngredient, resetField, setNewIngredient, setValue]);
+  //       resetField('price');
+  //       resetField('quantity');
+  //     }
+  //   }
+  // }, [errors, handleSubmit, ingredientInfo, newIngredient, resetField, setNewIngredient, setValue]);
 
   return (
-    <Box
-      letterSpacing={'2px'}
-      fontSize={'16px'}
-      scrollSnapAlign={'center'}
-      border={{ base: '1px solid grey', sm: 'none' }}
-      borderRadius={'5px'}
-      outline={{ sm: 'none' }}
-      h={{ sm: '300px' }}
-      w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
-      transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-      boxShadow={highlighted ? 'under' : 'normal'}
-      _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
-    >
-      {/* Image */}
-      <Flex minHeight={'180px'}>
-        <Box margin={'auto'}>
-          {/* TODO: image uploading */}
-          {/* TODO: wrap NextJS Image with ChakraImage, currently using NextJS Image only
-            https://www.jamesperkins.dev/post/using-next-image-with-chakra/
-           */}
-          <Image
-            src={'media/foodPlaceholder.png'}
-            alt={'Food placeholder'}
-            // width={'300px'}
-            // height={'200px'}
-          />
-        </Box>
-      </Flex>
+    <></>
+    // <Box
+    //   letterSpacing={'2px'}
+    //   fontSize={'16px'}
+    //   scrollSnapAlign={'center'}
+    //   border={{ base: '1px solid grey', sm: 'none' }}
+    //   borderRadius={'5px'}
+    //   outline={{ sm: 'none' }}
+    //   h={{ sm: '300px' }}
+    //   w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
+    //   transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
+    //   boxShadow={highlighted ? 'under' : 'normal'}
+    //   _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
+    // >
+    //   {/* Image */}
+    //   <Flex minHeight={'180px'}>
+    //     <Box margin={'auto'}>
+    //       {/* TODO: image uploading */}
+    //       {/* TODO: wrap NextJS Image with ChakraImage, currently using NextJS Image only
+    //         https://www.jamesperkins.dev/post/using-next-image-with-chakra/
+    //        */}
+    //       <Image
+    //         src={'/../../public/media/foodPlaceholder.png'}
+    //         alt={'Food placeholder'}
+    //         width={300}
+    //         height={200}
+    //         loading={'lazy'}
+    //       />
+    //     </Box>
+    //   </Flex>
 
-      {/* Card line */}
-      <Box borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
+    //   {/* Card line */}
+    //   <Box borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
 
-      {/* Info */}
-      <Box onClick={onClickHandler} h={'100%'} w={'100%'} padding={'15px 30px'} cursor={'pointer'}>
-        <Text
-          as="b"
-          color={'#0070f3'}
-          whiteSpace={'nowrap'}
-          display={'block'}
-          textAlign={'center'}
-          overflow={'hidden'}
-        >
-          {ingredientInfo?.variety}
-        </Text>
+    //   {/* Info */}
+    //   <Box onClick={onClickHandler} h={'100%'} w={'100%'} padding={'15px 30px'} cursor={'pointer'}>
+    //     <Text
+    //       as="b"
+    //       color={'#0070f3'}
+    //       whiteSpace={'nowrap'}
+    //       display={'block'}
+    //       textAlign={'center'}
+    //       overflow={'hidden'}
+    //     >
+    //       {ingredientInfo?.variety}
+    //     </Text>
 
-        {/* <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-          Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
-        </Text>
+    //     {/* <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
+    //       Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
+    //     </Text>
 
-        <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-          Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
-        </Text> */}
-      </Box>
-    </Box>
+    //     <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
+    //       Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
+    //     </Text> */}
+    //   </Box>
+    // </Box>
   );
 };
 
@@ -173,72 +176,73 @@ export const NewIngredientCard: FC<CardProps> = ({
   const convertedPreviewPrice = priceConverter(previewPrice, newIngredient?.unit, currentUnit);
 
   // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
-  const onClickHandler = useCallback(async () => {
-    if (handleSubmit && newIngredient && setNewIngredient) {
-      setValue('variety', newIngredient.variety);
+  // const onClickHandler = useCallback(async () => {
+  //   if (handleSubmit && newIngredient && setNewIngredient) {
+  //     setValue('variety', newIngredient.variety);
 
-      await handleSubmit();
+  //     await handleSubmit();
 
-      if (Object.keys(errors).length === 0) {
-        setNewIngredient({ ...newIngredient, variety: newIngredient.variety, unit: '' as Unit });
+  //     if (Object.keys(errors).length === 0) {
+  //       setNewIngredient({ ...newIngredient, variety: newIngredient.variety, unit: '' as Unit });
 
-        resetField('price');
-        resetField('quantity');
-      }
-    }
-  }, [errors, handleSubmit, newIngredient, resetField, setNewIngredient, setValue]);
+  //       resetField('price');
+  //       resetField('quantity');
+  //     }
+  //   }
+  // }, [errors, handleSubmit, newIngredient, resetField, setNewIngredient, setValue]);
 
   return (
-    <Box
-      ml={{ base: '30px', sm: 'unset' }}
-      letterSpacing={'2px'}
-      fontSize={'16px'}
-      scrollSnapAlign={'center'}
-      border={{ base: '1px solid grey', sm: 'none' }}
-      borderRadius={'5px'}
-      outline={{ sm: 'none' }}
-      h={{ sm: '300px' }}
-      w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
-      transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-      boxShadow={'normal'}
-      _hover={{ boxShadow: 'hover' }}
-    >
-      {/* Image */}
-      <Flex minHeight={'180px'}>
-        <Box margin={'auto'}>
-          {/* TODO: image uploading */}
-          {/* TODO: wrap NextJS Image with ChakraImage, currently using NextJS Image only
-            https://www.jamesperkins.dev/post/using-next-image-with-chakra/
-           */}
-          <Image
-            src={'media/imageUploadIcon.png'}
-            alt={'Upload image'}
-            // width={'150px'}
-            // height={'100px'}
-          />
-        </Box>
-      </Flex>
+    <></>
+    // <Box
+    //   ml={{ base: '30px', sm: 'unset' }}
+    //   letterSpacing={'2px'}
+    //   fontSize={'16px'}
+    //   scrollSnapAlign={'center'}
+    //   border={{ base: '1px solid grey', sm: 'none' }}
+    //   borderRadius={'5px'}
+    //   outline={{ sm: 'none' }}
+    //   h={{ sm: '300px' }}
+    //   w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
+    //   transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
+    //   boxShadow={'normal'}
+    //   _hover={{ boxShadow: 'hover' }}
+    // >
+    //   {/* Image */}
+    //   <Flex minHeight={'180px'}>
+    //     <Box margin={'auto'}>
+    //       {/* TODO: image uploading */}
+    //       {/* TODO: wrap NextJS Image with ChakraImage, currently using NextJS Image only
+    //         https://www.jamesperkins.dev/post/using-next-image-with-chakra/
+    //        */}
+    //       <Image
+    //         src={'media/imageUploadIcon.png'}
+    //         alt={'Upload image'}
+    //         // width={'150px'}
+    //         // height={'100px'}
+    //       />
+    //     </Box>
+    //   </Flex>
 
-      {/* Cardline */}
-      <Box borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
+    //   {/* Cardline */}
+    //   <Box borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
 
-      {/* Info */}
-      <Box onClick={onClickHandler} h={'100%'} w={'100%'} padding={'15px 30px'} cursor={'pointer'}>
-        <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-          Save
-        </Text>
+    //   {/* Info */}
+    //   <Box onClick={onClickHandler} h={'100%'} w={'100%'} padding={'15px 30px'} cursor={'pointer'}>
+    //     <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
+    //       Save
+    //     </Text>
 
-        <Text as={'b'} display={'block'} textAlign={'center'} overflow={'hidden'} color={'#0070f3'}>
-          {newIngredient?.variety || 'an ingredient'}
-        </Text>
+    //     <Text as={'b'} display={'block'} textAlign={'center'} overflow={'hidden'} color={'#0070f3'}>
+    //       {newIngredient?.variety || 'an ingredient'}
+    //     </Text>
 
-        {/* TODO: add preview pricing */}
-        {newIngredient && newIngredient.price && newIngredient.quantity && newIngredient.unit ? (
-          <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-            {currencyFormatter.format(convertedPreviewPrice)}/{unitFormatter(convertedUnit)}
-          </Text>
-        ) : null}
-      </Box>
-    </Box>
+    //     {/* TODO: add preview pricing */}
+    //     {newIngredient && newIngredient.price && newIngredient.quantity && newIngredient.unit ? (
+    //       <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
+    //         {currencyFormatter.format(convertedPreviewPrice)}/{unitFormatter(convertedUnit)}
+    //       </Text>
+    //     ) : null}
+    //   </Box>
+    // </Box>
   );
 };

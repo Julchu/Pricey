@@ -8,6 +8,9 @@ import { IngredientCard, NewIngredientCard } from '../IngredientCards';
 import IngredientForm from '../IngredientForm';
 import { useAuth } from '../../hooks/useAuth';
 import { useDebouncedState } from '../../hooks/useDebouncedState';
+// import Commodities from '../../';
+
+import Fuse from 'fuse.js';
 
 export type SubmissionFormData = {
   plu: string;
@@ -21,15 +24,72 @@ export type SubmissionFormData = {
 const defaultFormValues = (): Partial<SubmissionFormData> => ({
   // Add fields that are required for object submitted to Firebase as empty strings
   plu: '',
-  price: 0,
   submitter: '',
   location: '',
-  unit: undefined,
 });
 
 const IngredientList: FC = () => {
   const { authUser } = useAuth();
-  // const [{ submitIngredient }, _loading, _error] = useIngredient();
+
+  // IngredientForm submission
+  const methods = useForm<SubmissionFormData>({ defaultValues: defaultFormValues() });
+  const { handleSubmit } = methods;
+
+  const [newIngredient, setNewIngredient] = useState<SubmissionFormData>({
+    plu: '',
+    price: NaN,
+    quantity: NaN,
+    unit: '' as Unit,
+    submitter: authUser ? authUser.uid : '',
+    // location
+  });
+
+  /* Manual ingredient search
+   * searchIngredient: user input into search box; not used for query
+   * debouncedIngredient: debounced searchIngredient; used for actual query
+   * previousSearch: previous search to determine if re-query is needed
+   * * if previous search/query includes new search, no need to re-query
+   * searchResultsObj: holds array of streamed results
+   * * Set as 4 fields of result arrays
+   * * Individually filtered for duplicates
+   * * Cannot combine due to syncing streaming issues
+   * searchResultsArr: flattened searchResultsObj into single <Ingredient> array
+   * * Used to filter with fuse.js
+   */
+  const [searchIngredient, setSearchIngredient] = useState<string>('');
+  const debouncedIngredient = useDebouncedState(searchIngredient, 500);
+  const [previousSearch, setPreviousSearch] = useState<string>('');
+  const [searchResultsObj, setSearchResultsObj] = useState<{
+    plu: Ingredient[];
+    category: Ingredient[];
+    commodity: Ingredient[];
+    variety: Ingredient[];
+  }>({
+    plu: [],
+    category: [],
+    commodity: [],
+    variety: [],
+  });
+
+  const [searchResultsArr, setSearchResultsArr] = useState<Ingredient[]>([]);
+  const [foundIngredient, setFoundIngredient] = useState<boolean>(false);
+
+  const [{ csvToIngredient }, csvData, _loading, _error] = useIngredient();
+
+  useEffect(() => {
+    csvToIngredient();
+  }, [csvToIngredient]);
+
+  // csvData
+  // // Simplified fuzzy search with Fuse.js
+  const filteredResults = useMemo(() => {
+    const fuse = new Fuse(csvData, {
+      keys: ['plu', 'category', 'commodity', 'variety', 'size'],
+    });
+    const results = fuse.search(searchIngredient);
+    setFoundIngredient(results.length == 1);
+    return results;
+  }, [csvData, searchIngredient]);
 
   const onSubmit = useCallback(
     async (data: SubmissionFormData): Promise<void> => {
@@ -41,119 +101,76 @@ const IngredientList: FC = () => {
     ],
   );
 
-  // React Hook Form
-  const methods = useForm<SubmissionFormData>({ defaultValues: defaultFormValues() });
-  const { handleSubmit } = methods;
-
-  /* Manual ingredient search
-   * searchInput: is used for filtering search results after query
-   * searchResults holds array of streamed results
-   */
-  const [newIngredient, setNewIngredient] = useState<SubmissionFormData>({
-    plu: '',
-    price: NaN,
-    quantity: NaN,
-    unit: '' as Unit,
-    submitter: authUser ? authUser.uid : '',
-    // location
-  });
-
-  const [searchIngredient, setSearchIngredient] = useState<string>('');
-  const debouncedIngredient = useDebouncedState(searchIngredient, 1000);
-  const previousSearch = useRef<string>('');
-  const [foundIngredient, setFoundIngredient] = useState<boolean>(false);
-
-  useEffect(() => {
-    previousSearch.current = debouncedIngredient;
-  }, [debouncedIngredient]);
-
-  const [searchResults, setSearchResults] = useState<Record<string, Ingredient[]>>({
-    plu: [],
-    category: [],
-    commodity: [],
-    variety: [],
-  });
-
-  // Simplified fuzzy search
-  useEffect(() => {
-    /* TODO: detect if new search includes old search term
-     * console.log("bananana".includes('banana'));
-     */
-    console.log('current:', debouncedIngredient, 'previous:', previousValue.current);
-    if (!debouncedIngredient.includes(previousSearch.current)) {
-      const searchFields = ['plu', 'category', 'commodity', 'variety'];
-
-      searchFields.forEach(searchField => {
-        const ingredientInfoList: Ingredient[] = [];
-        const existingPLU = new Set<string>([]);
-        const q = query(
-          db.ingredientCollection,
-          where(searchField, '>=', debouncedIngredient),
-          limit(30),
-        );
-
-        onSnapshot(q, querySnapshot => {
-          querySnapshot.forEach(doc => {
-            const currentPLU = doc.data().plu;
-            if (!existingPLU.has(currentPLU)) {
-              existingPLU.add(currentPLU);
-              ingredientInfoList.push(doc.data());
-            }
-          });
-
-          const filtered = ingredientInfoList.filter(ingredient =>
-            (ingredient[searchField as keyof Ingredient] as string)?.includes(debouncedIngredient),
-          );
-
-          setSearchResults(previousSearch => ({
-            ...previousSearch,
-            [searchField]: filtered,
-          }));
-        });
-      });
-    }
-  }, [debouncedIngredient]);
-
-  useEffect(() => {
-    console.log(searchResults);
-  }, [searchResults]);
-
-  // useEffect(() => {
-  //   if (debouncedIngredient.trim()) {
-  //     searchIngredient(debouncedIngredient.trim(), true).then(data => {
-  //       setPropositions(
-  //         data?.map(item => ({
-  //           label: `${item.name}\t(${item.category})${
-  //             item.brandOwner ? `  |  ` + item.brandOwner : ''
-  //           }`,
-  //           ingredient: item,
-  //         })) || [],
-  //       );
-  //     });
-  //   }
-  // }, [debouncedIngredient, searchIngredient]);
-
   /* One day, text search can be simply done with Firestore
    * Currently, good solutions require backend 3rd party library (ElasticSearch, Algolia, Typesense)
    * https://cloud.google.com/firestore/docs/solutions/search
    * For now, really memory-inefficient client-sided method requires multiple queries and combining and filtering duplicates
    */
+  // useEffect(() => {
+  //   /* Detect if new search includes old search term
+  //    * Ex: "bananana".includes('banana');
+  //    */
+  //   if (debouncedIngredient && (!debouncedIngredient.includes(previousSearch) || !previousSearch)) {
+  //     setPreviousSearch(debouncedIngredient);
+  //     const searchFields = ['plu', 'category', 'commodity', 'variety'];
 
-  /* const [ingredient, setIngredient] = useState('');
-  useEffect(() => {
-      if (debouncedIngredient.trim()) {
-        searchIngredient(debouncedIngredient.trim(), true).then(data => {
-          setPropositions(
-            data?.map(item => ({
-              label: `${item.name}\t(${item.category})${
-                item.brandOwner ? `  |  ` + item.brandOwner : ''
-              }`,
-              ingredient: item,
-            })) || [],
-          );
-        });
-      }
-    }, [debouncedIngredient, searchIngredient]); */
+  //     searchFields.forEach(searchField => {
+  //       const ingredientInfoList: Ingredient[] = [];
+  //       const existingPLU = new Set<string>([]);
+
+  //       const q = query(
+  //         db.ingredientCollection,
+  //         where(searchField, '>=', debouncedIngredient),
+  //         limit(30),
+  //       );
+
+  //       onSnapshot(q, querySnapshot => {
+  //         querySnapshot.forEach(doc => {
+  //           const currentPLU = doc.data().plu;
+  //           if (!existingPLU.has(currentPLU)) {
+  //             existingPLU.add(currentPLU);
+  //             ingredientInfoList.push(doc.data());
+  //           }
+  //         });
+
+  //         /* Need to cast searchField as keyof Ingredient to type it an Ingredient's field
+  //          * Need to cast the result as string since some Ingredient fields aren't strings
+  //          */
+  //         const filtered = ingredientInfoList.filter(ingredient =>
+  //           (ingredient[searchField as keyof Ingredient] as string)?.includes(debouncedIngredient),
+  //         );
+
+  //         setSearchResultsObj(previousSearch => ({
+  //           ...previousSearch,
+  //           [searchField]: filtered,
+  //         }));
+  //       });
+  //     });
+  //   }
+  // }, [debouncedIngredient, previousSearch]);
+
+  // const removeDuplicateIngredients = (originalArray: Ingredient[]): Ingredient[] => {
+  //   const existingIngredient = new Set<string>([]);
+  //   return originalArray.filter(ingredient => {
+  //     if (!existingIngredient.has(ingredient.plu)) {
+  //       existingIngredient.add(ingredient.plu);
+  //       return ingredient;
+  //     }
+  //   });
+  // };
+
+  // useEffect(() => {
+  //   if (searchResultsObj) {
+  //     const flatSearch = [
+  //       ...searchResultsObj.plu,
+  //       ...searchResultsObj.category,
+  //       ...searchResultsObj.commodity,
+  //       ...searchResultsObj.variety,
+  //     ];
+
+  //     setSearchResultsArr(removeDuplicateIngredients(flatSearch));
+  //   }
+  // }, [searchResultsObj]);
 
   /* Live-updating retrieval of specific document and its contents */
   // useEffect(() => {
@@ -208,7 +225,7 @@ const IngredientList: FC = () => {
           {/* Line separating header form and cards */}
           <Box my={'20px'} borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
 
-          {/* <Grid
+          <Grid
             mx={{ base: 'unset', sm: '30px' }}
             gridAutoFlow={{ base: 'column', sm: 'row' }}
             rowGap={'30px'}
@@ -221,7 +238,7 @@ const IngredientList: FC = () => {
               sm: 'repeat(auto-fill, 250px)',
             }}
           >
-            {!foundIngredient ? (
+            {/* {!foundIngredient ? (
               <GridItem>
                 <NewIngredientCard
                   handleSubmit={handleSubmit(onSubmit)}
@@ -229,25 +246,25 @@ const IngredientList: FC = () => {
                   setNewIngredient={setNewIngredient}
                 />
               </GridItem>
-            ) : null}
+            ) : null} */}
 
-            {filteredResults?.map((ingredientInfo, index) => {
+            {/* {filteredResults?.map(({ item }, index) => {
               return (
                 <GridItem
                   ml={{ base: foundIngredient ? '30px' : '', sm: 'unset' }}
                   mr={{ base: index === filteredResults.length - 1 ? '30px' : '', sm: 'unset' }}
-                  key={`${ingredientInfo.variety}_${index}`}
+                  key={`${item.variety}_${index}`}
                 >
                   <IngredientCard
-                    ingredientInfo={ingredientInfo}
+                    ingredientInfo={item}
                     handleSubmit={handleSubmit(onSubmit)}
                     newIngredient={newIngredient}
                     setNewIngredient={setNewIngredient}
                   />
                 </GridItem>
               );
-            })}
-          </Grid> */}
+            })} */}
+          </Grid>
         </>
       </FormProvider>
     </form>

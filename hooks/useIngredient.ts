@@ -19,7 +19,8 @@ import { useAuth } from './useAuth';
 import { firestore } from '../lib/firebase';
 
 type IngredientMethods = {
-  csvToIngredient: (file: File) => void;
+  csvToIngredient: () => void;
+  csvToFirestore: () => void;
   submitIngredient: (ingredientData: SubmissionFormData) => void; //Promise<CollectionReference<Submission>>;
 
   updateIngredient: () => void;
@@ -28,25 +29,27 @@ type IngredientMethods = {
   // ) => Promise<CollectionReference<Ingredient>>;
 };
 
-const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
+const useIngredient = (): [
+  IngredientMethods,
+  Record<string, string>[],
+  boolean,
+  Error | undefined,
+] => {
+  const [csvData, setCSVData] = useState<Record<string, string>[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const { authUser } = useAuth();
 
-  const csvToIngredient = useCallback<IngredientMethods['csvToIngredient']>((file: File): void => {
-    setLoading(true);
-    Papa.parse(file, {
+  // Parses through CSV and /save every ingredient to Firestore
+  const stepParser = useCallback((data: string) => {
+    Papa.parse(data, {
       header: true,
       worker: true,
-
       // Streaming and modifying row by row
       step: async (row: { data: Record<string, string> }) => {
-        const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, SIZE, ..._rest } = row.data;
-
-        // Get a new write batch
         const batch = writeBatch(firestore);
 
-        // const ingredientRef = doc(db.ingredientCollection);
+        const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, SIZE, ..._rest } = row.data;
         const ingredientDocRef = doc(db.ingredientCollection, PLU);
 
         const ingredientInfo = {
@@ -66,27 +69,66 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         await batch.commit();
       },
 
-      // // Parsing the entire file at once
-      // complete: results => {
-      //   const newResults = results.data.reduce<Record<string, string>[]>(
-      //     (filteredData, nextValue) => {
-      //       const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, ..._rest } = nextValue as Record<
-      //         string,
-      //         string
-      //       >;
-
-      //       filteredData.push({ PLU, CATEGORY, COMMODITY, VARIETY, IMAGE });
-      //       return filteredData;
-      //     },
-      //     [],
-      //   );
-      // setCSVData(newResults as Record<string, string>[]);
-      // },
       complete: _ => {
         setLoading(false);
       },
     });
   }, []);
+
+  const wholeParser = useCallback((data: string) => {
+    Papa.parse(data, {
+      header: true,
+      worker: true,
+      // Parsing the entire file at once
+      complete: results => {
+        const newResults = results.data.reduce<Record<string, string>[]>(
+          (filteredData, nextValue) => {
+            const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, SIZE, ..._rest } =
+              nextValue as Record<string, string>;
+
+            const ingredientInfo = {
+              plu: PLU.trim(),
+              category: CATEGORY ? CATEGORY.trim().toLocaleLowerCase() : '',
+              commodity: COMMODITY ? COMMODITY.trim().toLocaleLowerCase() : '',
+              variety: VARIETY ? VARIETY.trim().toLocaleLowerCase() : '',
+              image: IMAGE ? IMAGE.trim().toLocaleLowerCase() : '',
+              size: SIZE ? SIZE.trim().toLocaleLowerCase() : '',
+            };
+
+            filteredData.push(ingredientInfo);
+            return filteredData;
+          },
+          [],
+        );
+        setCSVData(newResults as Record<string, string>[]);
+        setLoading(false);
+      },
+    });
+  }, []);
+
+  const csvToIngredient = useCallback<IngredientMethods['csvToIngredient']>(async (): void => {
+    setLoading(true);
+
+    await fetch('/file.csv')
+      .then(response => {
+        return response.text();
+      })
+      .then(data => {
+        wholeParser(data);
+      });
+  }, [wholeParser]);
+
+  const csvToFirestore = useCallback<IngredientMethods['csvToFirestore']>(() => {
+    setLoading(true);
+
+    fetch('/file.csv')
+      .then(response => {
+        return response.text();
+      })
+      .then(data => {
+        stepParser(data);
+      });
+  }, [stepParser]);
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
     async ({}: // variety,
@@ -98,89 +140,94 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       if (!authUser) return;
       setLoading(true);
 
-      // Get a new write batch
-      const batch = writeBatch(firestore);
+      //     // Get a new write batch
+      //     const batch = writeBatch(firestore);
 
-      // price = priceConverter((price * 100) / quantity, unit, {
-      //   mass: Unit.pound,
-      //   liquid: Unit.quart,
-      // });
+      //     // price = priceConverter((price * 100) / quantity, unit, {
+      //     //   mass: Unit.pound,
+      //     //   liquid: Unit.quart,
+      //     // });
 
-      // unit = isMass(unit)
-      //   ? Unit.pound
-      //   : isLiquid(unit)
-      //   ? Unit.litre
-      //   : unit in Unit
-      //   ? unit
-      //   : Unit.unit;
+      //     // unit = isMass(unit)
+      //     //   ? Unit.pound
+      //     //   : isLiquid(unit)
+      //     //   ? Unit.litre
+      //     //   : unit in Unit
+      //     //   ? unit
+      //     //   : Unit.unit;
 
-      // const trimmedName = variety.trim().toLocaleLowerCase('en-US');
+      //     // const trimmedName = variety.trim().toLocaleLowerCase('en-US');
 
-      // const submissionDocRef = doc(db.submissionCollection);
+      //     // const submissionDocRef = doc(db.submissionCollection);
 
-      // Ex: /ingredientInfo/almond: { info }
-      // const submissionDocumentRef = db.ingredientDoc(trimmedName);
+      //     // Ex: /ingredientInfo/almond: { info }
+      //     // const submissionDocumentRef = db.ingredientDoc(trimmedName);
 
-      // Ensuring all fields are passed by typechecking Ingredient
-      // const newSubmission: Submission = {
-      //   // name,
-      //   price,
-      //   // location,
-      //   unit,
-      //   createdAt: serverTimestamp(),
-      // };
+      //     // Ensuring all fields are passed by typechecking Ingredient
+      //     // const newSubmission: Submission = {
+      //     //   // name,
+      //     //   price,
+      //     //   // location,
+      //     //   unit,
+      //     //   createdAt: serverTimestamp(),
+      //     // };
 
-      /* If you want to auto generate an ID, use addDoc() + collection()
-       * If you want to manually set the ID, use setDoc() + doc()
-       */
-      try {
-        // /ingredients collection
-        // const docRef = await addDoc(submissionCollectionRef, newSubmission);
-        // Getting current summary to compare lowest
-        // const existingIngredient = await getDoc(ingredientDocumentRef).then(doc => doc.data());
-        // await getDocs(query(db.ingredientCollection, where('plu', '==', uid)));
-        /* If lowest exists:
-         * * If lowest > price: price
-         * * Else: lowest
-         * Else price
-         */
-        // const lowest = currentIngredientInfo?.lowest
-        //   ? currentIngredientInfo?.lowest > price
-        //     ? price
-        //     : currentIngredientInfo?.lowest
-        //   : price;
-        // Prevent overriding existing ingredient unit
-        // const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
-        // Update existing ingredient
-        // const submissionInfo: Ingredient = {
-        //   name: 'cheese',
-        // submissions: arrayUnion(docRef.id),
-        // count: increment(1),
-        // total: increment(price),
-        // lowest,
-        // unit: existingUnit,
-        //   ingredientId: '',
-        //   image: '',
-        //   price: 0,
-        //   unit: Unit.pound,
-        //   submitter: authUser,
-        //   createdAt: serverTimestamp(),
-        // };
-        // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent)
-        // await setDoc(submissionDocumentRef, submissionInfo, { merge: true });
-      } catch (e) {
-        setError(e as Error);
-      }
+      //     /* If you want to auto generate an ID, use addDoc() + collection()
+      //      * If you want to manually set the ID, use setDoc() + doc()
+      //      */
+      //     try {
+      //       // /ingredients collection
+      //       // const docRef = await addDoc(submissionCollectionRef, newSubmission);
+      //       // Getting current summary to compare lowest
+      //       // const existingIngredient = await getDoc(ingredientDocumentRef).then(doc => doc.data());
+      //       // await getDocs(query(db.ingredientCollection, where('plu', '==', uid)));
+      //       /* If lowest exists:
+      //        * * If lowest > price: price
+      //        * * Else: lowest
+      //        * Else price
+      //        */
+      //       // const lowest = currentIngredientInfo?.lowest
+      //       //   ? currentIngredientInfo?.lowest > price
+      //       //     ? price
+      //       //     : currentIngredientInfo?.lowest
+      //       //   : price;
+      //       // Prevent overriding existing ingredient unit
+      //       // const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
+      //       // Update existing ingredient
+      //       // const submissionInfo: Ingredient = {
+      //       //   name: 'cheese',
+      //       // submissions: arrayUnion(docRef.id),
+      //       // count: increment(1),
+      //       // total: increment(price),
+      //       // lowest,
+      //       // unit: existingUnit,
+      //       //   ingredientId: '',
+      //       //   image: '',
+      //       //   price: 0,
+      //       //   unit: Unit.pound,
+      //       //   submitter: authUser,
+      //       //   createdAt: serverTimestamp(),
+      //       // };
+      //       // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent)
+      //       // await setDoc(submissionDocumentRef, submissionInfo, { merge: true });
+      //     } catch (e) {
+      //       setError(e as Error);
+      //     }
 
-      setLoading(false);
-      return submissionCollectionRef as CollectionReference<Submission>;
+      //     setLoading(false);
+      //     return submissionCollectionRef as CollectionReference<Submission>;
     },
     [authUser],
   );
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(() => {}, []);
 
-  return [{ csvToIngredient, submitIngredient, updateIngredient }, loading, error];
+  return [
+    { csvToIngredient, csvToFirestore, submitIngredient, updateIngredient },
+    csvData,
+    loading,
+    error,
+  ];
 };
 
 export default useIngredient;
