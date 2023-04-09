@@ -3,7 +3,7 @@ import { FC, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-import useIngredient from '../../hooks/useIngredient';
+import useCSV from '../../hooks/useCSV';
 
 type FileFormData = {
   file: File[];
@@ -12,17 +12,9 @@ type FileFormData = {
 const Functions: FC = () => {
   const { authUser, loading: userLoading, login, logout } = useAuth();
 
-  const [{ csvToIngredient }, ingredientLoading, error] = useIngredient();
-
-  const { handleSubmit, register } = useForm<FileFormData>();
-
   useEffect(() => {
     if (authUser) console.log('dashboard useAuth:', authUser);
   }, [authUser]);
-
-  const onSubmit = (data: FileFormData): void => {
-    if (data.file[0]) csvToIngredient(data.file[0]);
-  };
 
   return (
     <Flex flexDir={'column'}>
@@ -78,31 +70,40 @@ const Functions: FC = () => {
       ) : (
         <Text>User not loading</Text>
       )}
-
-      {authUser ? (
-        <>
-          <form>
-            <Input
-              {...register('file', { required: false })}
-              placeholder="Choose ingredients CSV"
-              type="file"
-              accept="csv"
-            />
-            <Button onClick={handleSubmit(onSubmit)}>Upload ingredients</Button>
-          </form>
-
-          {ingredientLoading ? (
-            <>
-              <Spinner />
-              <Text>File reading</Text>
-            </>
-          ) : (
-            <Text>File not reading</Text>
-          )}
-        </>
-      ) : null}
     </Flex>
   );
 };
 
 export default Functions;
+
+/* Uploading CSV to parse, proof of concept */
+// const [{ csvToIngredient }, ingredientLoading, error] = useIngredient();
+// const { handleSubmit, register } = useForm<FileFormData>();
+// const onSubmit = (data: FileFormData): void => {
+//   if (data.file[0]) csvToIngredient();
+// };
+
+/* 
+  {authUser ? (
+    <>
+      <form>
+        <Input
+          {...register('file', { required: false })}
+          placeholder="Choose ingredients CSV"
+          type="file"
+          accept="csv"
+        />
+        <Button onClick={handleSubmit(onSubmit)}>Upload ingredients</Button>
+      </form>
+
+      {ingredientLoading ? (
+        <>
+          <Spinner />
+          <Text>File reading</Text>
+        </>
+      ) : (
+        <Text>File not reading</Text>
+      )}
+    </>
+  ) : null}
+*/

@@ -41,6 +41,6 @@ export const isMass = (unit?: Unit): boolean => {
   return unit === Unit.pound || unit === Unit.kilogram;
 };
 
-export const isLiquid = (unit?: Unit): boolean => {
+export const isVolume = (unit?: Unit): boolean => {
   return unit === Unit.litre || unit === Unit.quart;
 };

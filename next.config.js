@@ -10,7 +10,7 @@ const typescript = {
 };
 
 const images = {
-  domains: ['avatars.githubusercontent.com'],
+  domains: ['avatars.githubusercontent.com', 'localhost'],
   loader: 'akamai',
   path: '',
 };

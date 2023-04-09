@@ -1,248 +1,163 @@
-import { Dispatch, SetStateAction, FC, useCallback } from 'react';
-import Image from 'next/image';
-import { Box, Flex, Text } from '@chakra-ui/react';
-import { useFormContext } from 'react-hook-form';
+import { Dispatch, SetStateAction, FC, useCallback, useEffect, useState } from 'react';
+import {
+  Box,
+  Flex,
+  Text,
+  Image,
+  Card,
+  Divider,
+  CardHeader,
+  CardBody,
+  Heading,
+  StatArrow,
+  Stat,
+  StatHelpText,
+} from '@chakra-ui/react';
+import { useFormContext, useFormState, useWatch } from 'react-hook-form';
 import { Ingredient, Unit } from '../../lib/firebase/interfaces';
 import {
   isMass,
-  isLiquid,
+  isVolume,
   priceConverter,
   currencyFormatter,
   unitFormatter,
 } from '../../lib/textFormatters';
-import { SubmissionFormData } from '../Dashboard';
+import { IngredientFormData } from '../Dashboard';
 import { useUnit } from '../../hooks/useUnit';
-import foodPlaceholder from 'public/media/foodPlaceholder.png';
 
 type CardProps = {
   ingredientInfo?: Ingredient;
   handleSubmit?: () => Promise<void>;
-  newIngredient?: SubmissionFormData;
-  setNewIngredient?: Dispatch<SetStateAction<SubmissionFormData>>;
+  highlighted?: boolean;
 };
 
 // TODO: hovering over existing cards should show detailed information
 // Search result cards
-export const IngredientCard: FC<CardProps> = ({
-  ingredientInfo,
-  handleSubmit,
-  newIngredient,
-  setNewIngredient,
-}) => {
-  const {
-    setValue,
-    resetField,
-    formState: { errors },
-  } = useFormContext<SubmissionFormData>();
+export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, highlighted }) => {
+  const { watch } = useFormContext<IngredientFormData>();
 
   // Showing price as unit preference
-  // const { currentUnit } = useUnit();
+  const { currentUnits, convertToCurrent } = useUnit();
 
-  /* Setting to currentUnit allows re-rendering of unit because it's a state
-   * If unit is mass, use Unit.lb;
-   * Else if unit is area, use Unit.squareFeet
-   * Else use saved unit or submission form unit
-   */
-  // const convertedUnit =
-  //   ingredientInfo && isMass(ingredientInfo.unit)
-  //     ? currentUnit.mass
-  //     : ingredientInfo && isLiquid(ingredientInfo.unit)
-  //     ? currentUnit.liquid
-  //     : ingredientInfo?.unit;
+  const ingredientUnit = currentUnits;
 
-  // const convertedTotal = ingredientInfo
-  //   ? priceConverter(ingredientInfo.total as number, ingredientInfo.unit, currentUnit)
-  //   : 0;
-
-  // const convertedLowest = ingredientInfo
-  //   ? priceConverter(ingredientInfo.lowest as number, ingredientInfo.unit, currentUnit)
-  //   : 0;
-
-  // IngredientInfo fields
-  // const averagePrice = ingredientInfo?.count
-  //   ? convertedTotal / (ingredientInfo.count as number)
-  //   : 0;
-
-  // Highlighting cards
-  // const highlighted = newIngredient?.variety === ingredientInfo?.variety;
-
-  // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
-  // const onClickHandler = useCallback(async () => {
-  //   if (ingredientInfo && handleSubmit && newIngredient && setNewIngredient) {
-  //     setValue('variety', ingredientInfo.variety || '');
-  //     // setValue('unit', ingredientInfo.unit);
-
-  //     await handleSubmit();
-
-  //     if (Object.keys(errors).length === 0) {
-  //       setNewIngredient({
-  //         ...newIngredient,
-  //         variety: ingredientInfo.variety || '',
-  //         unit: '' as Unit,
-  //       });
-
-  //       resetField('price');
-  //       resetField('quantity');
-  //     }
-  //   }
-  // }, [errors, handleSubmit, ingredientInfo, newIngredient, resetField, setNewIngredient, setValue]);
+  // Preview new ingredient information
+  const previewPrice = ingredientInfo ? ingredientInfo.price / 100 : 0;
+  const convertedPreviewPrice = ingredientInfo
+    ? convertToCurrent(previewPrice, ingredientInfo.unit)
+    : 0;
 
   return (
-    <></>
-    // <Box
-    //   letterSpacing={'2px'}
-    //   fontSize={'16px'}
-    //   scrollSnapAlign={'center'}
-    //   border={{ base: '1px solid grey', sm: 'none' }}
-    //   borderRadius={'5px'}
-    //   outline={{ sm: 'none' }}
-    //   h={{ sm: '300px' }}
-    //   w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
-    //   transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-    //   boxShadow={highlighted ? 'under' : 'normal'}
-    //   _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
-    // >
-    //   {/* Image */}
-    //   <Flex minHeight={'180px'}>
-    //     <Box margin={'auto'}>
-    //       {/* TODO: image uploading */}
-    //       {/* TODO: wrap NextJS Image with ChakraImage, currently using NextJS Image only
-    //         https://www.jamesperkins.dev/post/using-next-image-with-chakra/
-    //        */}
-    //       <Image
-    //         src={'/../../public/media/foodPlaceholder.png'}
-    //         alt={'Food placeholder'}
-    //         width={300}
-    //         height={200}
-    //         loading={'lazy'}
-    //       />
-    //     </Box>
-    //   </Flex>
+    <Card
+      ml={{ base: '30px', sm: 'unset' }}
+      letterSpacing={'2px'}
+      scrollSnapAlign={'center'}
+      border={{ base: '1px solid grey', sm: 'none' }}
+      borderRadius={'5px'}
+      // h={{ sm: '300px' }}
+      w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
+      transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
+      boxShadow={highlighted ? 'under' : 'normal'}
+      _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
+    >
+      {/* Image */}
+      <CardHeader height={'180px'}>
+        {/* TODO: image uploading */}
+        <Image src={'/media/foodPlaceholder.png'} alt={'Food placeholder'} />
+      </CardHeader>
 
-    //   {/* Card line */}
-    //   <Box borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
+      {/* Card line */}
+      <Divider boxShadow={'focus'} borderColor={'lightgrey'} />
 
-    //   {/* Info */}
-    //   <Box onClick={onClickHandler} h={'100%'} w={'100%'} padding={'15px 30px'} cursor={'pointer'}>
-    //     <Text
-    //       as="b"
-    //       color={'#0070f3'}
-    //       whiteSpace={'nowrap'}
-    //       display={'block'}
-    //       textAlign={'center'}
-    //       overflow={'hidden'}
-    //     >
-    //       {ingredientInfo?.variety}
-    //     </Text>
+      {/* Info */}
+      <CardBody
+        onClick={handleSubmit}
+        h={'100%'}
+        w={'100%'}
+        padding={'15px 30px'}
+        cursor={'pointer'}
+        textAlign={'center'}
+      >
+        <Stat>
+          <StatArrow type="increase" />
+          Cheese
+        </Stat>
 
-    //     {/* <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-    //       Avg: {currencyFormatter.format(averagePrice / 100)}/{unitFormatter(convertedUnit)}
-    //     </Text>
+        <Text as="b" color={'#0070f3'} whiteSpace={'nowrap'} display={'block'} overflow={'hidden'}>
+          {ingredientInfo?.name}
+        </Text>
 
-    //     <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-    //       Low: {currencyFormatter.format(convertedLowest / 100)}/{unitFormatter(convertedUnit)}
-    //     </Text> */}
-    //   </Box>
-    // </Box>
+        <Text display={'block'} overflow={'hidden'}>
+          {ingredientInfo?.price ? currencyFormatter.format(convertedPreviewPrice) : 'price'}/
+          {ingredientInfo?.unit ? ingredientUnit : 'unit'}
+        </Text>
+      </CardBody>
+    </Card>
   );
 };
 
 // Search result cards
-export const NewIngredientCard: FC<CardProps> = ({
-  handleSubmit,
-  newIngredient,
-  setNewIngredient,
-}) => {
-  const {
-    setValue,
-    resetField,
-    formState: { errors },
-  } = useFormContext<SubmissionFormData>();
-
+export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
   // Showing price as unit preference
-  const { currentUnit } = useUnit();
+  const { currentUnits, convertToCurrent } = useUnit();
+
+  const { watch } = useFormContext<IngredientFormData>();
+  const newIngredient = watch();
 
   // Preview new ingredient information
   const previewPrice = newIngredient
-    ? (newIngredient?.price * 100) / newIngredient?.quantity / 100
+    ? (newIngredient.price * 100) / newIngredient.quantity / 100
     : 0;
 
-  const convertedUnit = isMass(newIngredient?.unit)
-    ? currentUnit.mass
-    : isLiquid(newIngredient?.unit)
-    ? currentUnit.liquid
-    : newIngredient?.unit;
-
-  const convertedPreviewPrice = priceConverter(previewPrice, newIngredient?.unit, currentUnit);
-
-  // setSearchInput for search filter, and setValue('name') for submitting ingredient `name`
-  // const onClickHandler = useCallback(async () => {
-  //   if (handleSubmit && newIngredient && setNewIngredient) {
-  //     setValue('variety', newIngredient.variety);
-
-  //     await handleSubmit();
-
-  //     if (Object.keys(errors).length === 0) {
-  //       setNewIngredient({ ...newIngredient, variety: newIngredient.variety, unit: '' as Unit });
-
-  //       resetField('price');
-  //       resetField('quantity');
-  //     }
-  //   }
-  // }, [errors, handleSubmit, newIngredient, resetField, setNewIngredient, setValue]);
+  const [convertedPreviewPrice, convertedUnit] = convertToCurrent(previewPrice, newIngredient.unit);
+  console.log(convertedUnit);
 
   return (
-    <></>
-    // <Box
-    //   ml={{ base: '30px', sm: 'unset' }}
-    //   letterSpacing={'2px'}
-    //   fontSize={'16px'}
-    //   scrollSnapAlign={'center'}
-    //   border={{ base: '1px solid grey', sm: 'none' }}
-    //   borderRadius={'5px'}
-    //   outline={{ sm: 'none' }}
-    //   h={{ sm: '300px' }}
-    //   w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
-    //   transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-    //   boxShadow={'normal'}
-    //   _hover={{ boxShadow: 'hover' }}
-    // >
-    //   {/* Image */}
-    //   <Flex minHeight={'180px'}>
-    //     <Box margin={'auto'}>
-    //       {/* TODO: image uploading */}
-    //       {/* TODO: wrap NextJS Image with ChakraImage, currently using NextJS Image only
-    //         https://www.jamesperkins.dev/post/using-next-image-with-chakra/
-    //        */}
-    //       <Image
-    //         src={'media/imageUploadIcon.png'}
-    //         alt={'Upload image'}
-    //         // width={'150px'}
-    //         // height={'100px'}
-    //       />
-    //     </Box>
-    //   </Flex>
+    <Card
+      ml={{ base: '30px', sm: 'unset' }}
+      letterSpacing={'2px'}
+      scrollSnapAlign={'center'}
+      border={{ base: '1px solid grey', sm: 'none' }}
+      borderRadius={'5px'}
+      // h={{ sm: '300px' }}
+      w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
+      transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
+      boxShadow={'normal'}
+      _hover={{ boxShadow: 'hover' }}
+    >
+      {/* Image */}
+      <CardHeader height={'180px'}>
+        {/* TODO: image uploading */}
+        <Image src={'/media/imageUploadIcon.png'} alt={'Upload image'} borderRadius="lg" />
+      </CardHeader>
 
-    //   {/* Cardline */}
-    //   <Box borderTop={'1px solid lightgrey'} boxShadow={'focus'} />
+      {/* Card line */}
+      <Divider boxShadow={'focus'} borderColor={'lightgrey'} />
 
-    //   {/* Info */}
-    //   <Box onClick={onClickHandler} h={'100%'} w={'100%'} padding={'15px 30px'} cursor={'pointer'}>
-    //     <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-    //       Save
-    //     </Text>
+      <CardBody
+        onClick={handleSubmit}
+        h={'100%'}
+        w={'100%'}
+        padding={'15px 30px'}
+        cursor={'pointer'}
+        textAlign={'center'}
+      >
+        <Text display={'block'} overflow={'hidden'}>
+          Save
+        </Text>
 
-    //     <Text as={'b'} display={'block'} textAlign={'center'} overflow={'hidden'} color={'#0070f3'}>
-    //       {newIngredient?.variety || 'an ingredient'}
-    //     </Text>
+        <Text as={'b'} display={'block'} overflow={'hidden'} color={'#0070f3'}>
+          {newIngredient.name || 'ingredient'}
+        </Text>
 
-    //     {/* TODO: add preview pricing */}
-    //     {newIngredient && newIngredient.price && newIngredient.quantity && newIngredient.unit ? (
-    //       <Text display={'block'} textAlign={'center'} overflow={'hidden'}>
-    //         {currencyFormatter.format(convertedPreviewPrice)}/{unitFormatter(convertedUnit)}
-    //       </Text>
-    //     ) : null}
-    //   </Box>
-    // </Box>
+        {/* Shows price / unit */}
+        <Text display={'block'} overflow={'hidden'}>
+          {newIngredient?.price && newIngredient?.quantity
+            ? currencyFormatter.format(convertedPreviewPrice)
+            : 'price'}
+          /{newIngredient?.unit ? unitFormatter(convertedUnit) : 'unit'}
+        </Text>
+      </CardBody>
+    </Card>
   );
 };

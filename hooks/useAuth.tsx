@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import {
   getAuth,
   onAuthStateChanged,
@@ -14,6 +14,13 @@ import { User } from '../lib/firebase/interfaces';
 import { useRouter } from 'next/router';
 import useUser from './useUser';
 
+export const AuthContext = createContext<AuthContextType>({
+  authUser: undefined,
+  loading: false,
+  login: async () => void 0,
+  logout: async () => void 0,
+});
+
 type AuthContextType = {
   authUser: User | undefined;
   loading: boolean;
@@ -21,15 +28,15 @@ type AuthContextType = {
   logout: () => Promise<void>;
 };
 
+// Public auth hook
+export const useAuth = (): AuthContextType => useContext(AuthContext);
+
+// Initial values of Auth Context (AuthContextType)
 export const useProvideAuth = (): AuthContextType => {
   const [authUser, setAuthUser] = useState<User | undefined>(undefined);
   const [{ getUser, createUser }, _createUserLoading] = useUser();
-  const [loading, _setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
-
-  // useEffect(() => {
-  //   setLoading(loading || createUserLoading);
-  // }, [createUserLoading, loading]);
 
   const login = async (): Promise<void> => {
     const provider = new GoogleAuthProvider();
@@ -51,7 +58,7 @@ export const useProvideAuth = (): AuthContextType => {
         // Sign-out successful.
         setAuthUser(undefined);
         console.log('Signed out');
-        router.push('/functions');
+        router.push('/');
       })
       .catch(error => {
         // An error happened.
@@ -101,24 +108,21 @@ export const useProvideAuth = (): AuthContextType => {
     [createUser, getUser],
   );
 
-  const handleAuthChange = async (user: FirebaseUser | null): Promise<void> => {
-    if (user) {
-      /* The signed-in user info; at this point they are authenticated
-       * Auth state will update to existing user; don't create a new user here (save db reads too)
-       */
-      setAuthUser(
-        {
-          uid: user.uid,
-          email: user.email || '',
-          photoURL: user.photoURL || '',
-          name: user.displayName || '',
-        } || undefined,
-      );
-    } else {
-      setAuthUser(undefined);
-      console.log('User is not logged');
-    }
-  };
+  const handleAuthChange = useCallback(
+    async (user: FirebaseUser | null) => {
+      if (user) {
+        /* The signed-in user info; at this point they are authenticated
+         * Auth state will update to existing user; don't create a new user here (save db reads too)
+         */
+
+        setAuthUser((await getUser(user.uid)) || undefined);
+      } else {
+        setAuthUser(undefined);
+        console.log('User is not logged');
+      }
+    },
+    [getUser],
+  );
 
   // Auth persistence: detect if user is authenticated or not
   useEffect(() => {
@@ -126,16 +130,11 @@ export const useProvideAuth = (): AuthContextType => {
     const unsubscribe = onAuthStateChanged(auth, handleAuthChange);
     handleRedirect(auth);
     return () => unsubscribe();
-  }, [handleRedirect]);
+  }, [handleAuthChange, handleRedirect]);
 
   return { authUser, loading, login, logout };
 };
 
-export const AuthContext = createContext<AuthContextType>({
-  authUser: undefined,
-  loading: true,
-  login: async () => void 0,
-  logout: async () => void 0,
-});
-
-export const useAuth = (): AuthContextType => useContext(AuthContext);
+export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  return <AuthContext.Provider value={useProvideAuth()}>{children}</AuthContext.Provider>;
+};

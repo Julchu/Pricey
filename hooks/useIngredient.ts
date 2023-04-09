@@ -3,25 +3,28 @@ import {
   arrayUnion,
   CollectionReference,
   doc,
+  DocumentReference,
   getDoc,
+  getDocs,
   increment,
   PartialWithFieldValue,
+  query,
   serverTimestamp,
   setDoc,
+  where,
   writeBatch,
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import Papa from 'papaparse';
-import { SubmissionFormData } from '../components/Dashboard';
-import { db, Submission, Ingredient, Unit } from '../lib/firebase/interfaces';
-import { isLiquid, isMass, priceConverter } from '../lib/textFormatters';
+import { db, Ingredient, Unit } from '../lib/firebase/interfaces';
+import { isVolume, isMass, priceConverter } from '../lib/textFormatters';
 import { useAuth } from './useAuth';
 import { firestore } from '../lib/firebase';
+import { IngredientFormData } from '../components/Dashboard';
 
 type IngredientMethods = {
-  csvToIngredient: () => void;
-  csvToFirestore: () => void;
-  submitIngredient: (ingredientData: SubmissionFormData) => void; //Promise<CollectionReference<Submission>>;
+  submitIngredient: (
+    ingredientData: IngredientFormData,
+  ) => Promise<DocumentReference<Ingredient> | undefined>; //Promise<CollectionReference<Submission>>;
 
   updateIngredient: () => void;
   // updateIngredient: (
@@ -29,205 +32,96 @@ type IngredientMethods = {
   // ) => Promise<CollectionReference<Ingredient>>;
 };
 
-const useIngredient = (): [
-  IngredientMethods,
-  Record<string, string>[],
-  boolean,
-  Error | undefined,
-] => {
-  const [csvData, setCSVData] = useState<Record<string, string>[]>([]);
+const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const { authUser } = useAuth();
 
-  // Parses through CSV and /save every ingredient to Firestore
-  const stepParser = useCallback((data: string) => {
-    Papa.parse(data, {
-      header: true,
-      worker: true,
-      // Streaming and modifying row by row
-      step: async (row: { data: Record<string, string> }) => {
-        const batch = writeBatch(firestore);
-
-        const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, SIZE, ..._rest } = row.data;
-        const ingredientDocRef = doc(db.ingredientCollection, PLU);
-
-        const ingredientInfo = {
-          plu: PLU.trim(),
-          category: CATEGORY ? CATEGORY.trim().toLocaleLowerCase() : '',
-          commodity: COMMODITY ? COMMODITY.trim().toLocaleLowerCase() : '',
-          variety: VARIETY ? VARIETY.trim().toLocaleLowerCase() : '',
-          image: IMAGE ? IMAGE.trim().toLocaleLowerCase() : '',
-          size: SIZE ? SIZE.trim().toLocaleLowerCase() : '',
-          count: increment(0),
-          lastUpdated: serverTimestamp(),
-        };
-
-        batch.set(ingredientDocRef, ingredientInfo as PartialWithFieldValue<Ingredient>);
-
-        // Commit the batch
-        await batch.commit();
-      },
-
-      complete: _ => {
-        setLoading(false);
-      },
-    });
-  }, []);
-
-  const wholeParser = useCallback((data: string) => {
-    Papa.parse(data, {
-      header: true,
-      worker: true,
-      // Parsing the entire file at once
-      complete: results => {
-        const newResults = results.data.reduce<Record<string, string>[]>(
-          (filteredData, nextValue) => {
-            const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, SIZE, ..._rest } =
-              nextValue as Record<string, string>;
-
-            const ingredientInfo = {
-              plu: PLU.trim(),
-              category: CATEGORY ? CATEGORY.trim().toLocaleLowerCase() : '',
-              commodity: COMMODITY ? COMMODITY.trim().toLocaleLowerCase() : '',
-              variety: VARIETY ? VARIETY.trim().toLocaleLowerCase() : '',
-              image: IMAGE ? IMAGE.trim().toLocaleLowerCase() : '',
-              size: SIZE ? SIZE.trim().toLocaleLowerCase() : '',
-            };
-
-            filteredData.push(ingredientInfo);
-            return filteredData;
-          },
-          [],
-        );
-        setCSVData(newResults as Record<string, string>[]);
-        setLoading(false);
-      },
-    });
-  }, []);
-
-  const csvToIngredient = useCallback<IngredientMethods['csvToIngredient']>(async (): void => {
-    setLoading(true);
-
-    await fetch('/file.csv')
-      .then(response => {
-        return response.text();
-      })
-      .then(data => {
-        wholeParser(data);
-      });
-  }, [wholeParser]);
-
-  const csvToFirestore = useCallback<IngredientMethods['csvToFirestore']>(() => {
-    setLoading(true);
-
-    fetch('/file.csv')
-      .then(response => {
-        return response.text();
-      })
-      .then(data => {
-        stepParser(data);
-      });
-  }, [stepParser]);
-
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
-    async ({}: // variety,
-    // price,
-    // quantity,
-    // unit,
-    // location,
-    SubmissionFormData) => {
+    async ({ name, price, quantity, unit, location, image }) => {
       if (!authUser) return;
       setLoading(true);
 
-      //     // Get a new write batch
-      //     const batch = writeBatch(firestore);
+      price = priceConverter((price * 100) / quantity, unit, {
+        mass: Unit.pound,
+        liquid: Unit.quart,
+      });
 
-      //     // price = priceConverter((price * 100) / quantity, unit, {
-      //     //   mass: Unit.pound,
-      //     //   liquid: Unit.quart,
-      //     // });
+      unit = isMass(unit)
+        ? Unit.pound
+        : isVolume(unit)
+        ? Unit.litre
+        : unit in Unit
+        ? unit
+        : Unit.unit;
 
-      //     // unit = isMass(unit)
-      //     //   ? Unit.pound
-      //     //   : isLiquid(unit)
-      //     //   ? Unit.litre
-      //     //   : unit in Unit
-      //     //   ? unit
-      //     //   : Unit.unit;
+      const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
-      //     // const trimmedName = variety.trim().toLocaleLowerCase('en-US');
+      // Ex: /ingredientInfo/almond: { info }
+      const ingredientDocRef = doc(db.ingredientCollection);
 
-      //     // const submissionDocRef = doc(db.submissionCollection);
+      // Ensuring all fields are passed by typechecking Ingredient
+      const newIngredient: Ingredient = {
+        name: trimmedName,
+        price,
+        unit,
+        userId: authUser.uid,
+        createdAt: serverTimestamp(),
+      };
 
-      //     // Ex: /ingredientInfo/almond: { info }
-      //     // const submissionDocumentRef = db.ingredientDoc(trimmedName);
+      try {
+        /* If you want to auto generate an ID, use addDoc() + collection()
+         * If you want to manually set the ID, use setDoc() + doc()
+         */
+        await setDoc(ingredientDocRef, newIngredient);
+      } catch (e) {
+        setError(e as Error);
+      }
 
-      //     // Ensuring all fields are passed by typechecking Ingredient
-      //     // const newSubmission: Submission = {
-      //     //   // name,
-      //     //   price,
-      //     //   // location,
-      //     //   unit,
-      //     //   createdAt: serverTimestamp(),
-      //     // };
-
-      //     /* If you want to auto generate an ID, use addDoc() + collection()
-      //      * If you want to manually set the ID, use setDoc() + doc()
-      //      */
-      //     try {
-      //       // /ingredients collection
-      //       // const docRef = await addDoc(submissionCollectionRef, newSubmission);
-      //       // Getting current summary to compare lowest
-      //       // const existingIngredient = await getDoc(ingredientDocumentRef).then(doc => doc.data());
-      //       // await getDocs(query(db.ingredientCollection, where('plu', '==', uid)));
-      //       /* If lowest exists:
-      //        * * If lowest > price: price
-      //        * * Else: lowest
-      //        * Else price
-      //        */
-      //       // const lowest = currentIngredientInfo?.lowest
-      //       //   ? currentIngredientInfo?.lowest > price
-      //       //     ? price
-      //       //     : currentIngredientInfo?.lowest
-      //       //   : price;
-      //       // Prevent overriding existing ingredient unit
-      //       // const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
-      //       // Update existing ingredient
-      //       // const submissionInfo: Ingredient = {
-      //       //   name: 'cheese',
-      //       // submissions: arrayUnion(docRef.id),
-      //       // count: increment(1),
-      //       // total: increment(price),
-      //       // lowest,
-      //       // unit: existingUnit,
-      //       //   ingredientId: '',
-      //       //   image: '',
-      //       //   price: 0,
-      //       //   unit: Unit.pound,
-      //       //   submitter: authUser,
-      //       //   createdAt: serverTimestamp(),
-      //       // };
-      //       // Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent)
-      //       // await setDoc(submissionDocumentRef, submissionInfo, { merge: true });
-      //     } catch (e) {
-      //       setError(e as Error);
-      //     }
-
-      //     setLoading(false);
-      //     return submissionCollectionRef as CollectionReference<Submission>;
+      setLoading(false);
+      return ingredientDocRef;
     },
     [authUser],
   );
 
-  const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(() => {}, []);
+  const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(() => {
+    // // ingredients collection
+    // const docRef = await addDoc(ingredientCollectionRef, newIngredient);
+    // // Getting current summary to compare lowest
+    // const existingIngredient = await getDoc(ingredientDocumentRef).then(doc => doc.data());
+    // await getDocs(query(db.ingredientCollection, where('plu', '==', uid)));
+    // /* If lowest exists:
+    //  * * If lowest > price: price
+    //  * * Else: lowest
+    //  * Else price
+    //  */
+    // const ingredientCollectionRef = doc(db.ingredientCollection);
+    // const lowest = currentIngredientInfo?.lowest
+    //   ? currentIngredientInfo?.lowest > price
+    //     ? price
+    //     : currentIngredientInfo?.lowest
+    //   : price;
+    // // Prevent overriding existing ingredient unit
+    // const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
+    // Update existing ingredient
+    // const ingredientInfo: Ingredient = {
+    //   name: 'cheese',
+    //   submissions: arrayUnion(docRef.id),
+    //   count: increment(1),
+    //   total: increment(price),
+    //   lowest,
+    //   unit: existingUnit,
+    //   ingredientId: '',
+    //   image: '',
+    //   price: 0,
+    //   unit: Unit.pound,
+    //   submitter: authUser,
+    //   createdAt: serverTimestamp(),
+    // };
+    /* Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent) */
+  }, []);
 
-  return [
-    { csvToIngredient, csvToFirestore, submitIngredient, updateIngredient },
-    csvData,
-    loading,
-    error,
-  ];
+  return [{ submitIngredient, updateIngredient }, loading, error];
 };
 
 export default useIngredient;

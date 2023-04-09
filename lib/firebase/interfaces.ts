@@ -1,5 +1,3 @@
-// import { Timestamp } from "firebase/firestore";
-
 import {
   collection,
   doc,
@@ -15,44 +13,54 @@ import {
 import { firestore } from './index';
 import { CollectionReference } from '@firebase/firestore';
 
-export enum Status {
-  Approved = 'APPROVED',
-  Pending = 'PENDING',
-  Denied = 'DENIED',
-}
+export type WithId<T> = { id?: string } & T;
 
 export enum Unit {
-  pound = 'lb',
+  // Mass
   kilogram = 'kg',
+  pound = 'lb',
+
+  // Volume
   litre = 'L',
   quart = 'qt',
-  oz = 'oz',
+
   unit = 'unit',
 }
 
-// Record of every instance that an ingredient is saved
-// TODO: allow submission of other materials that aren't part of ingredients
-export interface Submission {
-  plu?: string;
-  image?: string;
-  price: number;
-  quantity: number;
-  unit: Unit;
-  submitter: string;
-  location?: Address;
-  createdAt: Timestamp | FieldValue;
+export type UnitCategory = {
+  mass: Unit.kilogram | Unit.pound;
+  volume: Unit.litre | Unit.quart;
+};
+
+export enum Season {
+  spring = 'Spring',
+  winter = 'Winter',
+  summer = 'Summer',
+  fall = 'Fall',
 }
 
-// PLU code is the
+export enum Role {
+  admin = 'admin',
+  standard = 'standard',
+}
+
 export interface Ingredient {
-  plu: string;
-  category?: string;
-  commodity?: string;
-  variety?: string;
+  name: string;
+  price: number;
+  unit: Unit;
   image?: string;
-  submissions?: string[] | FieldValue;
+  userId: string;
   count?: number | FieldValue;
+  season?: Season;
+  createdAt?: Timestamp | FieldValue;
   lastUpdated?: Timestamp | FieldValue;
+}
+
+// TODO: grocery list
+export interface GroceryList {
+  ingredients: Ingredient[];
+  userId: string;
+  public?: boolean;
 }
 
 // Public user data (aka not private auth data)
@@ -63,14 +71,12 @@ export interface User {
   name?: string;
   location?: Address;
   createdAt?: Timestamp;
-  submissions?: Submission[];
-  // Preferences
+  role: Role;
+  preferences?: UnitCategory;
+  // Preferences, like prefered units
 }
 
-/* Public features:
- * Create Time-to-live (TTL) grocery list w/ ingredients
- *
- */
+/* TODO: create Time-to-live (TTL) grocery list w/ ingredients */
 
 /* Logged in user features:
  * Save grocery list
@@ -78,7 +84,9 @@ export interface User {
  *
  */
 
-// City, province/state, country
+/* TODO: ask user if they want to save address of lowest ingredient
+ * City, province/state, country
+ */
 export interface Address {
   locality: string;
   administrative_area_level_1: string;
@@ -98,19 +106,19 @@ const collectionPoint = <T>(collectionPath: string): CollectionReference<T> =>
 const docPoint = <T>(collectionPath: string, ...extraPaths: string[]): DocumentReference<T> =>
   doc(firestore, collectionPath, ...extraPaths).withConverter(converter<T>());
 
-/* dataPoint use-cases:
+/* Db usage:
  * const ingredientsCollectionRef = db.ingredientCollection;
  * const ingredientDocumentRef = db.ingredientInfoDoc(id, ...extraPaths);
  * * const ingredientDocumentRef = doc(db.ingredientCollection, id, ...extraPaths);
  */
 export const db = {
   // Collections
-  submissionCollection: collectionPoint<Submission>('submissions'),
+  groceryCollection: collectionPoint<GroceryList>('groceryList'),
   ingredientCollection: collectionPoint<Ingredient>('ingredients'),
   userCollection: collectionPoint<User>('users'),
 
   // Docs
-  submissionDoc: (...extraPaths: string[]) => docPoint<Submission>('submissions', ...extraPaths),
+  groceryDoc: (...extraPaths: string[]) => docPoint<GroceryList>('groceryList', ...extraPaths),
   ingredientDoc: (...extraPaths: string[]) => docPoint<Ingredient>('ingredients', ...extraPaths),
   userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
 };

@@ -1,12 +1,22 @@
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  query,
+  serverTimestamp,
+  setDoc,
+  where,
+} from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { db, User } from '../lib/firebase/interfaces';
+import { db, User, Role } from '../lib/firebase/interfaces';
 
 type AuthData = {
   uid: string;
   displayName: string;
   email: string;
   photoURL: string;
+  role?: Role;
 };
 
 interface UseUserMethods {
@@ -23,16 +33,18 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
     try {
       setLoading(true);
       // Associate auth info to a specific user in db for public data:
-      const existingUser = await getDoc(doc(db.userCollection, uid));
+      const q = query(db.userCollection, where('uid', '==', uid));
+      const existingUser = await getDocs(q);
 
-      if (existingUser.exists()) {
-        const user = existingUser.data();
+      if (existingUser.size == 1) {
+        const user = existingUser.docs[0].data();
         setLoading(false);
         return {
           uid: uid,
           name: user.name,
           email: user.email,
           photoURL: user.photoURL,
+          role: user.role,
         };
       }
     } catch (error) {
@@ -41,19 +53,18 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   }, []);
 
   const createUser = useCallback<UseUserMethods['createUser']>(
-    async ({ uid, displayName, email, photoURL }) => {
+    async ({ uid, displayName, email, photoURL, role = Role.standard }) => {
       try {
         setLoading(true);
 
-        const newUserDocRef = doc(db.userCollection, uid);
-
+        const newUserDocRef = doc(db.userCollection);
         await setDoc(newUserDocRef, {
           uid,
           email,
           photoURL,
           name: displayName,
           createdAt: serverTimestamp(),
-          submissions: [],
+          role,
         });
 
         const newUserDoc = await getDoc(newUserDocRef);
@@ -61,10 +72,11 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
           const user = newUserDoc.data();
           setLoading(false);
           return {
-            uid: uid,
+            uid,
             name: user.name,
             email: user.email,
             photoURL: user.photoURL,
+            role: user.role,
           };
         }
       } catch (error) {
