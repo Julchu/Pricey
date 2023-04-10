@@ -1,29 +1,27 @@
-import { Dispatch, SetStateAction, FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useMemo } from 'react';
 import {
-  Box,
-  Flex,
   Text,
   Image,
   Card,
   Divider,
   CardHeader,
   CardBody,
-  Heading,
   StatArrow,
   Stat,
-  StatHelpText,
+  Flex,
 } from '@chakra-ui/react';
-import { useFormContext, useFormState, useWatch } from 'react-hook-form';
-import { Ingredient, Unit } from '../../lib/firebase/interfaces';
-import {
-  isMass,
-  isVolume,
-  priceConverter,
-  currencyFormatter,
-  unitFormatter,
-} from '../../lib/textFormatters';
+import { useFormContext, useWatch } from 'react-hook-form';
+import { Ingredient } from '../../lib/firebase/interfaces';
 import { IngredientFormData } from '../Dashboard';
 import { useUnit } from '../../hooks/useUnit';
+import {
+  currencyFormatter,
+  getPercentChange,
+  percentageFormatter,
+  priceCalculator,
+  priceConverter,
+  unitConverter,
+} from '../../lib/textFormatters';
 
 type CardProps = {
   ingredientInfo?: Ingredient;
@@ -34,18 +32,41 @@ type CardProps = {
 // TODO: hovering over existing cards should show detailed information
 // Search result cards
 export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, highlighted }) => {
-  const { watch } = useFormContext<IngredientFormData>();
-
   // Showing price as unit preference
-  const { currentUnits, convertToCurrent } = useUnit();
+  const { currentUnits } = useUnit();
 
-  const ingredientUnit = currentUnits;
+  const { control, setValue, resetField } = useFormContext<IngredientFormData>();
 
-  // Preview new ingredient information
-  const previewPrice = ingredientInfo ? ingredientInfo.price / 100 : 0;
-  const convertedPreviewPrice = ingredientInfo
-    ? convertToCurrent(previewPrice, ingredientInfo.unit)
-    : 0;
+  const [newPrice, newQuantity, newUnit] = useWatch({
+    control,
+    name: ['price', 'quantity', 'unit'],
+  });
+
+  // const previewNewPrice = useMemo(() => {
+  //   if (name === ingredientInfo?.name) return (newPrice * 100) / newQuantity / 100;
+  // }, [ingredientInfo?.name, name, newPrice, newQuantity]);
+
+  const convertedNewPrice = useMemo(() => {
+    return priceConverter(priceCalculator(newPrice, newQuantity), newUnit, currentUnits);
+  }, [currentUnits, newPrice, newQuantity, newUnit]);
+
+  const convertedExistingPrice =
+    useMemo(() => {
+      if (ingredientInfo)
+        return priceConverter(
+          priceCalculator(ingredientInfo.price, 1),
+          ingredientInfo?.unit,
+          currentUnits,
+        );
+    }, [ingredientInfo, currentUnits]) || 0;
+
+  const convertedExistingUnit = useMemo(() => {
+    if (ingredientInfo) return unitConverter(ingredientInfo.unit, currentUnits);
+  }, [currentUnits, ingredientInfo]);
+
+  const delta = useMemo(() => {
+    if (convertedNewPrice) return getPercentChange(convertedExistingPrice, convertedNewPrice);
+  }, [convertedExistingPrice, convertedNewPrice]);
 
   return (
     <Card
@@ -79,8 +100,14 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
         textAlign={'center'}
       >
         <Stat>
-          <StatArrow type="increase" />
-          Cheese
+          {delta ? (
+            <>
+              <StatArrow type={delta > 0 ? 'increase' : 'decrease'} />
+              {percentageFormatter.format(delta)}%
+            </>
+          ) : (
+            <>&nbsp;</>
+          )}
         </Stat>
 
         <Text as="b" color={'#0070f3'} whiteSpace={'nowrap'} display={'block'} overflow={'hidden'}>
@@ -88,8 +115,8 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
         </Text>
 
         <Text display={'block'} overflow={'hidden'}>
-          {ingredientInfo?.price ? currencyFormatter.format(convertedPreviewPrice) : 'price'}/
-          {ingredientInfo?.unit ? ingredientUnit : 'unit'}
+          {ingredientInfo?.price ? currencyFormatter.format(convertedExistingPrice) : 'price'}/
+          {ingredientInfo?.unit ? convertedExistingUnit : 'unit'}
         </Text>
       </CardBody>
     </Card>
@@ -99,18 +126,29 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
 // Search result cards
 export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
   // Showing price as unit preference
-  const { currentUnits, convertToCurrent } = useUnit();
+  const { currentUnits } = useUnit();
 
-  const { watch } = useFormContext<IngredientFormData>();
-  const newIngredient = watch();
+  const { control } = useFormContext<IngredientFormData>();
 
-  // Preview new ingredient information
-  const previewPrice = newIngredient
-    ? (newIngredient.price * 100) / newIngredient.quantity / 100
-    : 0;
+  const [newName, newPrice, newQuantity, newUnit] = useWatch({
+    control,
+    name: ['name', 'price', 'quantity', 'unit'],
+  });
 
-  const [convertedPreviewPrice, convertedUnit] = convertToCurrent(previewPrice, newIngredient.unit);
-  console.log(convertedUnit);
+  /* Preview new ingredient information: memoizing reduces rerenders/function calls
+   * previewPrice: converting price/quantity cents to dollar (100 -> $1.00)
+   * convertedPreviewPrice: converted dropdown unit's price to user's current unit price
+   * convertedUnit: converted dropdown unit to user's appropriate (mass, volume) current unit
+   */
+  const previewPrice = useMemo(() => (newPrice * 100) / newQuantity / 100, [newPrice, newQuantity]);
+  const convertedPreviewPrice = useMemo(
+    () => priceConverter(previewPrice, newUnit, currentUnits),
+    [currentUnits, newUnit, previewPrice],
+  );
+  const convertedUnit = useMemo(
+    () => unitConverter(newUnit, currentUnits),
+    [currentUnits, newUnit],
+  );
 
   return (
     <Card
@@ -142,20 +180,20 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
         cursor={'pointer'}
         textAlign={'center'}
       >
-        <Text display={'block'} overflow={'hidden'}>
-          Save
-        </Text>
+        <Flex direction={'row'}>
+          <Text display={'block'} overflow={'hidden'}>
+            Save
+          </Text>
 
-        <Text as={'b'} display={'block'} overflow={'hidden'} color={'#0070f3'}>
-          {newIngredient.name || 'ingredient'}
-        </Text>
+          <Text as={'b'} display={'block'} overflow={'hidden'} color={'#0070f3'}>
+            {newName || 'ingredient'}
+          </Text>
+        </Flex>
 
         {/* Shows price / unit */}
         <Text display={'block'} overflow={'hidden'}>
-          {newIngredient?.price && newIngredient?.quantity
-            ? currencyFormatter.format(convertedPreviewPrice)
-            : 'price'}
-          /{newIngredient?.unit ? unitFormatter(convertedUnit) : 'unit'}
+          {newPrice && newQuantity ? currencyFormatter.format(convertedPreviewPrice) : 'price'}/
+          {newUnit ? convertedUnit : 'unit'}
         </Text>
       </CardBody>
     </Card>

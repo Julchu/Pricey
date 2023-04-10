@@ -1,6 +1,4 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {};
-
 // !! WARN !!
 // Dangerously allow production builds to successfully complete even if
 // your project has type errors.
@@ -34,7 +32,7 @@ const publicRuntimeConfig = {
 };
 
 const experimental = {
-  // emotion: true,
+  // appDir: true,
 };
 
 const compiler = {
@@ -42,11 +40,10 @@ const compiler = {
 };
 
 module.exports = {
-  // nextConfig,
+  experimental,
   typescript,
   images,
   publicRuntimeConfig,
-  // experimental,
   compiler,
   swcMinify: true,
   trailingSlash: false,

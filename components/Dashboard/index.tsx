@@ -60,7 +60,7 @@ const IngredientList: FC = () => {
     },
   });
 
-  const { handleSubmit, reset, watch } = methods;
+  const { handleSubmit, reset, resetField, watch, setValue, getValues } = methods;
   const searchIngredient = watch('name');
 
   /* Original live-updating retrieval of specific document and its contents */
@@ -105,11 +105,25 @@ const IngredientList: FC = () => {
   );
 
   const onUpdate = useCallback(
-    async (data: IngredientFormData): Promise<void> => {
-      await updateIngredient();
-      reset();
+    async (data: WithId<Ingredient>): Promise<void> => {
+      setValue('name', data.name);
+      setValue('ingredientId', data.id);
+
+      const currentIngredient: IngredientFormData = {
+        ingredientId: data.id,
+        name: data.name,
+        price: getValues('price'),
+        quantity: getValues('quantity'),
+        unit: getValues('unit'),
+        submitter: data.userId,
+      };
+      await updateIngredient(currentIngredient);
+
+      resetField('price');
+      resetField('quantity');
+      resetField('unit');
     },
-    [reset, updateIngredient],
+    [getValues, resetField, setValue, updateIngredient],
   );
 
   return (
@@ -119,6 +133,7 @@ const IngredientList: FC = () => {
         <>
           <Flex>
             <IngredientForm />
+
             {/* Hamburger */}
             <Show above={'sm'}>
               <Center>
@@ -154,11 +169,11 @@ const IngredientList: FC = () => {
               sm: 'repeat(auto-fill, 250px)',
             }}
           >
-            {!foundIngredient ? (
-              <GridItem>
-                <NewIngredientCard handleSubmit={handleSubmit(onSubmit)} />
-              </GridItem>
-            ) : null}
+            {/* {!foundIngredient ? ( */}
+            <GridItem>
+              <NewIngredientCard handleSubmit={handleSubmit(onSubmit)} />
+            </GridItem>
+            {/* ) : null} */}
 
             {filteredResults?.map((item, index) => {
               // Highlighting card if ingredient is found
@@ -172,7 +187,9 @@ const IngredientList: FC = () => {
                 >
                   <IngredientCard
                     ingredientInfo={item}
-                    handleSubmit={handleSubmit(onUpdate)}
+                    handleSubmit={async () => {
+                      onUpdate(item);
+                    }}
                     highlighted={highlighted}
                   />
                 </GridItem>

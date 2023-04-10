@@ -24,7 +24,7 @@ export enum Unit {
   litre = 'L',
   quart = 'qt',
 
-  unit = 'unit',
+  item = 'item',
 }
 
 export type UnitCategory = {

@@ -1,3 +1,4 @@
+import { Box, Text } from '@chakra-ui/react';
 import { FC } from 'react';
 // import { openInNewTab } from '../../lib/openLink';
 // import { GithubLogo } from '../Icons/Objects';
@@ -63,7 +64,8 @@ import { FC } from 'react';
 // Nav bar
 const About: FC = () => {
   return (
-    <>
+    <Box bg="blue" h={'100%'}>
+      <Text>About Pricey</Text>
       {/* <Row style={{ justifyContent: 'center' }}>
         <h1 style={{ fontSize: '4rem', lineHeight: '1.15px' }}>
           Welcome to <Hyperlink href="https://github.com/julchu/Pricey">Pricey!</Hyperlink>
@@ -108,7 +110,7 @@ const About: FC = () => {
           ))}
         </ProfileGrid>
       </div> */}
-    </>
+    </Box>
   );
 };
 

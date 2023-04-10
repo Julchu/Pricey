@@ -1,8 +1,8 @@
-import { Button, Grid, Input, Select, Show } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
+import { Button, ButtonGroup, Grid, IconButton, Input, Select, Show } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Unit } from '../../lib/firebase/interfaces';
-import { unitFormatter } from '../../lib/textFormatters';
 import { IngredientFormData } from '../Dashboard';
 
 // TODO: after submitting an ingredient, reset search to empty
@@ -111,9 +111,6 @@ const IngredientForm: FC = () => {
       {/* Unit selector */}
       <Select
         letterSpacing={'2px'}
-        color={
-          errors.unit?.type === 'required' || errors.unit?.type === 'validate' ? 'red' : 'grey'
-        }
         border={{ base: '1px solid grey', sm: 'none' }}
         outline={{ sm: 'none' }}
         boxShadow={{ sm: 'normal' }}
@@ -132,21 +129,26 @@ const IngredientForm: FC = () => {
           required: true,
         })}
         isInvalid={errors.unit?.type === 'required'}
+        placeholder={'Unit'}
       >
-        <option selected hidden disabled value="">
-          Unit
-        </option>
         {Object.values(Unit).map((unit, index) => {
           return (
             <option key={`${unit}_${index}`} value={unit}>
-              {unitFormatter(unit)}
+              {unit}
             </option>
           );
         })}
       </Select>
 
       <Show above={'sm'}>
-        <Button>Create Grocery List</Button>
+        <ButtonGroup isAttached>
+          <Button>Grocery Lists</Button>
+          <IconButton
+            aria-label="Create Grocery List"
+            icon={<AddIcon />}
+            borderLeft={'0.5px solid teal'}
+          />
+        </ButtonGroup>
       </Show>
     </Grid>
   );

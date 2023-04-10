@@ -1,5 +1,5 @@
+import { AddIcon, RepeatIcon } from '@chakra-ui/icons';
 import {
-  Text,
   Box,
   Button,
   Drawer,
@@ -10,21 +10,24 @@ import {
   DrawerHeader,
   DrawerOverlay,
   IconButton,
-  Link,
+  LinkBox,
+  LinkOverlay,
+  ButtonGroup,
+  Stack,
+  Text,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FC, useCallback, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { SidebarEnums, SidebarTypes, useSidebar } from '../../hooks/useSidebar';
 import { useUnit } from '../../hooks/useUnit';
-import { CloseIcon } from '../Icons/Objects';
 
 /* { label: 'Pricey', path: '/' },
     { label: 'About Us', path: '/about/' },
     { label: 'Functions', path: '/functions/' }, */
 
 const Sidebar: FC = () => {
-  const { isSidebarOpen, openSidebar, closeSidebar, toggleSidebar, panelId } = useSidebar();
+  const { isSidebarOpen, _openSidebar, closeSidebar, _toggleSidebar, panelId } = useSidebar();
 
   const sidebarTypes: SidebarTypes = {
     userActions: <UserActionSidebar />,
@@ -43,11 +46,7 @@ const UserActionSidebar: FC = () => {
   const { authUser, logout } = useAuth();
   const { closeSidebar } = useSidebar();
 
-  const { currentUnits, toggleUnit } = useUnit();
-
-  useEffect(() => {
-    console.log(currentUnits);
-  }, [currentUnits]);
+  const { toggleUnit, currentUnits } = useUnit();
 
   const logoutHandler = useCallback(async () => {
     await logout();
@@ -60,13 +59,37 @@ const UserActionSidebar: FC = () => {
       <DrawerHeader>Hello {authUser?.name}</DrawerHeader>
 
       <DrawerBody>
-        <Link as={NextLink} href={'/about'}>
-          About
-        </Link>
-        <Text>Current Units: {JSON.stringify(currentUnits)}</Text>
-        <Box marginBottom={'auto'} marginLeft={'auto'}>
-          <IconButton onClick={toggleUnit} icon={<CloseIcon />} aria-label={'Close sidepanel'} />
-        </Box>
+        <Stack>
+          <LinkBox as={Box}>
+            <Button>
+              <LinkOverlay as={NextLink} href={'/about'}>
+                About
+              </LinkOverlay>
+            </Button>
+          </LinkBox>
+
+          <Text>Current Units: {JSON.stringify(currentUnits)}</Text>
+
+          <Box marginBottom={'auto'} marginLeft={'auto'}>
+            <Button
+              colorScheme={'gray'}
+              aria-label={'Toggle units'}
+              onClick={toggleUnit}
+              leftIcon={<RepeatIcon />}
+            >
+              Toggle units
+            </Button>
+          </Box>
+
+          <ButtonGroup isAttached>
+            <Button>Grocery Lists</Button>
+            <IconButton
+              aria-label="Create Grocery List"
+              icon={<AddIcon />}
+              borderLeft={'0.5px solid teal'}
+            />
+          </ButtonGroup>
+        </Stack>
       </DrawerBody>
 
       <DrawerFooter justifyContent={'center'}>
