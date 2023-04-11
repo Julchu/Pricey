@@ -11,6 +11,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  updateDoc,
   where,
   writeBatch,
 } from 'firebase/firestore';
@@ -30,11 +31,11 @@ import { IngredientFormData } from '../components/Dashboard';
 type IngredientMethods = {
   submitIngredient: (
     ingredientData: IngredientFormData,
-  ) => Promise<DocumentReference<Ingredient> | undefined>; //Promise<CollectionReference<Submission>>;
+  ) => Promise<DocumentReference<Ingredient> | undefined>;
 
   updateIngredient: (
     ingredientData: IngredientFormData,
-  ) => Promise<CollectionReference<Ingredient>>;
+  ) => Promise<DocumentReference<Ingredient> | undefined>;
 };
 
 const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
@@ -43,26 +44,30 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   const { authUser } = useAuth();
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
-    async ({ name, price, quantity, unit, location, image }) => {
+    async ({ name, price, amount, quantity = 1, unit, location, image }) => {
       if (!authUser) return;
       setLoading(true);
 
-      const previewPrice = (price * 100) / quantity / 100;
+      const previewPrice = (price * 100) / amount / (quantity || 1) / 100;
       const convertedUnit = unitConverter(unit, { mass: Unit.kilogram, volume: Unit.litre });
-      const convertedPreviewPrice = priceConverter(previewPrice, unit, convertedUnit);
+      const convertedPreviewPrice = priceConverter(previewPrice, unit, {
+        mass: Unit.kilogram,
+        volume: Unit.litre,
+      }).toPrecision(2);
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
-      // Ex: /ingredientInfo/almond: { info }
+      // Creating doc with auto-generated id
       const ingredientDocRef = doc(db.ingredientCollection);
 
       // Ensuring all fields are passed by typechecking Ingredient
       const newIngredient: Ingredient = {
         name: trimmedName,
-        price: convertedPreviewPrice,
-        unit,
+        price: parseFloat(convertedPreviewPrice),
+        unit: convertedUnit,
         userId: authUser.uid,
         createdAt: serverTimestamp(),
+        image,
       };
 
       try {
@@ -81,44 +86,24 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   );
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(
-    async ({ ingredientId, name, price, quantity, unit, location, image }) => {
-      // ingredients collection
-      // const docRef = await addDoc(ingredientCollectionRef, newIngredient);
-      // Getting current summary to compare lowest
-      // const existingIngredient = await getDoc(ingredientDocumentRef).then(doc => doc.data());
+    async ({ ingredientId, price, amount, quantity, unit, location, image }) => {
+      const previewPrice = (price * 100) / amount / (quantity || 1) / 100;
+      const convertedPreviewPrice = priceConverter(previewPrice, unit, {
+        mass: Unit.kilogram,
+        volume: Unit.litre,
+      }).toPrecision(2);
 
-      console.log(ingredientId, name, price, quantity, unit, location, image);
-      // const existingDoc = await getDoc(doc(db.ingredientCollection, ingredientId));
-      // console.log(existingDoc);
-      /* If lowest exists:
-       * * If lowest > price: price
-       * * Else: lowest
-       * Else price
-       */
-      // const ingredientCollectionRef = doc(db.ingredientCollection);
-      // const lowest = currentIngredientInfo?.lowest
-      //   ? currentIngredientInfo?.lowest > price
-      //     ? price
-      //     : currentIngredientInfo?.lowest
-      //   : price;
-      // // Prevent overriding existing ingredient unit
-      // const existingUnit = !currentIngredientInfo?.unit ? unit : undefined;
-      // // Update existing ingredient
-      // const ingredientInfo: Ingredient = {
-      //   name: 'cheese',
-      //   submissions: arrayUnion(docRef.id),
-      //   count: increment(1),
-      //   total: increment(price),
-      //   lowest,
-      //   unit: existingUnit,
-      //   ingredientId: '',
-      //   image: '',
-      //   price: 0,
-      //   unit: Unit.pound,
-      //   submitter: authUser,
-      //   createdAt: serverTimestamp(),
-      // };
-      /* Use setDoc instead of updateDoc because update will not create new docs (if previously nonexistent) */
+      const ingredientDocRef = doc(db.ingredientCollection, ingredientId);
+
+      try {
+        await updateDoc(ingredientDocRef, {
+          price: parseFloat(convertedPreviewPrice),
+        });
+      } catch (e) {
+        setError(e as Error);
+      }
+
+      return ingredientDocRef;
     },
     [],
   );

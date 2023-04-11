@@ -9,8 +9,11 @@ import {
   Flex,
   Grid,
   GridItem,
+  Heading,
+  IconButton,
   Show,
   SkeletonCircle,
+  Text,
 } from '@chakra-ui/react';
 import { IngredientCard, NewIngredientCard } from '../IngredientCards';
 import IngredientForm from '../IngredientForm';
@@ -18,6 +21,7 @@ import { useAuth } from '../../hooks/useAuth';
 import Fuse from 'fuse.js';
 import useIngredient from '../../hooks/useIngredient';
 import { useSidebar } from '../../hooks/useSidebar';
+import { HamburgerIcon } from '@chakra-ui/icons';
 
 export type IngredientFormData = {
   ingredientId?: string;
@@ -25,6 +29,7 @@ export type IngredientFormData = {
   price: number;
   quantity: number;
   unit: Unit;
+  amount: number;
   submitter: string;
   location?: string;
   image?: string;
@@ -54,8 +59,9 @@ const IngredientList: FC = () => {
     defaultValues: {
       name: '',
       price: undefined,
-      quantity: undefined,
+      amount: undefined,
       unit: undefined,
+      quantity: undefined,
       submitter: authUser?.uid,
     },
   });
@@ -82,17 +88,19 @@ const IngredientList: FC = () => {
   const filteredResults = useMemo(() => {
     const fuse = new Fuse(searchResults, {
       keys: ['name'],
+      includeScore: true,
       ignoreLocation: true,
     });
 
-    const results = searchIngredient
-      ? fuse.search(searchIngredient).map(result => result.item)
+    const results = fuse.search(searchIngredient);
+    if (results.some(result => result.score && result.score < 0.00001)) setFoundIngredient(true);
+    else setFoundIngredient(false);
+
+    return searchIngredient
+      ? results.map(result => {
+          return result.item;
+        })
       : searchResults;
-
-    // Found Ingredient adjusts margins for card grid
-    setFoundIngredient(results.length == 1);
-
-    return results;
   }, [searchIngredient, searchResults]);
 
   // Reset form on successful submit
@@ -104,26 +112,35 @@ const IngredientList: FC = () => {
     [reset, submitIngredient],
   );
 
-  const onUpdate = useCallback(
+  // Modify form data for update submission
+  const onUpdateTransform = useCallback(
     async (data: WithId<Ingredient>): Promise<void> => {
       setValue('name', data.name);
       setValue('ingredientId', data.id);
+    },
+    [setValue],
+  );
 
+  const onUpdateSubmit = useCallback(
+    async (data: IngredientFormData): Promise<void> => {
       const currentIngredient: IngredientFormData = {
-        ingredientId: data.id,
+        ingredientId: data.ingredientId,
         name: data.name,
         price: getValues('price'),
         quantity: getValues('quantity'),
+        amount: getValues('amount'),
         unit: getValues('unit'),
-        submitter: data.userId,
+        submitter: getValues('submitter'),
       };
+
       await updateIngredient(currentIngredient);
 
-      resetField('price');
-      resetField('quantity');
-      resetField('unit');
+      // resetField('price');
+      // resetField('quantity');
+      // resetField('unit');
+      // resetField('amount');
     },
-    [getValues, resetField, setValue, updateIngredient],
+    [getValues, resetField, updateIngredient],
   );
 
   return (
@@ -132,13 +149,37 @@ const IngredientList: FC = () => {
       <FormProvider {...methods}>
         <>
           <Flex>
+            {/* Pricey Logo */}
+            <Show above={'sm'}>
+              <Center mx={'20px'}>
+                {/* <SkeletonCircle isLoaded={!userLoading} fitContent> */}
+                {/* <Avatar
+                  boxShadow={'normal'}
+                  _hover={{ boxShadow: 'hover' }}
+                  cursor={'pointer'}
+                  name={'Pricey'}
+                  src={authUser?.photoURL}
+                  aria-label={'Pricey Logo'}
+                  // onClick={loginHandler}
+                /> */}
+                <Heading color={'blue'}>Pricey</Heading>
+              </Center>
+            </Show>
             <IngredientForm />
 
             {/* Hamburger */}
             <Show above={'sm'}>
               <Center>
+                <IconButton
+                  mx={'20px'}
+                  variant={'outline'}
+                  // borderRadius={'50%'}
+                  aria-label={'Open sidepanel'}
+                  icon={<HamburgerIcon />}
+                  onClick={loginHandler}
+                />
                 {/* <SkeletonCircle isLoaded={!userLoading} fitContent> */}
-                <Avatar
+                {/* <Avatar
                   mx={'20px'}
                   boxShadow={'normal'}
                   _hover={{ boxShadow: 'hover' }}
@@ -147,7 +188,7 @@ const IngredientList: FC = () => {
                   src={authUser?.photoURL}
                   aria-label={'Open sidepanel'}
                   onClick={loginHandler}
-                />
+                /> */}
                 {/* </SkeletonCircle> */}
               </Center>
             </Show>
@@ -157,7 +198,7 @@ const IngredientList: FC = () => {
 
           <Grid
             mx={{ base: 'unset', sm: '30px' }}
-            mt={{ sm: '20px' }}
+            mt={'20px'}
             gridAutoFlow={{ base: 'column', sm: 'row' }}
             rowGap={'30px'}
             columnGap={{ base: '100%', sm: '30px' }}
@@ -169,26 +210,32 @@ const IngredientList: FC = () => {
               sm: 'repeat(auto-fill, 250px)',
             }}
           >
-            {/* {!foundIngredient ? ( */}
-            <GridItem>
-              <NewIngredientCard handleSubmit={handleSubmit(onSubmit)} />
-            </GridItem>
-            {/* ) : null} */}
+            {!foundIngredient ? (
+              <GridItem>
+                <NewIngredientCard handleSubmit={handleSubmit(onSubmit)} />
+              </GridItem>
+            ) : null}
 
             {filteredResults?.map((item, index) => {
               // Highlighting card if ingredient is found
               const searchKeys = searchIngredient.split(' ');
-              const highlighted = searchKeys.every(value => item.name?.includes(value));
+              const highlighted =
+                searchKeys.length > 1
+                  ? searchKeys.every(value => item.name?.includes(value))
+                  : false;
+
               return (
                 <GridItem
                   ml={{ base: foundIngredient ? '30px' : '', sm: 'unset' }}
                   mr={{ base: index === filteredResults.length - 1 ? '30px' : '', sm: 'unset' }}
+                  // _last={{ base: { mr: '30px' } }}
                   key={`${item.name}_${index}`}
                 >
                   <IngredientCard
                     ingredientInfo={item}
                     handleSubmit={async () => {
-                      onUpdate(item);
+                      await onUpdateTransform(item);
+                      handleSubmit(onUpdateSubmit)();
                     }}
                     highlighted={highlighted}
                   />

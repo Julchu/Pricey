@@ -35,20 +35,16 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
   // Showing price as unit preference
   const { currentUnits } = useUnit();
 
-  const { control, setValue, resetField } = useFormContext<IngredientFormData>();
+  const { control } = useFormContext<IngredientFormData>();
 
-  const [newPrice, newQuantity, newUnit] = useWatch({
+  const [newPrice, newAmount, newUnit] = useWatch({
     control,
-    name: ['price', 'quantity', 'unit'],
+    name: ['price', 'amount', 'unit'],
   });
 
-  // const previewNewPrice = useMemo(() => {
-  //   if (name === ingredientInfo?.name) return (newPrice * 100) / newQuantity / 100;
-  // }, [ingredientInfo?.name, name, newPrice, newQuantity]);
-
   const convertedNewPrice = useMemo(() => {
-    return priceConverter(priceCalculator(newPrice, newQuantity), newUnit, currentUnits);
-  }, [currentUnits, newPrice, newQuantity, newUnit]);
+    return priceConverter(priceCalculator(newPrice, newAmount), newUnit, currentUnits);
+  }, [currentUnits, newAmount, newPrice, newUnit]);
 
   const convertedExistingPrice =
     useMemo(() => {
@@ -78,7 +74,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
       // h={{ sm: '300px' }}
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-      boxShadow={highlighted ? 'under' : 'normal'}
+      boxShadow={{ sm: highlighted ? 'under' : 'normal' }}
       _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
     >
       {/* Image */}
@@ -99,6 +95,19 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
         cursor={'pointer'}
         textAlign={'center'}
       >
+        <Text display={'block'} overflow={'hidden'}>
+          Update
+        </Text>
+
+        <Text as="b" color={'#0070f3'} whiteSpace={'nowrap'} display={'block'} overflow={'hidden'}>
+          {ingredientInfo?.name}
+        </Text>
+
+        <Text display={'block'} overflow={'hidden'}>
+          {ingredientInfo?.price ? currencyFormatter.format(convertedExistingPrice) : 'price'}/
+          {ingredientInfo?.unit ? convertedExistingUnit : 'unit'}
+        </Text>
+
         <Stat>
           {delta ? (
             <>
@@ -109,15 +118,6 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
             <>&nbsp;</>
           )}
         </Stat>
-
-        <Text as="b" color={'#0070f3'} whiteSpace={'nowrap'} display={'block'} overflow={'hidden'}>
-          {ingredientInfo?.name}
-        </Text>
-
-        <Text display={'block'} overflow={'hidden'}>
-          {ingredientInfo?.price ? currencyFormatter.format(convertedExistingPrice) : 'price'}/
-          {ingredientInfo?.unit ? convertedExistingUnit : 'unit'}
-        </Text>
       </CardBody>
     </Card>
   );
@@ -130,9 +130,9 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
 
   const { control } = useFormContext<IngredientFormData>();
 
-  const [newName, newPrice, newQuantity, newUnit] = useWatch({
+  const [newName, newPrice, newQuantity, newUnit, newAmount] = useWatch({
     control,
-    name: ['name', 'price', 'quantity', 'unit'],
+    name: ['name', 'price', 'quantity', 'unit', 'amount'],
   });
 
   /* Preview new ingredient information: memoizing reduces rerenders/function calls
@@ -140,11 +140,16 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
    * convertedPreviewPrice: converted dropdown unit's price to user's current unit price
    * convertedUnit: converted dropdown unit to user's appropriate (mass, volume) current unit
    */
-  const previewPrice = useMemo(() => (newPrice * 100) / newQuantity / 100, [newPrice, newQuantity]);
-  const convertedPreviewPrice = useMemo(
-    () => priceConverter(previewPrice, newUnit, currentUnits),
-    [currentUnits, newUnit, previewPrice],
+  const previewPrice = useMemo(
+    () => (newPrice * 100) / (newQuantity || 1) / 100,
+    [newPrice, newQuantity],
   );
+
+  const convertedPreviewPrice = useMemo(
+    () => priceConverter(previewPrice / newAmount, newUnit, currentUnits),
+    [currentUnits, newAmount, newUnit, previewPrice],
+  );
+
   const convertedUnit = useMemo(
     () => unitConverter(newUnit, currentUnits),
     [currentUnits, newUnit],
@@ -160,7 +165,7 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
       // h={{ sm: '300px' }}
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-      boxShadow={'normal'}
+      boxShadow={{ sm: 'normal' }}
       _hover={{ boxShadow: 'hover' }}
     >
       {/* Image */}
@@ -180,20 +185,24 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
         cursor={'pointer'}
         textAlign={'center'}
       >
-        <Flex direction={'row'}>
-          <Text display={'block'} overflow={'hidden'}>
-            Save
-          </Text>
-
-          <Text as={'b'} display={'block'} overflow={'hidden'} color={'#0070f3'}>
-            {newName || 'ingredient'}
-          </Text>
-        </Flex>
-
-        {/* Shows price / unit */}
         <Text display={'block'} overflow={'hidden'}>
-          {newPrice && newQuantity ? currencyFormatter.format(convertedPreviewPrice) : 'price'}/
+          Save
+        </Text>
+
+        <Text as={'b'} display={'block'} overflow={'hidden'} color={'#0070f3'}>
+          {newName || 'ingredient'}
+        </Text>
+
+        {/* price / unit */}
+        <Text display={'block'} overflow={'hidden'}>
+          {newPrice && newAmount ? currencyFormatter.format(convertedPreviewPrice) : 'price'}/
           {newUnit ? convertedUnit : 'unit'}
+        </Text>
+
+        {/* Shows price / unit * amount */}
+        <Text display={'block'} overflow={'hidden'}>
+          {previewPrice ? currencyFormatter.format(previewPrice) : ''}
+          &nbsp;each
         </Text>
       </CardBody>
     </Card>

@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { Submission, Unit } from '../../lib/firebase/interfaces';
+import { Unit } from '../../lib/firebase/interfaces';
 
 export type GroceryListFormData = {
   ingredients: Submission[];

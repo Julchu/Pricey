@@ -43,12 +43,6 @@ export const currencyFormatter = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
 });
 
-export const unitFormatter = (unit?: Unit): string => {
-  // if (unit === Unit.squareFeet) return 'ft²';
-  // else if (unit === Unit.squareMeters) return 'm²';
-  return unit || '';
-};
-
 export const getPercentChange = (earlierPrice: number, laterPrice: number): number =>
   ((laterPrice - earlierPrice) / earlierPrice) * 100;
 
