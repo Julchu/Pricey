@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { Unit } from '../../lib/firebase/interfaces';
+import { Ingredient, Unit } from '../../lib/firebase/interfaces';
 
 export type GroceryListFormData = {
-  ingredients: Submission[];
+  ingredients: Ingredient[];
   price: number;
   quantity: number;
   unit: Unit;

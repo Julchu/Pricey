@@ -27,7 +27,8 @@ import { useUnit } from '../../hooks/useUnit';
     { label: 'Functions', path: '/functions/' }, */
 
 const Sidebar: FC = () => {
-  const { isSidebarOpen, _openSidebar, closeSidebar, _toggleSidebar, panelId } = useSidebar();
+  const { isSidebarOpen, /* openSidebar , */ closeSidebar, /* toggleSidebar , */ panelId } =
+    useSidebar();
 
   const sidebarTypes: SidebarTypes = {
     userActions: <UserActionSidebar />,

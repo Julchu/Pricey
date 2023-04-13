@@ -1,32 +1,17 @@
 import {
-  addDoc,
-  arrayUnion,
-  CollectionReference,
   doc,
   DocumentReference,
-  getDoc,
-  getDocs,
-  increment,
-  PartialWithFieldValue,
-  query,
   serverTimestamp,
   setDoc,
   updateDoc,
-  where,
   writeBatch,
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { db, Ingredient, Unit } from '../lib/firebase/interfaces';
-import {
-  isVolume,
-  isMass,
-  priceConverter,
-  currencyFormatter,
-  unitConverter,
-} from '../lib/textFormatters';
+import { priceConverter, unitConverter } from '../lib/textFormatters';
 import { useAuth } from './useAuth';
-import { firestore } from '../lib/firebase';
 import { IngredientFormData } from '../components/Dashboard';
+import { firestore } from '../lib/firebase';
 
 type IngredientMethods = {
   submitIngredient: (
@@ -93,12 +78,22 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         volume: Unit.litre,
       }).toPrecision(2);
 
+      const batch = writeBatch(firestore);
+
       const ingredientDocRef = doc(db.ingredientCollection, ingredientId);
 
       try {
-        await updateDoc(ingredientDocRef, {
+        batch.update(ingredientDocRef, {
           price: parseFloat(convertedPreviewPrice),
         });
+
+        if (image) {
+          batch.update(ingredientDocRef, {
+            image,
+          });
+        }
+
+        await batch.commit();
       } catch (e) {
         setError(e as Error);
       }

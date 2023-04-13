@@ -24,14 +24,13 @@ const IngredientForm: FC = () => {
       templateColumns={{ base: 'auto', sm: 'repeat(6, 1fr)' }}
       templateRows={{ sm: 'repeat(1, 1fr)' }}
       gap={'10px 30px'}
-      w={'100%'}
+      w={{ sm: '100%' }}
     >
       {/* Ingredient name input */}
       <Input
         gridColumn={{ sm: '1/3' }}
         letterSpacing={'2px'}
         height={'40px'}
-        width={'100%'}
         transition={'box-shadow 0.2s ease-in-out'}
         border={{ base: '1px solid grey', sm: 'none' }}
         outline={{ sm: 'none' }}

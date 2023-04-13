@@ -1,8 +1,9 @@
 import { limit, onSnapshot, query, where } from 'firebase/firestore';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, Ingredient, Unit, WithId } from '../../lib/firebase/interfaces';
 import {
+  AbsoluteCenter,
   Avatar,
   Center,
   Divider,
@@ -10,9 +11,12 @@ import {
   Grid,
   GridItem,
   Heading,
+  HStack,
   IconButton,
   Show,
+  Skeleton,
   SkeletonCircle,
+  SkeletonText,
   Text,
 } from '@chakra-ui/react';
 import { IngredientCard, NewIngredientCard } from '../IngredientCards';
@@ -36,7 +40,7 @@ export type IngredientFormData = {
 };
 
 const IngredientList: FC = () => {
-  const { authUser, loading: userLoading, login } = useAuth();
+  const { authUser, loading: userLoading, login, logout } = useAuth();
 
   const { openSidebar } = useSidebar();
 
@@ -46,12 +50,12 @@ const IngredientList: FC = () => {
   }, [authUser, login, openSidebar]);
 
   // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
-  const [{ submitIngredient, updateIngredient }, ingredientLoading, error] = useIngredient();
   /* Manual ingredient search
    * searchIngredient: user input into search box; not used for query
    * foundIngredient: used for desktop card card margins
    */
-  const [foundIngredient, setFoundIngredient] = useState<boolean>(false);
+  const [{ submitIngredient, updateIngredient }, ingredientLoading, error] = useIngredient();
+  const [foundIngredient, setFoundIngredient] = useState<string>('');
   const [searchResults, setSearchResults] = useState<WithId<Ingredient>[]>([]);
 
   // IngredientForm submission
@@ -93,8 +97,11 @@ const IngredientList: FC = () => {
     });
 
     const results = fuse.search(searchIngredient);
-    if (results.some(result => result.score && result.score < 0.00001)) setFoundIngredient(true);
-    else setFoundIngredient(false);
+    const found = results.find(result => result.score && result.score < 0.00001)?.item || {
+      id: '',
+    };
+    if (found.id) setFoundIngredient(found.id);
+    else setFoundIngredient('');
 
     return searchIngredient
       ? results.map(result => {
@@ -135,10 +142,10 @@ const IngredientList: FC = () => {
 
       await updateIngredient(currentIngredient);
 
-      // resetField('price');
-      // resetField('quantity');
-      // resetField('unit');
-      // resetField('amount');
+      resetField('price');
+      resetField('quantity');
+      resetField('unit');
+      resetField('amount');
     },
     [getValues, resetField, updateIngredient],
   );
@@ -148,7 +155,44 @@ const IngredientList: FC = () => {
       {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
         <>
-          <Flex>
+          <Flex flexDir={{ base: 'column', sm: 'row' }}>
+            {/* Mobile version */}
+            <Show below={'sm'}>
+              <HStack m={'20px 30px 0px'} justifyContent={'space-between'}>
+                <Heading color={'blue'}>Pricey</Heading>
+
+                <SkeletonCircle isLoaded={!userLoading} fitContent>
+                  <IconButton
+                    variant={'outline'}
+                    aria-label={'Open sidepanel'}
+                    icon={<HamburgerIcon />}
+                    onClick={loginHandler}
+                  />
+                  {/* <Avatar
+                    mx={'20px'}
+                    boxShadow={'normal'}
+                    _hover={{ boxShadow: 'hover' }}
+                    cursor={'pointer'}
+                    name={authUser?.name}
+                    src={authUser?.photoURL}
+                    aria-label={'Open sidepanel'}
+                    onClick={() => openSidebar('userActions')}
+                  /> */}
+                </SkeletonCircle>
+
+                {/* <SkeletonCircle isLoaded={!userLoading} fitContent> */}
+                {/* <Avatar
+                  boxShadow={'normal'}
+                  _hover={{ boxShadow: 'hover' }}
+                  cursor={'pointer'}
+                  name={'Pricey'}
+                  src={authUser?.photoURL}
+                  aria-label={'Pricey Logo'}
+                  // onClick={loginHandler}
+                /> */}
+              </HStack>
+            </Show>
+
             {/* Pricey Logo */}
             <Show above={'sm'}>
               <Center mx={'20px'}>
@@ -165,21 +209,23 @@ const IngredientList: FC = () => {
                 <Heading color={'blue'}>Pricey</Heading>
               </Center>
             </Show>
+
             <IngredientForm />
 
             {/* Hamburger */}
             <Show above={'sm'}>
-              <Center>
-                <IconButton
-                  mx={'20px'}
-                  variant={'outline'}
-                  // borderRadius={'50%'}
-                  aria-label={'Open sidepanel'}
-                  icon={<HamburgerIcon />}
-                  onClick={loginHandler}
-                />
-                {/* <SkeletonCircle isLoaded={!userLoading} fitContent> */}
-                {/* <Avatar
+              <Center mx={'20px'}>
+                <Skeleton isLoaded={!userLoading} fadeDuration={4} speed={3}>
+                  <IconButton
+                    variant={'outline'}
+                    // borderRadius={'50%'}
+                    aria-label={'Open sidepanel'}
+                    icon={<HamburgerIcon />}
+                    onClick={loginHandler}
+                  />
+
+                  {/* <Text onClick={loginHandler}>Cheese</Text> */}
+                  {/* <Avatar
                   mx={'20px'}
                   boxShadow={'normal'}
                   _hover={{ boxShadow: 'hover' }}
@@ -189,7 +235,7 @@ const IngredientList: FC = () => {
                   aria-label={'Open sidepanel'}
                   onClick={loginHandler}
                 /> */}
-                {/* </SkeletonCircle> */}
+                </Skeleton>
               </Center>
             </Show>
           </Flex>
@@ -217,12 +263,7 @@ const IngredientList: FC = () => {
             ) : null}
 
             {filteredResults?.map((item, index) => {
-              // Highlighting card if ingredient is found
-              const searchKeys = searchIngredient.split(' ');
-              const highlighted =
-                searchKeys.length > 1
-                  ? searchKeys.every(value => item.name?.includes(value))
-                  : false;
+              const highlighted = item.id === foundIngredient;
 
               return (
                 <GridItem

@@ -95,7 +95,9 @@ export interface Address {
 
 // Firestore data converters
 export const converter = <T>(): FirestoreDataConverter<T> => ({
-  toFirestore: (data: PartialWithFieldValue<T>) => data as DocumentData,
+  toFirestore: (data: PartialWithFieldValue<T>) => {
+    return data as DocumentData;
+  },
   fromFirestore: (snapshot: QueryDocumentSnapshot, options: SnapshotOptions) =>
     snapshot.data(options) as T,
 });

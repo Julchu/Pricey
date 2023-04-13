@@ -4,10 +4,8 @@ import {
   onAuthStateChanged,
   GoogleAuthProvider,
   signOut,
-  signInWithRedirect,
-  getRedirectResult,
+  signInWithPopup,
   User as FirebaseUser,
-  Auth,
 } from '@firebase/auth';
 
 import { User } from '../lib/firebase/interfaces';
@@ -37,8 +35,10 @@ export const useProvideAuth = (): AuthContextType => {
   const [{ getUser, createUser }, _createUserLoading] = useUser();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
+  const auth = getAuth();
 
   const login = async (): Promise<void> => {
+    setLoading(true);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -47,12 +47,11 @@ export const useProvideAuth = (): AuthContextType => {
     // provider.addScope('profile');
     // provider.addScope('email');
 
-    const auth = getAuth();
-    signInWithRedirect(auth, provider);
+    signInWithPopup(auth, provider); // signInWithRedirect(auth, provider) doesn't work for mobile for now
   };
 
   const logout = async (): Promise<void> => {
-    const auth = getAuth();
+    setLoading(true);
     signOut(auth)
       .then(() => {
         // Sign-out successful.
@@ -64,73 +63,41 @@ export const useProvideAuth = (): AuthContextType => {
         // An error happened.
         console.log('Sign out error:', error);
       });
+    setLoading(false);
   };
 
-  /* When user signs in, they're redirected (instead of using Google popup signin flow)
-   * if user doesn't exist in database, save public version of their user (rather than using exposing their auth info)
-   * Only create user here, otherwise multiple users will be saved
+  /* Every page load, checks if there is a user authenticated from Google services (not Pricey db)
+   * If there is one (aka after signing in), go to handleRedirect to getRedirectResults
+   * If user had redirected from Google login services, there will be a redirectResult: get/create user
+   * If user refreshes page, there will be no redirect result: get user
    */
-  const handleRedirect = useCallback(
-    (auth: Auth): void => {
-      getRedirectResult(auth)
-        .then(async result => {
-          if (result) {
-            // This gives you a Google Access Token. You can use it to access Google APIs.
-            const credential = GoogleAuthProvider.credentialFromResult(result);
-            const _token = credential?.accessToken;
-            const user = result.user;
-
-            // The signed-in user info; at this point they are authenticated
-            setAuthUser(
-              (await getUser(user.uid)) ||
-                (await createUser({
-                  uid: user.uid,
-                  email: user.email || '',
-                  photoURL: user.photoURL || '',
-                  displayName: user.displayName || '',
-                })) ||
-                undefined,
-            );
-          }
-        })
-        .catch(error => {
-          // Handle Errors here.
-          console.error(error);
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          // The email of the user's account used.
-          const email = error.customData.email;
-          // The AuthCredential type that was used.
-          const credential = GoogleAuthProvider.credentialFromError(error);
-          console.error(errorCode, errorMessage, email, credential);
-        });
-    },
-    [createUser, getUser],
-  );
-
   const handleAuthChange = useCallback(
     async (user: FirebaseUser | null) => {
-      if (user) {
-        /* The signed-in user info; at this point they are authenticated
-         * Auth state will update to existing user; don't create a new user here (save db reads too)
-         */
+      setLoading(true);
 
-        setAuthUser((await getUser(user.uid)) || undefined);
+      if (user) {
+        setAuthUser(
+          (await getUser(user.uid)) ||
+            (await createUser({
+              uid: user.uid,
+              email: user.email || '',
+              photoURL: user.photoURL || '',
+              displayName: user.displayName || '',
+            })),
+        );
       } else {
         setAuthUser(undefined);
         console.log('User is not logged');
       }
+      setLoading(false);
     },
-    [getUser],
+    [createUser, getUser],
   );
 
-  // Auth persistence: detect if user is authenticated or not
+  // Auth persistence: detect if user is authenticated or not (on page change, on page refresh)
   useEffect(() => {
-    const auth = getAuth();
-    const unsubscribe = onAuthStateChanged(auth, handleAuthChange);
-    handleRedirect(auth);
-    return () => unsubscribe();
-  }, [handleAuthChange, handleRedirect]);
+    onAuthStateChanged(auth, handleAuthChange);
+  }, [auth, handleAuthChange]);
 
   return { authUser, loading, login, logout };
 };
@@ -138,3 +105,50 @@ export const useProvideAuth = (): AuthContextType => {
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   return <AuthContext.Provider value={useProvideAuth()}>{children}</AuthContext.Provider>;
 };
+
+/* Use this (getRedirectResult) if using signInWithRedirect? */
+// const handleRedirect = useCallback(
+//   async (auth: Auth, user: FirebaseUser | null): Promise<User | void> => {
+//     return await getRedirectResult(auth)
+//       .then(async result => {
+//         // If user refreshes page, there will be no redirect result since it's not coming from signInWithRedirect
+//         if (result) {
+//           // This gives you a Google Access Token. You can use it to access Google APIs.
+//           const credential = GoogleAuthProvider.credentialFromResult(result);
+//           const _token = credential?.accessToken;
+//           const user = result.user;
+
+//           return (
+//             (await getUser(user.uid)) ||
+//             (await createUser({
+//               uid: user.uid,
+//               email: user.email || '',
+//               photoURL: user.photoURL || '',
+//               displayName: user.displayName || '',
+//             }))
+//           );
+//         } else if (user)
+//           return (
+//             (await getUser(user.uid)) ||
+//             (await createUser({
+//               uid: user.uid,
+//               email: user.email || '',
+//               photoURL: user.photoURL || '',
+//               displayName: user.displayName || '',
+//             }))
+//           );
+//       })
+//       .catch(error => {
+//         // Handle Errors here.
+//         console.error(error);
+//         const errorCode = error.code;
+//         const errorMessage = error.message;
+//         // The email of the user's account used.
+//         const email = error.customData.email;
+//         // The AuthCredential type that was used.
+//         const credential = GoogleAuthProvider.credentialFromError(error);
+//         console.error(errorCode, errorMessage, email, credential);
+//       });
+//   },
+//   [createUser, getUser],
+// );

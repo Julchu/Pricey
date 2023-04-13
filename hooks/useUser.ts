@@ -1,13 +1,4 @@
-import {
-  doc,
-  getDoc,
-  getDocs,
-  limit,
-  query,
-  serverTimestamp,
-  setDoc,
-  where,
-} from 'firebase/firestore';
+import { doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { db, User, Role } from '../lib/firebase/interfaces';
 

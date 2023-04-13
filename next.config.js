@@ -47,5 +47,5 @@ module.exports = {
   compiler,
   swcMinify: true,
   trailingSlash: false,
-  reactStrictMode: true,
+  // reactStrictMode: true,
 };

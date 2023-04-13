@@ -1,4 +1,4 @@
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   Text,
   Image,
@@ -9,6 +9,7 @@ import {
   StatArrow,
   Stat,
   Flex,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient } from '../../lib/firebase/interfaces';
@@ -41,6 +42,17 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
     control,
     name: ['price', 'amount', 'unit'],
   });
+
+  // Check if text is overflowing
+  const [overflowing, setOverflowing] = useState<boolean>(false);
+  const textRef = useRef<HTMLParagraphElement>(null);
+  useLayoutEffect(() => {
+    const { current } = textRef;
+    if (current) {
+      const hasOverflow = current.scrollWidth > current.clientWidth;
+      setOverflowing(hasOverflow);
+    }
+  }, []);
 
   const convertedNewPrice = useMemo(() => {
     return priceConverter(priceCalculator(newPrice, newAmount), newUnit, currentUnits);
@@ -95,13 +107,21 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
         cursor={'pointer'}
         textAlign={'center'}
       >
-        <Text display={'block'} overflow={'hidden'}>
-          Update
-        </Text>
+        <Text display={'block'}>Update</Text>
 
-        <Text as="b" color={'#0070f3'} whiteSpace={'nowrap'} display={'block'} overflow={'hidden'}>
-          {ingredientInfo?.name}
-        </Text>
+        <Tooltip isDisabled={!overflowing} hasArrow label={ingredientInfo?.name} placement={'top'}>
+          <Text
+            ref={textRef}
+            as="b"
+            color={'#0070f3'}
+            whiteSpace={'nowrap'}
+            display={'block'}
+            overflow={'hidden'}
+            textOverflow={'ellipsis'}
+          >
+            {ingredientInfo?.name}
+          </Text>
+        </Tooltip>
 
         <Text display={'block'} overflow={'hidden'}>
           {ingredientInfo?.price ? currencyFormatter.format(convertedExistingPrice) : 'price'}/
