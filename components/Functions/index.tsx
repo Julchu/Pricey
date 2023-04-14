@@ -1,13 +1,7 @@
-import { Button, Flex, Input, Link, Spinner, Text } from '@chakra-ui/react';
+import { Flex, Link, Spinner, Text } from '@chakra-ui/react';
 import { FC, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-import useCSV from '../../hooks/useCSV';
-
-type FileFormData = {
-  file: File[];
-};
 
 const Functions: FC = () => {
   const { authUser, loading: userLoading, login, logout } = useAuth();

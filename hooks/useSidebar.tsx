@@ -1,4 +1,13 @@
-import { createContext, FC, ReactElement, ReactNode, useContext, useState } from 'react';
+import {
+  createContext,
+  FC,
+  ReactElement,
+  ReactNode,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+} from 'react';
 
 /* SidebarTypes
   * userActions: (isOpen: boolean, onClose: () => void) => ReactElement;
@@ -48,6 +57,11 @@ type SidebarContextType = {
  */
 export const useSidebar = (): SidebarContextType => {
   const { isOpen, setIsOpen, panelId, setPanelId } = useContext(SidebarContext);
+
+  // Closes sidebar when new page is loaded (like when navigating using Chakra Link)
+  useLayoutEffect(() => {
+    return () => setIsOpen(false);
+  }, [setIsOpen]);
 
   return {
     isSidebarOpen: isOpen,

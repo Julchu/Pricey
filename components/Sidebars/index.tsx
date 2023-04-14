@@ -15,6 +15,8 @@ import {
   ButtonGroup,
   Stack,
   Text,
+  Avatar,
+  Center,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FC, useCallback, useEffect } from 'react';
@@ -44,9 +46,8 @@ const Sidebar: FC = () => {
 };
 
 const UserActionSidebar: FC = () => {
-  const { authUser, logout } = useAuth();
+  const { authUser, login, logout } = useAuth();
   const { closeSidebar } = useSidebar();
-
   const { toggleUnit, currentUnits } = useUnit();
 
   const logoutHandler = useCallback(async () => {
@@ -54,17 +55,33 @@ const UserActionSidebar: FC = () => {
     closeSidebar();
   }, [logout, closeSidebar]);
 
+  const loginHandler = useCallback(async () => {
+    await login();
+    closeSidebar();
+  }, [login, closeSidebar]);
+
   return (
     <DrawerContent>
       <DrawerCloseButton />
+
       <DrawerHeader>Hello {authUser?.name}</DrawerHeader>
+
+      <Avatar
+        mx={'20px'}
+        boxShadow={'normal'}
+        _hover={{ boxShadow: 'hover' }}
+        cursor={'pointer'}
+        name={authUser?.name}
+        src={authUser?.photoURL}
+        aria-label={'Open sidepanel'}
+      />
 
       <DrawerBody>
         <Stack>
           <LinkBox as={Box}>
             <Button>
               <LinkOverlay as={NextLink} href={'/about'}>
-                About
+                About Pricey
               </LinkOverlay>
             </Button>
           </LinkBox>
@@ -82,14 +99,16 @@ const UserActionSidebar: FC = () => {
             </Button>
           </Box>
 
-          <ButtonGroup isAttached>
-            <Button>Grocery Lists</Button>
-            <IconButton
-              aria-label="Create Grocery List"
-              icon={<AddIcon />}
-              borderLeft={'0.5px solid teal'}
-            />
-          </ButtonGroup>
+          {authUser ? (
+            <ButtonGroup isAttached>
+              <Button>Grocery Lists</Button>
+              <IconButton
+                aria-label="Create Grocery List"
+                icon={<AddIcon />}
+                borderLeft={'0.5px solid teal'}
+              />
+            </ButtonGroup>
+          ) : null}
         </Stack>
       </DrawerBody>
 
@@ -98,7 +117,11 @@ const UserActionSidebar: FC = () => {
           <Button variant="outline" onClick={logoutHandler}>
             Logout
           </Button>
-        ) : null}
+        ) : (
+          <Button variant="outline" onClick={loginHandler}>
+            Login
+          </Button>
+        )}
       </DrawerFooter>
     </DrawerContent>
   );

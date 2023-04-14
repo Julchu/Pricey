@@ -44,11 +44,6 @@ const IngredientList: FC = () => {
 
   const { openSidebar } = useSidebar();
 
-  const loginHandler = useCallback(async () => {
-    if (!authUser) await login();
-    if (authUser) openSidebar('userActions');
-  }, [authUser, login, openSidebar]);
-
   // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
   /* Manual ingredient search
    * searchIngredient: user input into search box; not used for query
@@ -156,88 +151,7 @@ const IngredientList: FC = () => {
       <FormProvider {...methods}>
         <>
           <Flex flexDir={{ base: 'column', sm: 'row' }}>
-            {/* Mobile version */}
-            <Show below={'sm'}>
-              <HStack m={'20px 30px 0px'} justifyContent={'space-between'}>
-                <Heading color={'blue'}>Pricey</Heading>
-
-                <SkeletonCircle isLoaded={!userLoading} fitContent>
-                  <IconButton
-                    variant={'outline'}
-                    aria-label={'Open sidepanel'}
-                    icon={<HamburgerIcon />}
-                    onClick={loginHandler}
-                  />
-                  {/* <Avatar
-                    mx={'20px'}
-                    boxShadow={'normal'}
-                    _hover={{ boxShadow: 'hover' }}
-                    cursor={'pointer'}
-                    name={authUser?.name}
-                    src={authUser?.photoURL}
-                    aria-label={'Open sidepanel'}
-                    onClick={() => openSidebar('userActions')}
-                  /> */}
-                </SkeletonCircle>
-
-                {/* <SkeletonCircle isLoaded={!userLoading} fitContent> */}
-                {/* <Avatar
-                  boxShadow={'normal'}
-                  _hover={{ boxShadow: 'hover' }}
-                  cursor={'pointer'}
-                  name={'Pricey'}
-                  src={authUser?.photoURL}
-                  aria-label={'Pricey Logo'}
-                  // onClick={loginHandler}
-                /> */}
-              </HStack>
-            </Show>
-
-            {/* Pricey Logo */}
-            <Show above={'sm'}>
-              <Center mx={'20px'}>
-                {/* <SkeletonCircle isLoaded={!userLoading} fitContent> */}
-                {/* <Avatar
-                  boxShadow={'normal'}
-                  _hover={{ boxShadow: 'hover' }}
-                  cursor={'pointer'}
-                  name={'Pricey'}
-                  src={authUser?.photoURL}
-                  aria-label={'Pricey Logo'}
-                  // onClick={loginHandler}
-                /> */}
-                <Heading color={'blue'}>Pricey</Heading>
-              </Center>
-            </Show>
-
             <IngredientForm />
-
-            {/* Hamburger */}
-            <Show above={'sm'}>
-              <Center mx={'20px'}>
-                <Skeleton isLoaded={!userLoading} fadeDuration={4} speed={3}>
-                  <IconButton
-                    variant={'outline'}
-                    // borderRadius={'50%'}
-                    aria-label={'Open sidepanel'}
-                    icon={<HamburgerIcon />}
-                    onClick={loginHandler}
-                  />
-
-                  {/* <Text onClick={loginHandler}>Cheese</Text> */}
-                  {/* <Avatar
-                  mx={'20px'}
-                  boxShadow={'normal'}
-                  _hover={{ boxShadow: 'hover' }}
-                  cursor={'pointer'}
-                  name={authUser?.name}
-                  src={authUser?.photoURL}
-                  aria-label={'Open sidepanel'}
-                  onClick={loginHandler}
-                /> */}
-                </Skeleton>
-              </Center>
-            </Show>
           </Flex>
 
           <Divider boxShadow={'focus'} />
@@ -269,7 +183,6 @@ const IngredientList: FC = () => {
                 <GridItem
                   ml={{ base: foundIngredient ? '30px' : '', sm: 'unset' }}
                   mr={{ base: index === filteredResults.length - 1 ? '30px' : '', sm: 'unset' }}
-                  // _last={{ base: { mr: '30px' } }}
                   key={`${item.name}_${index}`}
                 >
                   <IngredientCard

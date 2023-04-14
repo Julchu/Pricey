@@ -1,116 +1,141 @@
-import { Box, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Heading,
+  Image,
+  Grid,
+  LinkBox,
+  LinkOverlay,
+  Icon,
+  Text,
+  Center,
+  HStack,
+  IconButton,
+  Show,
+} from '@chakra-ui/react';
 import { FC } from 'react';
-// import { openInNewTab } from '../../lib/openLink';
-// import { GithubLogo } from '../Icons/Objects';
-// import { Hyperlink } from '../UI/Buttons';
-// import { RoundedImage, Row } from '../UI/Structure';
-// import { ProfileGrid, ProfileImageWrapper, ProfileWrapper } from './styles';
+import NextLink from 'next/link';
+import { openInNewTab } from '../../lib/openLink';
+import { HamburgerIcon } from '@chakra-ui/icons';
+import { useSidebar } from '../../hooks/useSidebar';
 
-// type GithubUser = {
-//   name: string;
-//   link?: string;
-//   imageSrc?: string;
-//   alt?: string | '';
-//   width?: string | '200px';
-//   height?: string | '200px';
-// };
+type GithubUser = {
+  name: string;
+  link?: string;
+  imageSrc?: string;
+  alt?: string | '';
+  width?: string | '200px';
+  height?: string | '200px';
+};
 
-// const contributors = [
-//   {
-//     name: 'Julian',
-//     link: 'https://github.com/julchu/',
-//     imageSrc: 'https://avatars.githubusercontent.com/u/17052350?v=4',
-//   },
-//   {
-//     name: 'Lili',
-//   },
-//   {
-//     name: 'Justin',
-//     link: 'https://github.com/jktoo/',
-//     imageSrc: 'https://avatars.githubusercontent.com/u/49129827?v=4',
-//   },
-//   {
-//     name: 'Ali',
-//     link: 'https://github.com/AliShahidGit/',
-//     imageSrc: 'https://avatars.githubusercontent.com/u/43257696?v=4',
-//   },
-//   {
-//     name: 'Christine',
-//     link: 'https://github.com/ChristineAu-Yeung/',
-//     imageSrc: 'https://avatars.githubusercontent.com/u/44853547?v=4',
-//   },
-// ];
+const contributors = [
+  {
+    name: 'Julian',
+    link: 'https://github.com/julchu/',
+    imageSrc: 'https://avatars.githubusercontent.com/u/17052350?v=4',
+  },
+  {
+    name: 'Lili',
+  },
+  // {
+  //   name: 'Justin',
+  //   link: 'https://github.com/jktoo/',
+  //   imageSrc: 'https://avatars.githubusercontent.com/u/49129827?v=4',
+  // },
+  {
+    name: 'Ali',
+    link: 'https://github.com/AliShahidGit/',
+    imageSrc: 'https://avatars.githubusercontent.com/u/43257696?v=4',
+  },
+  {
+    name: 'Christine',
+    link: 'https://github.com/ChristineAu-Yeung/',
+    imageSrc: 'https://avatars.githubusercontent.com/u/44853547?v=4',
+  },
+];
 
-// const Profile: FC<GithubUser> = ({ name, link, imageSrc, alt, width, height }) => {
-//   return (
-//     <ProfileWrapper
-//       style={{ width, cursor: link ? 'pointer' : 'not-allowed' }}
-//       onClick={() => link && openInNewTab(link)}
-//     >
-//       <ProfileImageWrapper width={width} height={height}>
-//         {imageSrc ? (
-//           <RoundedImage src={imageSrc} alt={alt} width={width} height={height} />
-//         ) : (
-//           <GithubLogo style={{ width, height }} />
-//         )}
-//       </ProfileImageWrapper>
-//       <Row>
-//         <h3 style={{ margin: '10px auto 20px', fontWeight: 'normal' }}>{name}</h3>
-//       </Row>
-//     </ProfileWrapper>
-//   );
-// };
+const Profile: FC<GithubUser> = ({ name, link, imageSrc, alt, width, height }) => {
+  return (
+    <Flex
+      flexDir={'column'}
+      style={{ width, cursor: link ? 'pointer' : 'not-allowed' }}
+      onClick={() => link && openInNewTab(link)}
+    >
+      <Center>
+        <Flex flexDir={'column'}>
+          <Box width={{ base: '100px', sm: '200px' }} height={{ base: '100px', sm: '200px' }}>
+            {imageSrc ? (
+              <Image src={imageSrc} alt={alt} borderRadius={'5px'} />
+            ) : (
+              // GitHub logo
+              <Icon viewBox="0 0 16 16" boxSize={'auto'}>
+                <path
+                  fillRule="evenodd"
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"
+                />
+              </Icon>
+            )}
+          </Box>
+          <Flex flexDir={'row'}>
+            <Heading as={'h3'} m={'10px auto 20px'} fontWeight={'normal'}>
+              {name}
+            </Heading>
+          </Flex>
+        </Flex>
+      </Center>
+    </Flex>
+  );
+};
 
 // Nav bar
 const About: FC = () => {
   return (
-    <Box bg="blue" h={'100%'}>
-      <Text>About Pricey</Text>
-      {/* <Row style={{ justifyContent: 'center' }}>
-        <h1 style={{ fontSize: '4rem', lineHeight: '1.15px' }}>
-          Welcome to <Hyperlink href="https://github.com/julchu/Pricey">Pricey!</Hyperlink>
-        </h1>
-      </Row> */}
+    <>
+      <Box h={'100%'}>
+        <Center>
+          <Flex flexDir={'row'}>
+            <LinkBox as={Box}>
+              <Heading as={'h1'} fontSize={'3rem'} textAlign={'center'}>
+                About&nbsp;
+                <LinkOverlay
+                  color={'green'}
+                  as={NextLink}
+                  href={'https://github.com/julchu/Pricey'}
+                >
+                  Pricey!
+                </LinkOverlay>
+              </Heading>
+            </LinkBox>
+          </Flex>
+        </Center>
 
-      {/* <p className={styles.description} style={{ marginBottom: '0px' }}>
-        Template code to learn React available at{' '}
-        <code className={styles.code}>pages/template.tsx</code>
-      </p>
+        <Box mt={'auto'}>
+          <Center>
+            <Text>Contributors</Text>
+          </Center>
 
-      <p className={styles.description}>
-        View live template code at&nbsp;
-        <code
-          className={styles.code}
-          onClick={() => router.push('/template')}
-          style={{ cursor: 'pointer' }}
-        >
-          /template
-        </code>
-      </p> */}
-
-      {/* style={{ marginLeft: 'auto', marginRight: 'auto' }} */}
-      {/* <Row style={{ justifyContent: 'center' }}>Contributors</Row>
-
-      <div
-        style={{
-          paddingLeft: '100px',
-          paddingRight: '100px',
-        }}
-      >
-        <ProfileGrid>
-          {contributors.map(({ name, link, imageSrc }, index) => (
-            <Profile
-              key={`contributor_${index}`}
-              name={name}
-              link={link}
-              imageSrc={imageSrc}
-              width="200px"
-              height="200px"
-            />
-          ))}
-        </ProfileGrid>
-      </div> */}
-    </Box>
+          <Grid
+            gap={{ sm: '30px' }}
+            templateColumns={{
+              base: '1fr 1fr',
+              sm: 'repeat(auto-fit, 200px)',
+            }}
+            justifyContent={'center'}
+          >
+            {contributors.map(({ name, link, imageSrc }, index) => (
+              <Profile
+                key={`contributor_${index}`}
+                name={name}
+                link={link}
+                imageSrc={imageSrc}
+                width="200px"
+                height="200px"
+              />
+            ))}
+          </Grid>
+        </Box>
+      </Box>
+    </>
   );
 };
 

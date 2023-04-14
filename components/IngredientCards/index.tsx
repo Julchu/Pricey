@@ -81,12 +81,11 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
       ml={{ base: '30px', sm: 'unset' }}
       letterSpacing={'2px'}
       scrollSnapAlign={'center'}
-      border={{ base: '1px solid grey', sm: 'none' }}
+      border={'none'}
       borderRadius={'5px'}
-      // h={{ sm: '300px' }}
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-      boxShadow={{ sm: highlighted ? 'under' : 'normal' }}
+      boxShadow={highlighted ? 'under' : 'normal'}
       _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
     >
       {/* Image */}

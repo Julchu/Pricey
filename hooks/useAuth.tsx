@@ -38,7 +38,6 @@ export const useProvideAuth = (): AuthContextType => {
   const auth = getAuth();
 
   const login = async (): Promise<void> => {
-    setLoading(true);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -51,7 +50,6 @@ export const useProvideAuth = (): AuthContextType => {
   };
 
   const logout = async (): Promise<void> => {
-    setLoading(true);
     signOut(auth)
       .then(() => {
         // Sign-out successful.
@@ -73,8 +71,6 @@ export const useProvideAuth = (): AuthContextType => {
    */
   const handleAuthChange = useCallback(
     async (user: FirebaseUser | null) => {
-      setLoading(true);
-
       if (user) {
         setAuthUser(
           (await getUser(user.uid)) ||
@@ -89,7 +85,6 @@ export const useProvideAuth = (): AuthContextType => {
         setAuthUser(undefined);
         console.log('User is not logged');
       }
-      setLoading(false);
     },
     [createUser, getUser],
   );

@@ -9,8 +9,7 @@ const montserrat = Montserrat({
 export const theme = {
   colors: {
     blue: '#0000FF',
-    b: '#0000FF',
-    rb: '#002366',
+    green: 'lightcoral',
   },
   fonts: {
     heading: montserrat.style.fontFamily,

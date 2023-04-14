@@ -20,10 +20,11 @@ const IngredientForm: FC = () => {
 
   return (
     <Grid
-      m={{ base: '20px 30px', sm: '20px 0px' }}
+      m={{ base: '0px 30px 20px', sm: '20px 0px' }}
       templateColumns={{ base: 'auto', sm: 'repeat(6, 1fr)' }}
       templateRows={{ sm: 'repeat(1, 1fr)' }}
-      gap={'10px 30px'}
+      rowGap={{ base: '10px' }}
+      columnGap={{ sm: '30px' }}
       w={{ sm: '100%' }}
     >
       {/* Ingredient name input */}
@@ -32,12 +33,11 @@ const IngredientForm: FC = () => {
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
-        border={{ base: '1px solid grey', sm: 'none' }}
-        outline={{ sm: 'none' }}
+        border={'none'}
         borderRadius={'5px'}
-        boxShadow={{ sm: 'normal' }}
-        _hover={{ boxShadow: { sm: 'hover' } }}
-        _focus={{ boxShadow: { sm: 'focus' } }}
+        boxShadow={'normal'}
+        _hover={{ boxShadow: 'hover' }}
+        _focus={{ boxShadow: 'focus' }}
         _invalid={{
           color: 'red',
           _placeholder: {
@@ -60,12 +60,11 @@ const IngredientForm: FC = () => {
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
-        border={{ base: '1px solid grey', sm: 'none' }}
-        outline={{ sm: 'none' }}
+        border={'none'}
         borderRadius={'5px'}
-        boxShadow={{ sm: 'normal' }}
-        _hover={{ boxShadow: { sm: 'hover' } }}
-        _focus={{ boxShadow: { sm: 'focus' } }}
+        boxShadow={'normal'}
+        _hover={{ boxShadow: { base: 'hover' } }}
+        _focus={{ boxShadow: { base: 'focus' } }}
         _invalid={{
           color: 'red',
           _placeholder: {
@@ -88,12 +87,11 @@ const IngredientForm: FC = () => {
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
-        border={{ base: '1px solid grey', sm: 'none' }}
-        outline={{ sm: 'none' }}
+        border={'none'}
         borderRadius={'5px'}
-        boxShadow={{ sm: 'normal' }}
-        _hover={{ boxShadow: { sm: 'hover' } }}
-        _focus={{ boxShadow: { sm: 'focus' } }}
+        boxShadow={'normal'}
+        _hover={{ boxShadow: 'hover' }}
+        _focus={{ boxShadow: 'focus' }}
         _invalid={{
           color: 'red',
           _placeholder: {
@@ -113,13 +111,12 @@ const IngredientForm: FC = () => {
 
       <Select
         letterSpacing={'2px'}
-        border={{ base: '1px solid grey', sm: 'none' }}
-        outline={{ sm: 'none' }}
-        boxShadow={{ sm: 'normal' }}
+        border={'none'}
+        boxShadow={'normal'}
         borderRadius={'5px'}
         transition={'box-shadow 0.2s ease-in-out'}
-        _hover={{ boxShadow: { sm: 'hover' } }}
-        _focus={{ boxShadow: { sm: 'focus' } }}
+        _hover={{ boxShadow: 'hover' }}
+        _focus={{ boxShadow: 'focus' }}
         _placeholder={{ color: 'red' }}
         _invalid={{
           color: 'red',
@@ -149,12 +146,11 @@ const IngredientForm: FC = () => {
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
-        border={{ base: '1px solid grey', sm: 'none' }}
-        outline={{ sm: 'none' }}
+        border={'none'}
         borderRadius={'5px'}
-        boxShadow={{ sm: 'normal' }}
-        _hover={{ boxShadow: { sm: 'hover' } }}
-        _focus={{ boxShadow: { sm: 'focus' } }}
+        boxShadow={'normal'}
+        _hover={{ boxShadow: 'hover' }}
+        _focus={{ boxShadow: 'focus' }}
         _invalid={{
           color: 'red',
           _placeholder: {
@@ -188,13 +184,13 @@ export default IngredientForm;
     bg={'white'}
     fontWeight={'normal'}
     letterSpacing={'2px'}
-    border={{ base: '1px solid grey', sm: 'none' }}
-    outline={{ sm: 'none' }}
-    boxShadow={{ sm: 'normal' }}
+    border={'none'}
+    
+    boxShadow={'normal' }
     borderRadius={'5px'}
     transition={'box-shadow 0.2s ease-in-out'}
-    _hover={{ boxShadow: { sm: 'hover' } }}
-    _focus={{ boxShadow: { sm: 'focus' } }}
+    _hover={{ boxShadow:  'hover'  }}
+    _focus={{ boxShadow:  'focus'  }}
     _placeholder={{ color: 'red' }}
     _invalid={{
       color: 'red',
