@@ -10,6 +10,9 @@ import {
   Stat,
   Flex,
   Tooltip,
+  Center,
+  AbsoluteCenter,
+  Box,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient } from '../../lib/firebase/interfaces';
@@ -81,7 +84,6 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
       ml={{ base: '30px', sm: 'unset' }}
       letterSpacing={'2px'}
       scrollSnapAlign={'center'}
-      border={'none'}
       borderRadius={'5px'}
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
@@ -89,9 +91,11 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
       _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
     >
       {/* Image */}
-      <CardHeader height={'180px'}>
+      <CardHeader height={'180px'} position={'relative'}>
         {/* TODO: image uploading */}
-        <Image src={'/media/foodPlaceholder.png'} alt={'Food placeholder'} />
+        <AbsoluteCenter w="100%">
+          <Image src={'/media/foodPlaceholder.png'} alt={'Food placeholder'} />
+        </AbsoluteCenter>
       </CardHeader>
 
       {/* Card line */}
@@ -178,19 +182,19 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
     <Card
       ml={{ base: '30px', sm: 'unset' }}
       letterSpacing={'2px'}
-      scrollSnapAlign={'center'}
-      border={{ base: '1px solid grey', sm: 'none' }}
       borderRadius={'5px'}
-      // h={{ sm: '300px' }}
+      scrollSnapAlign={'center'}
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
       boxShadow={{ sm: 'normal' }}
-      _hover={{ boxShadow: 'hover' }}
+      _hover={{ boxShadow: 'focus' }}
     >
       {/* Image */}
-      <CardHeader height={'180px'}>
-        {/* TODO: image uploading */}
-        <Image src={'/media/imageUploadIcon.png'} alt={'Upload image'} borderRadius="lg" />
+      <CardHeader height={'180px'} position={'relative'}>
+        <AbsoluteCenter>
+          {/* TODO: image uploading */}
+          <Image src={'/media/imageUploadIcon.png'} alt={'Upload image'} borderRadius={'lg'} />
+        </AbsoluteCenter>
       </CardHeader>
 
       {/* Card line */}

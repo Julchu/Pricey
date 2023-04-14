@@ -1,31 +1,13 @@
 import { limit, onSnapshot, query, where } from 'firebase/firestore';
-import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, Ingredient, Unit, WithId } from '../../lib/firebase/interfaces';
-import {
-  AbsoluteCenter,
-  Avatar,
-  Center,
-  Divider,
-  Flex,
-  Grid,
-  GridItem,
-  Heading,
-  HStack,
-  IconButton,
-  Show,
-  Skeleton,
-  SkeletonCircle,
-  SkeletonText,
-  Text,
-} from '@chakra-ui/react';
+import { Divider, Flex, Grid, GridItem } from '@chakra-ui/react';
 import { IngredientCard, NewIngredientCard } from '../IngredientCards';
 import IngredientForm from '../IngredientForm';
 import { useAuth } from '../../hooks/useAuth';
 import Fuse from 'fuse.js';
 import useIngredient from '../../hooks/useIngredient';
-import { useSidebar } from '../../hooks/useSidebar';
-import { HamburgerIcon } from '@chakra-ui/icons';
 
 export type IngredientFormData = {
   ingredientId?: string;
@@ -40,9 +22,7 @@ export type IngredientFormData = {
 };
 
 const IngredientList: FC = () => {
-  const { authUser, loading: userLoading, login, logout } = useAuth();
-
-  const { openSidebar } = useSidebar();
+  const { authUser, loading: userLoading } = useAuth();
 
   // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
   /* Manual ingredient search
@@ -159,15 +139,15 @@ const IngredientList: FC = () => {
           <Grid
             mx={{ base: 'unset', sm: '30px' }}
             mt={'20px'}
-            gridAutoFlow={{ base: 'column', sm: 'row' }}
+            autoFlow={{ base: 'column', sm: 'row' }}
             rowGap={'30px'}
             columnGap={{ base: '100%', sm: '30px' }}
             overflowX={{ base: 'scroll', sm: 'visible' }}
             overflowY={{ base: 'hidden', sm: 'visible' }}
             scrollSnapType={['x mandatory', 'none']}
-            gridTemplateColumns={{
-              base: 'repeat(auto-fill, 150px)',
-              sm: 'repeat(auto-fill, 250px)',
+            templateColumns={{
+              base: 'repeat(auto-fill, minmax(150px, 1fr))',
+              sm: 'repeat(auto-fill, minmax(250px, 1fr))',
             }}
           >
             {!foundIngredient ? (

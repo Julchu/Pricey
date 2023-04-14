@@ -21,15 +21,15 @@ const IngredientForm: FC = () => {
   return (
     <Grid
       m={{ base: '0px 30px 20px', sm: '20px 0px' }}
-      templateColumns={{ base: 'auto', sm: 'repeat(6, 1fr)' }}
-      templateRows={{ sm: 'repeat(1, 1fr)' }}
-      rowGap={{ base: '10px' }}
-      columnGap={{ sm: '30px' }}
+      templateColumns={{ base: 'repeat(2, 1fr)', sm: 'repeat(6, 1fr)' }}
+      rowGap={{ base: '20px' }}
+      columnGap={{ base: '20px', sm: '30px' }}
       w={{ sm: '100%' }}
     >
       {/* Ingredient name input */}
       <Input
-        gridColumn={{ sm: '1/3' }}
+        type={'search'}
+        gridColumn={{ base: '1/3', sm: '1/3' }}
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
@@ -56,7 +56,7 @@ const IngredientForm: FC = () => {
 
       {/* Price input */}
       <Input
-        gridColumn={{ base: '0/1', sm: 'unset' }}
+        type={'number'}
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
@@ -84,6 +84,7 @@ const IngredientForm: FC = () => {
 
       {/* Amount input */}
       <Input
+        type={'number'}
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
@@ -143,6 +144,7 @@ const IngredientForm: FC = () => {
 
       {/* Item quantity */}
       <Input
+        type={'number'}
         letterSpacing={'2px'}
         height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
