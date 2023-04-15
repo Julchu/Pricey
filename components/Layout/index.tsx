@@ -3,15 +3,8 @@ import {
   AbsoluteCenter,
   Avatar,
   Box,
-  Button,
-  Center,
   Circle,
-  FormControl,
-  FormLabel,
   Heading,
-  HStack,
-  IconButton,
-  Input,
   LinkBox,
   LinkOverlay,
   Menu,
@@ -22,16 +15,12 @@ import {
   MenuItemOption,
   MenuList,
   MenuOptionGroup,
-  SimpleGrid,
+  Skeleton,
+  Spinner,
   Square,
-  Switch,
-  Text,
-  VStack,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
-import Sidebar from '../Sidebars';
-import { useSidebar } from '../../hooks/useSidebar';
-import { ChevronDownIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { HamburgerIcon } from '@chakra-ui/icons';
 import { useAuth } from '../../hooks/useAuth';
 import { Unit } from '../../lib/firebase/interfaces';
 
@@ -79,9 +68,24 @@ const Header: FC = () => {
           _focus={{ boxShadow: 'focus' }}
           pos={'relative'}
         >
-          <AbsoluteCenter>
-            {authUser ? <Avatar src={authUser?.photoURL} /> : <HamburgerIcon color={'black'} />}
-          </AbsoluteCenter>
+          <Square>
+            {authUser ? (
+              <Skeleton isLoaded={!userLoading} fitContent={true}>
+                <Avatar
+                  alignSelf={'center'}
+                  justifySelf={'center'}
+                  m="auto"
+                  src={authUser?.photoURL}
+                  borderRadius={authUser ? '50%' : '5px'}
+                  boxShadow={'normal'}
+                />
+              </Skeleton>
+            ) : userLoading ? (
+              <Spinner m="auto" />
+            ) : (
+              <HamburgerIcon color={'black'} alignSelf={'center'} justifySelf={'center'} m="auto" />
+            )}
+          </Square>
         </MenuButton>
 
         <MenuList>

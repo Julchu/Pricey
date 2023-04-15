@@ -1,11 +1,4 @@
-import {
-  doc,
-  DocumentReference,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-  writeBatch,
-} from 'firebase/firestore';
+import { doc, DocumentReference, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { db, Ingredient, Unit } from '../lib/firebase/interfaces';
 import {
@@ -16,7 +9,6 @@ import {
 } from '../lib/textFormatters';
 import { useAuth } from './useAuth';
 import { IngredientFormData } from '../components/Dashboard';
-import { firestore } from '../lib/firebase';
 
 type IngredientMethods = {
   submitIngredient: (

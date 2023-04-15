@@ -38,6 +38,7 @@ export const useProvideAuth = (): AuthContextType => {
   const auth = getAuth();
 
   const login = async (): Promise<void> => {
+    setLoading(true);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -81,6 +82,7 @@ export const useProvideAuth = (): AuthContextType => {
               displayName: user.displayName || '',
             })),
         );
+        setLoading(false);
       } else {
         setAuthUser(undefined);
         console.log('User is not logged');

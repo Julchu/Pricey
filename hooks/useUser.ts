@@ -9,7 +9,7 @@ import {
   where,
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { db, User, Role, WithId } from '../lib/firebase/interfaces';
+import { db, User, Role, WithId, Unit } from '../lib/firebase/interfaces';
 import { filterNullableObject } from '../lib/textFormatters';
 
 type AuthData = {
@@ -42,11 +42,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
         setLoading(false);
         return {
           id: existingUser.docs[0].id,
-          uid: uid,
-          name: user.name,
-          email: user.email,
-          photoURL: user.photoURL,
-          role: user.role,
+          ...user,
         };
       }
     } catch (error) {
@@ -67,6 +63,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
           name: displayName,
           createdAt: serverTimestamp(),
           role,
+          preferences: { mass: Unit.kilogram, volume: Unit.litre },
         });
 
         const newUserDoc = await getDoc(newUserDocRef);
@@ -75,11 +72,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
           setLoading(false);
           return {
             id: newUserDocRef.id,
-            uid,
-            name: user.name,
-            email: user.email,
-            photoURL: user.photoURL,
-            role: user.role,
+            ...user,
           };
         }
       } catch (error) {
