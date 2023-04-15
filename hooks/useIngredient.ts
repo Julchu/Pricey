@@ -8,7 +8,12 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { db, Ingredient, Unit } from '../lib/firebase/interfaces';
-import { priceConverter, unitConverter } from '../lib/textFormatters';
+import {
+  priceCalculator,
+  filterNullableObject,
+  priceConverter,
+  unitConverter,
+} from '../lib/textFormatters';
 import { useAuth } from './useAuth';
 import { IngredientFormData } from '../components/Dashboard';
 import { firestore } from '../lib/firebase';
@@ -29,13 +34,14 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   const { authUser } = useAuth();
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
-    async ({ name, price, amount, quantity = 1, unit, location, image }) => {
+    async ({ name, price, amount, quantity = 1, unit, image }) => {
       if (!authUser) return;
       setLoading(true);
 
-      const previewPrice = (price * 100) / amount / (quantity || 1) / 100;
+      const previewPrice = priceCalculator(price, amount);
+
       const convertedUnit = unitConverter(unit, { mass: Unit.kilogram, volume: Unit.litre });
-      const convertedPreviewPrice = priceConverter(previewPrice, unit, {
+      const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,
       }).toPrecision(2);
@@ -72,28 +78,26 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(
     async ({ ingredientId, price, amount, quantity, unit, location, image }) => {
-      const previewPrice = (price * 100) / amount / (quantity || 1) / 100;
-      const convertedPreviewPrice = priceConverter(previewPrice, unit, {
+      const previewPrice = priceCalculator(price, amount);
+      const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,
       }).toPrecision(2);
 
-      const batch = writeBatch(firestore);
-
       const ingredientDocRef = doc(db.ingredientCollection, ingredientId);
 
+      const updatedIngredient = filterNullableObject({
+        ingredientId,
+        price: parseFloat(convertedPreviewPrice),
+        amount,
+        quantity,
+        unit,
+        location,
+        image,
+      });
+
       try {
-        batch.update(ingredientDocRef, {
-          price: parseFloat(convertedPreviewPrice),
-        });
-
-        if (image) {
-          batch.update(ingredientDocRef, {
-            image,
-          });
-        }
-
-        await batch.commit();
+        await updateDoc(ingredientDocRef, updatedIngredient);
       } catch (e) {
         setError(e as Error);
       }

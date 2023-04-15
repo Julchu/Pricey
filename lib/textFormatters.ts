@@ -52,4 +52,11 @@ export const percentageFormatter = new Intl.NumberFormat(undefined, {
 });
 
 export const priceCalculator = (price: number, quantity: number): number =>
-  (price * 100) / quantity / 100;
+  (price * 100) / (quantity > 0 ? quantity : 1) / 100;
+
+export const filterNullableObject = (obj: Record<string, unknown>): Record<string, unknown> => {
+  return Object.entries(obj).reduce<Record<string, unknown>>((previousObject, [key, value]) => {
+    if (value) previousObject[key] = value;
+    return previousObject;
+  }, {});
+};

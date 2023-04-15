@@ -1,6 +1,16 @@
-import { doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from 'firebase/firestore';
+import {
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { db, User, Role } from '../lib/firebase/interfaces';
+import { db, User, Role, WithId } from '../lib/firebase/interfaces';
+import { filterNullableObject } from '../lib/textFormatters';
 
 type AuthData = {
   uid: string;
@@ -11,9 +21,9 @@ type AuthData = {
 };
 
 interface UseUserMethods {
-  getUser: (uid: string) => Promise<User | undefined>;
-  createUser: (authData: AuthData) => Promise<User | undefined>;
-  // updateUser: (userData: Partial<User>) => Promise<User | undefined>;
+  getUser: (uid: string) => Promise<WithId<User> | undefined>;
+  createUser: (authData: AuthData) => Promise<WithId<User> | undefined>;
+  updateUser: (userData: Partial<WithId<User>>) => Promise<void>;
 }
 
 const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
@@ -31,6 +41,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
         const user = existingUser.docs[0].data();
         setLoading(false);
         return {
+          id: existingUser.docs[0].id,
           uid: uid,
           name: user.name,
           email: user.email,
@@ -63,6 +74,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
           const user = newUserDoc.data();
           setLoading(false);
           return {
+            id: newUserDocRef.id,
             uid,
             name: user.name,
             email: user.email,
@@ -77,28 +89,23 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
     [],
   );
 
-  // const userDocRef = db.userDoc();
-
-  // const updateUser = useCallback<UseUserMethods['updateUser']>(
-  //   async userData => {
-  //     setLoading(true);
-  //     if (!auth) throw new Error('Invalid user');
-
-  //     try {
-  //       await userDocRef.update(userData);
-  //     } catch (error) {
-  //       setError(error as Error);
-  //     }
-  //     setLoading(false);
-  //   },
-  //   [auth, userRef],
-  // );
+  const updateUser = useCallback<UseUserMethods['updateUser']>(async userData => {
+    try {
+      setLoading(true);
+      // Associate auth info to a specific user in db for public data:
+      const userDocRef = doc(db.userCollection, userData.id);
+      const updatedInfo = filterNullableObject(userData);
+      await updateDoc(userDocRef, updatedInfo);
+    } catch (error) {
+      setError(error as Error);
+    }
+  }, []);
 
   return [
     {
       getUser,
       createUser,
-      // updateUser,
+      updateUser,
     },
     loading,
     error,
@@ -106,25 +113,3 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
 };
 
 export default useUser;
-
-// const citiesRef = collection(db, "cities");
-// await setDoc(doc(citiesRef, 'LA'), {
-//   name: 'Los Angeles',
-//   state: 'CA',
-//   country: 'USA',
-//   capital: false,
-//   population: 3900000,
-//   regions: ['west_coast', 'socal'],
-// });
-
-// await setDoc(doc(db, 'cities', 'LA'), {
-//   name: 'Los Angeles',
-//   state: 'CA',
-//   country: 'USA',
-// });
-
-// await setDoc(
-//   doc(db, 'cities', 'LA'),
-//   { name: 'Los Angeles', state: 'CA', country: 'USA' },
-//   { merge: true },
-// );

@@ -1,10 +1,15 @@
 import { Flex, Link, Spinner, Text } from '@chakra-ui/react';
 import { FC, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import useIngredient from '../../hooks/useIngredient';
+import useUser from '../../hooks/useUser';
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
+import { WithId, User, Unit } from '../../lib/firebase/interfaces';
 
 const Functions: FC = () => {
   const { authUser, loading: userLoading, login, logout } = useAuth();
+  const [{ updateIngredient }] = useIngredient();
+  const [{ updateUser }] = useUser();
 
   useEffect(() => {
     if (authUser) console.log('dashboard useAuth:', authUser);
@@ -34,6 +39,36 @@ const Functions: FC = () => {
         }}
       >
         Delete Ingredients
+      </Link>
+
+      <Link
+        color={'#0070f3'}
+        cursor={'pointer'}
+        _hover={{ textDecoration: 'underline' }}
+        onClick={async () => {
+          await updateIngredient({
+            ingredientId: 'LhtXKGpV2SWjsKE32jsM',
+            name: 'test',
+            price: 1,
+            quantity: 0,
+            unit: '' as Unit,
+            amount: 0,
+            submitter: '',
+          });
+        }}
+      >
+        Update Ingredient
+      </Link>
+
+      <Link
+        color={'#0070f3'}
+        cursor={'pointer'}
+        _hover={{ textDecoration: 'underline' }}
+        onClick={async () => {
+          await updateUser(authUser as Partial<WithId<User>>);
+        }}
+      >
+        Update User
       </Link>
 
       {authUser ? (

@@ -15,11 +15,9 @@ import {
   ButtonGroup,
   Stack,
   Text,
-  Avatar,
-  Center,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { SidebarEnums, SidebarTypes, useSidebar } from '../../hooks/useSidebar';
 import { useUnit } from '../../hooks/useUnit';
@@ -38,7 +36,7 @@ const Sidebar: FC = () => {
   };
 
   return (
-    <Drawer isOpen={isSidebarOpen} placement="right" onClose={closeSidebar}>
+    <Drawer isOpen={isSidebarOpen} placement="left" onClose={closeSidebar}>
       <DrawerOverlay />
       {sidebarTypes[panelId as SidebarEnums]}
     </Drawer>
@@ -65,16 +63,6 @@ const UserActionSidebar: FC = () => {
       <DrawerCloseButton />
 
       <DrawerHeader>Hello {authUser?.name}</DrawerHeader>
-
-      <Avatar
-        mx={'20px'}
-        boxShadow={'normal'}
-        _hover={{ boxShadow: 'hover' }}
-        cursor={'pointer'}
-        name={authUser?.name}
-        src={authUser?.photoURL}
-        aria-label={'Open sidepanel'}
-      />
 
       <DrawerBody>
         <Stack>

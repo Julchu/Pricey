@@ -8,7 +8,7 @@ import {
   User as FirebaseUser,
 } from '@firebase/auth';
 
-import { User } from '../lib/firebase/interfaces';
+import { User, WithId } from '../lib/firebase/interfaces';
 import { useRouter } from 'next/router';
 import useUser from './useUser';
 
@@ -20,7 +20,7 @@ export const AuthContext = createContext<AuthContextType>({
 });
 
 type AuthContextType = {
-  authUser: User | undefined;
+  authUser: WithId<User> | undefined;
   loading: boolean;
   login: () => Promise<void>;
   logout: () => Promise<void>;
@@ -31,7 +31,7 @@ export const useAuth = (): AuthContextType => useContext(AuthContext);
 
 // Initial values of Auth Context (AuthContextType)
 export const useProvideAuth = (): AuthContextType => {
-  const [authUser, setAuthUser] = useState<User | undefined>(undefined);
+  const [authUser, setAuthUser] = useState<WithId<User> | undefined>(undefined);
   const [{ getUser, createUser }, _createUserLoading] = useUser();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
@@ -91,7 +91,8 @@ export const useProvideAuth = (): AuthContextType => {
 
   // Auth persistence: detect if user is authenticated or not (on page change, on page refresh)
   useEffect(() => {
-    onAuthStateChanged(auth, handleAuthChange);
+    const unsubscribe = onAuthStateChanged(auth, handleAuthChange);
+    return () => unsubscribe();
   }, [auth, handleAuthChange]);
 
   return { authUser, loading, login, logout };

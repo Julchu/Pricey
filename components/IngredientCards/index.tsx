@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { FC, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Text,
   Image,
@@ -8,21 +8,18 @@ import {
   CardBody,
   StatArrow,
   Stat,
-  Flex,
   Tooltip,
-  Center,
   AbsoluteCenter,
-  Box,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient } from '../../lib/firebase/interfaces';
 import { IngredientFormData } from '../Dashboard';
 import { useUnit } from '../../hooks/useUnit';
 import {
+  priceCalculator,
   currencyFormatter,
   getPercentChange,
   percentageFormatter,
-  priceCalculator,
   priceConverter,
   unitConverter,
 } from '../../lib/textFormatters';
@@ -49,7 +46,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
   // Check if text is overflowing
   const [overflowing, setOverflowing] = useState<boolean>(false);
   const textRef = useRef<HTMLParagraphElement>(null);
-  useLayoutEffect(() => {
+  useEffect(() => {
     const { current } = textRef;
     if (current) {
       const hasOverflow = current.scrollWidth > current.clientWidth;
@@ -119,8 +116,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
             color={'#0070f3'}
             whiteSpace={'nowrap'}
             display={'block'}
-            overflow={'hidden'}
-            textOverflow={'ellipsis'}
+            isTruncated
           >
             {ingredientInfo?.name}
           </Text>
@@ -158,18 +154,29 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
     name: ['name', 'price', 'quantity', 'unit', 'amount'],
   });
 
+  // Check if text is overflowing
+  const [overflowing, setOverflowing] = useState<boolean>(false);
+  const textRef = useRef<HTMLParagraphElement>(null);
+  useEffect(() => {
+    const { current } = textRef;
+    if (current) {
+      const hasOverflow = current.scrollWidth > current.clientWidth;
+      setOverflowing(hasOverflow);
+    }
+  }, []);
+
   /* Preview new ingredient information: memoizing reduces rerenders/function calls
    * previewPrice: converting price/quantity cents to dollar (100 -> $1.00)
    * convertedPreviewPrice: converted dropdown unit's price to user's current unit price
    * convertedUnit: converted dropdown unit to user's appropriate (mass, volume) current unit
    */
   const previewPrice = useMemo(
-    () => (newPrice * 100) / (newQuantity || 1) / 100,
+    () => priceCalculator(newPrice, newQuantity),
     [newPrice, newQuantity],
   );
 
   const convertedPreviewPrice = useMemo(
-    () => priceConverter(previewPrice / newAmount, newUnit, currentUnits),
+    () => priceConverter(priceCalculator(previewPrice, newAmount), newUnit, currentUnits),
     [currentUnits, newAmount, newUnit, previewPrice],
   );
 
@@ -180,6 +187,7 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
 
   return (
     <Card
+      // bg="darkcyan"
       ml={{ base: '30px', sm: 'unset' }}
       letterSpacing={'2px'}
       borderRadius={'5px'}
@@ -212,9 +220,23 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
           Save
         </Text>
 
-        <Text as={'b'} display={'block'} overflow={'hidden'} color={'#0070f3'}>
-          {newName || 'ingredient'}
-        </Text>
+        <Tooltip
+          isDisabled={!overflowing}
+          hasArrow
+          label={newName || 'ingredient'}
+          placement={'top'}
+        >
+          <Text
+            ref={textRef}
+            as={'b'}
+            display={'block'}
+            color={'#0070f3'}
+            whiteSpace={'nowrap'}
+            isTruncated
+          >
+            {newName || 'ingredient'}
+          </Text>
+        </Tooltip>
 
         {/* price / unit */}
         <Text display={'block'} overflow={'hidden'}>

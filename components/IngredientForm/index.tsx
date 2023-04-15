@@ -31,7 +31,6 @@ const IngredientForm: FC = () => {
         type={'search'}
         gridColumn={{ base: '1/3', sm: '1/3' }}
         letterSpacing={'2px'}
-        height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
         border={'none'}
         borderRadius={'5px'}
@@ -58,7 +57,6 @@ const IngredientForm: FC = () => {
       <Input
         type={'number'}
         letterSpacing={'2px'}
-        height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
         border={'none'}
         borderRadius={'5px'}
@@ -86,7 +84,6 @@ const IngredientForm: FC = () => {
       <Input
         type={'number'}
         letterSpacing={'2px'}
-        height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
         border={'none'}
         borderRadius={'5px'}
@@ -146,7 +143,6 @@ const IngredientForm: FC = () => {
       <Input
         type={'number'}
         letterSpacing={'2px'}
-        height={'40px'}
         transition={'box-shadow 0.2s ease-in-out'}
         border={'none'}
         borderRadius={'5px'}
