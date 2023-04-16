@@ -2,6 +2,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
@@ -21,7 +22,7 @@ type AuthData = {
 };
 
 interface UseUserMethods {
-  getUser: (uid: string) => Promise<WithId<User> | undefined>;
+  getUser: (uid: string) => Promise<WithId<User> | undefined | void>;
   createUser: (authData: AuthData) => Promise<WithId<User> | undefined>;
   updateUser: (userData: Partial<WithId<User>>) => Promise<void>;
 }
@@ -33,8 +34,10 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   const getUser = useCallback<UseUserMethods['getUser']>(async uid => {
     try {
       setLoading(true);
+
       // Associate auth info to a specific user in db for public data:
       const q = query(db.userCollection, where('uid', '==', uid));
+
       const existingUser = await getDocs(q);
 
       if (existingUser.size == 1) {

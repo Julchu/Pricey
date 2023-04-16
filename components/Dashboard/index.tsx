@@ -60,6 +60,8 @@ const IngredientList: FC = () => {
         });
         setSearchResults(ingredientInfoList);
       });
+    } else {
+      setSearchResults([]);
     }
   }, [authUser?.uid]);
 

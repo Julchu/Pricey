@@ -65,7 +65,7 @@ const Functions: FC = () => {
         cursor={'pointer'}
         _hover={{ textDecoration: 'underline' }}
         onClick={async () => {
-          await updateUser(authUser as Partial<WithId<User>>);
+          await updateUser({ mass: Unit.kilogram, volume: Unit.litre } as Partial<WithId<User>>);
         }}
       >
         Update User

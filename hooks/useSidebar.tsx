@@ -1,13 +1,4 @@
-import {
-  createContext,
-  FC,
-  ReactElement,
-  ReactNode,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from 'react';
+import { createContext, FC, ReactElement, ReactNode, useContext, useEffect, useState } from 'react';
 
 /* SidebarTypes
   * userActions: (isOpen: boolean, onClose: () => void) => ReactElement;
