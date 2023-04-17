@@ -1,12 +1,12 @@
+import { AbsoluteCenter, Heading } from '@chakra-ui/react';
 import Layout from '../components/Layout';
 
 export default function Custom404(): JSX.Element {
   return (
     <Layout>
-      <p style={{ margin: 'auto', height: '100%', width: '100%' }}>
-        {/* <Error statusCode={404} /> */}
-        404
-      </p>
+      <AbsoluteCenter>
+        <Heading as={'h1'}>Page not found</Heading>
+      </AbsoluteCenter>
     </Layout>
   );
 }

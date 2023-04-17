@@ -2,7 +2,6 @@ import {
   doc,
   getDoc,
   getDocs,
-  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
@@ -22,62 +21,67 @@ type AuthData = {
 };
 
 interface UseUserMethods {
-  getUser: (uid: string) => Promise<WithId<User> | undefined | void>;
-  createUser: (authData: AuthData) => Promise<WithId<User> | undefined>;
-  updateUser: (userData: Partial<WithId<User>>) => Promise<void>;
+  getUser: (docId: string) => Promise<WithId<User> | undefined | void>;
+  retrieveUser: (authData: AuthData) => Promise<WithId<User> | undefined | void>;
+  updateUser: (userData: Partial<WithId<User>>) => Promise<WithId<User> | undefined | void>;
 }
 
 const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   const [error, setError] = useState<Error>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const getUser = useCallback<UseUserMethods['getUser']>(async uid => {
+  const getUser = useCallback<UseUserMethods['getUser']>(async docId => {
     try {
       setLoading(true);
 
       // Associate auth info to a specific user in db for public data:
-      const q = query(db.userCollection, where('uid', '==', uid));
+      const existingUser = await getDoc(doc(db.userCollection, docId));
 
-      const existingUser = await getDocs(q);
+      if (existingUser.exists()) return { ...existingUser.data(), id: existingUser.id };
 
-      if (existingUser.size == 1) {
-        const user = existingUser.docs[0].data();
-        setLoading(false);
-        return {
-          id: existingUser.docs[0].id,
-          ...user,
-        };
-      }
+      setLoading(false);
     } catch (error) {
       setError(error as Error);
     }
   }, []);
 
-  const createUser = useCallback<UseUserMethods['createUser']>(
+  const retrieveUser = useCallback<UseUserMethods['retrieveUser']>(
     async ({ uid, displayName, email, photoURL, role = Role.standard }) => {
       try {
         setLoading(true);
 
-        const newUserDocRef = doc(db.userCollection);
-        await setDoc(newUserDocRef, {
-          uid,
-          email,
-          photoURL,
-          name: displayName,
-          createdAt: serverTimestamp(),
-          role,
-          preferences: { mass: Unit.kilogram, volume: Unit.litre },
-        });
+        // Associate auth info to a specific user in db for public data:
+        const q = query(db.userCollection, where('uid', '==', uid));
+        const existingUser = await getDocs(q);
 
-        const newUserDoc = await getDoc(newUserDocRef);
-        if (newUserDoc.exists()) {
-          const user = newUserDoc.data();
-          setLoading(false);
-          return {
-            id: newUserDocRef.id,
-            ...user,
-          };
+        if (existingUser.size > 0) {
+          const user = existingUser.docs[0].data();
+          return { id: existingUser.docs[0].id, ...user };
+        } else {
+          // Create new user if user doesn't exist
+          const newUserDocRef = doc(db.userCollection);
+          await setDoc(newUserDocRef, {
+            uid,
+            email,
+            photoURL,
+            name: displayName,
+            createdAt: serverTimestamp(),
+            role,
+            preferences: { mass: Unit.kilogram, volume: Unit.litre },
+          });
+
+          const newUserDoc = await getDoc(newUserDocRef);
+          if (newUserDoc.exists()) {
+            const user = newUserDoc.data();
+            setLoading(false);
+
+            return {
+              id: newUserDoc.id,
+              ...user,
+            };
+          }
         }
+        setLoading(false);
       } catch (error) {
         setError(error as Error);
       }
@@ -92,6 +96,13 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
       const userDocRef = doc(db.userCollection, userData.id);
       const updatedInfo = filterNullableObject(userData);
       await updateDoc(userDocRef, updatedInfo);
+      const updatedUser = await getDoc(userDocRef);
+
+      if (updatedUser.exists())
+        return {
+          id: updatedUser.id,
+          ...updatedUser.data(),
+        };
     } catch (error) {
       setError(error as Error);
     }
@@ -100,7 +111,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   return [
     {
       getUser,
-      createUser,
+      retrieveUser,
       updateUser,
     },
     loading,

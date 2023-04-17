@@ -1,4 +1,4 @@
-import { FC, useEffect, useMemo, useRef, useState } from 'react';
+import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Text,
   Image,
@@ -12,7 +12,7 @@ import {
   AbsoluteCenter,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { Ingredient } from '../../lib/firebase/interfaces';
+import { Ingredient, WithId } from '../../lib/firebase/interfaces';
 import { IngredientFormData } from '../Dashboard';
 import { useUnit } from '../../hooks/useUnit';
 import {
@@ -23,20 +23,23 @@ import {
   priceConverter,
   unitConverter,
 } from '../../lib/textFormatters';
+import useIngredient from '../../hooks/useIngredient';
 
 type CardProps = {
-  ingredientInfo?: Ingredient;
-  handleSubmit?: () => Promise<void>;
+  ingredientInfo: WithId<Ingredient>;
   highlighted?: boolean;
 };
 
 // TODO: hovering over existing cards should show detailed information
 // Search result cards
-export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, highlighted }) => {
+export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) => {
   // Showing price as unit preference
   const { currentUnits } = useUnit();
 
-  const { control } = useFormContext<IngredientFormData>();
+  const [{ updateIngredient }, ingredientLoading, error] = useIngredient();
+
+  const { handleSubmit, control, setValue, getValues, resetField } =
+    useFormContext<IngredientFormData>();
 
   const [newPrice, newAmount, newUnit] = useWatch({
     control,
@@ -53,6 +56,37 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
       setOverflowing(hasOverflow);
     }
   }, []);
+
+  // Modify form data for update submission
+  const onUpdateTransform = useCallback(
+    async (data: WithId<Ingredient>): Promise<void> => {
+      setValue('name', data.name);
+      setValue('ingredientId', data.id);
+    },
+    [setValue],
+  );
+
+  const onUpdateSubmit = useCallback(
+    async (data: IngredientFormData): Promise<void> => {
+      const currentIngredient: IngredientFormData = {
+        ingredientId: data.ingredientId,
+        name: data.name,
+        price: getValues('price'),
+        quantity: getValues('quantity'),
+        amount: getValues('amount'),
+        unit: getValues('unit'),
+        submitter: getValues('submitter'),
+      };
+
+      await updateIngredient(currentIngredient);
+
+      resetField('price');
+      resetField('quantity');
+      resetField('unit');
+      resetField('amount');
+    },
+    [getValues, resetField, updateIngredient],
+  );
 
   const convertedNewPrice = useMemo(() => {
     return priceConverter(priceCalculator(newPrice, newAmount), newUnit, currentUnits);
@@ -100,7 +134,10 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
 
       {/* Info */}
       <CardBody
-        onClick={handleSubmit}
+        onClick={async () => {
+          await onUpdateTransform(ingredientInfo);
+          handleSubmit(onUpdateSubmit)();
+        }}
         h={'100%'}
         w={'100%'}
         padding={'15px 30px'}
@@ -143,11 +180,13 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, handleSubmit, hi
 };
 
 // Search result cards
-export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
+export const NewIngredientCard: FC = () => {
   // Showing price as unit preference
   const { currentUnits } = useUnit();
 
-  const { control } = useFormContext<IngredientFormData>();
+  const [{ submitIngredient }, ingredientLoading, error] = useIngredient();
+
+  const { handleSubmit, control, reset } = useFormContext<IngredientFormData>();
 
   const [newName, newPrice, newQuantity, newUnit, newAmount] = useWatch({
     control,
@@ -164,6 +203,15 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
       setOverflowing(hasOverflow);
     }
   }, []);
+
+  // Reset form on successful submit
+  const onSubmit = useCallback(
+    async (data: IngredientFormData): Promise<void> => {
+      await submitIngredient(data);
+      reset();
+    },
+    [reset, submitIngredient],
+  );
 
   /* Preview new ingredient information: memoizing reduces rerenders/function calls
    * previewPrice: converting price/quantity cents to dollar (100 -> $1.00)
@@ -187,7 +235,6 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
 
   return (
     <Card
-      // bg="darkcyan"
       ml={{ base: '30px', sm: 'unset' }}
       letterSpacing={'2px'}
       borderRadius={'5px'}
@@ -195,7 +242,8 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
       boxShadow={{ sm: 'normal' }}
-      _hover={{ boxShadow: 'focus' }}
+      _hover={{ boxShadow: 'hover' }}
+      _focus={{ boxShadow: 'focus' }}
     >
       {/* Image */}
       <CardHeader height={'180px'} position={'relative'}>
@@ -209,7 +257,7 @@ export const NewIngredientCard: FC<CardProps> = ({ handleSubmit }) => {
       <Divider boxShadow={'focus'} borderColor={'lightgrey'} />
 
       <CardBody
-        onClick={handleSubmit}
+        onClick={handleSubmit(onSubmit)}
         h={'100%'}
         w={'100%'}
         padding={'15px 30px'}

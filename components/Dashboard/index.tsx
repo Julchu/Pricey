@@ -1,13 +1,12 @@
 import { limit, onSnapshot, query, where } from 'firebase/firestore';
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, Ingredient, Unit, WithId } from '../../lib/firebase/interfaces';
-import { Button, Divider, Flex, Grid, GridItem, Menu, MenuItem, MenuList } from '@chakra-ui/react';
-import { IngredientCard, NewIngredientCard } from '../IngredientCards';
-import IngredientForm from '../IngredientForm';
+import { Divider, Flex, Grid, GridItem } from '@chakra-ui/react';
+import { IngredientCard, NewIngredientCard } from '../Ingredients/ingredientCards';
+import IngredientForm from '../Ingredients/ingredientForm';
 import { useAuth } from '../../hooks/useAuth';
 import Fuse from 'fuse.js';
-import useIngredient from '../../hooks/useIngredient';
 
 export type IngredientFormData = {
   ingredientId?: string;
@@ -26,10 +25,9 @@ const IngredientList: FC = () => {
 
   // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
   /* Manual ingredient search
-   * searchIngredient: user input into search box; not used for query
    * foundIngredient: used for desktop card card margins
+   * searchIngredient: user input into search box; not used for query
    */
-  const [{ submitIngredient, updateIngredient }, ingredientLoading, error] = useIngredient();
   const [foundIngredient, setFoundIngredient] = useState<string>('');
   const [searchResults, setSearchResults] = useState<WithId<Ingredient>[]>([]);
 
@@ -45,7 +43,7 @@ const IngredientList: FC = () => {
     },
   });
 
-  const { handleSubmit, reset, resetField, watch, setValue, getValues } = methods;
+  const { watch } = methods;
   const searchIngredient = watch('name');
 
   /* Original live-updating retrieval of specific document and its contents */
@@ -87,46 +85,6 @@ const IngredientList: FC = () => {
       : searchResults;
   }, [searchIngredient, searchResults]);
 
-  // Reset form on successful submit
-  const onSubmit = useCallback(
-    async (data: IngredientFormData): Promise<void> => {
-      await submitIngredient(data);
-      reset();
-    },
-    [reset, submitIngredient],
-  );
-
-  // Modify form data for update submission
-  const onUpdateTransform = useCallback(
-    async (data: WithId<Ingredient>): Promise<void> => {
-      setValue('name', data.name);
-      setValue('ingredientId', data.id);
-    },
-    [setValue],
-  );
-
-  const onUpdateSubmit = useCallback(
-    async (data: IngredientFormData): Promise<void> => {
-      const currentIngredient: IngredientFormData = {
-        ingredientId: data.ingredientId,
-        name: data.name,
-        price: getValues('price'),
-        quantity: getValues('quantity'),
-        amount: getValues('amount'),
-        unit: getValues('unit'),
-        submitter: getValues('submitter'),
-      };
-
-      await updateIngredient(currentIngredient);
-
-      resetField('price');
-      resetField('quantity');
-      resetField('unit');
-      resetField('amount');
-    },
-    [getValues, resetField, updateIngredient],
-  );
-
   return (
     <form>
       {/* FormProvider from ReactHookForms */}
@@ -154,7 +112,7 @@ const IngredientList: FC = () => {
           >
             {!foundIngredient ? (
               <GridItem>
-                <NewIngredientCard handleSubmit={handleSubmit(onSubmit)} />
+                <NewIngredientCard />
               </GridItem>
             ) : null}
 
@@ -167,14 +125,7 @@ const IngredientList: FC = () => {
                   mr={{ base: index === filteredResults.length - 1 ? '30px' : '', sm: 'unset' }}
                   key={`${item.name}_${index}`}
                 >
-                  <IngredientCard
-                    ingredientInfo={item}
-                    handleSubmit={async () => {
-                      await onUpdateTransform(item);
-                      handleSubmit(onUpdateSubmit)();
-                    }}
-                    highlighted={highlighted}
-                  />
+                  <IngredientCard ingredientInfo={item} highlighted={highlighted} />
                 </GridItem>
               );
             })}

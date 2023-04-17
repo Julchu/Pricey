@@ -84,13 +84,13 @@ const Profile: FC<GithubUser> = ({ name, link, imageSrc, alt }) => {
 
 const About: FC = () => {
   return (
-    <Flex d flexDir={'column'} h="100%">
+    <Flex flexDir={'column'} h="100%">
       <Center>
         <Flex flexDir={'row'}>
           <LinkBox as={Box}>
             <Heading as={'h1'} textAlign={'center'}>
               GitHub&nbsp;
-              <LinkOverlay color={'green'} as={NextLink} href={'https://github.com/julchu/Pricey'}>
+              <LinkOverlay as={NextLink} href={'https://github.com/julchu/Pricey'}>
                 <Icon viewBox="0 0 16 16">
                   <path
                     fillRule="evenodd"

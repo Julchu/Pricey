@@ -1,13 +1,10 @@
-import { HamburgerIcon, AddIcon } from '@chakra-ui/icons';
+import { HamburgerIcon } from '@chakra-ui/icons';
 import {
-  LinkBox,
   Heading,
-  LinkOverlay,
   Menu,
   MenuButton,
   Circle,
   Square,
-  Skeleton,
   Avatar,
   Spinner,
   MenuList,
@@ -15,45 +12,28 @@ import {
   MenuItemOption,
   MenuDivider,
   MenuItem,
-  ButtonGroup,
-  Button,
-  IconButton,
   MenuGroup,
   Box,
-  Divider,
-  Center,
   Text,
-  HStack,
-  Flex,
+  ScaleFade,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useDebouncedState } from '../../hooks/useDebouncedState';
 import { useUnit } from '../../hooks/useUnit';
-import { Unit } from '../../lib/firebase/interfaces';
+import { Unit, UnitCategory } from '../../lib/firebase/interfaces';
 
 const Header: FC = () => {
-  const { authUser, loading: userLoading, login, logout } = useAuth();
-
-  const {} = useUnit();
-
-  const a = useDebouncedState();
-
-  const loginHandler = useCallback(async () => {
-    if (!authUser) await login();
-    else await logout();
-  }, [authUser, login, logout]);
+  const { authUser, loading: userLoading } = useAuth();
 
   return (
     <Box justifyContent={'space-between'} display={{ base: 'flex', sm: 'block' }}>
-      <LinkBox as={Heading}>
-        <LinkOverlay as={NextLink} href={'/'}>
-          <Heading color={'lightcoral'} float={{ base: 'left' }} m={'20px 30px'} h={'40px'}>
-            Pricey
-          </Heading>
-        </LinkOverlay>
-      </LinkBox>
+      <NextLink href={'/'}>
+        <Heading color={'lightcoral'} float={{ base: 'left' }} m={'20px 30px'} h={'40px'}>
+          Pricey
+        </Heading>
+      </NextLink>
 
       <Menu>
         <MenuButton
@@ -73,7 +53,7 @@ const Header: FC = () => {
         >
           <Square>
             {authUser ? (
-              <Skeleton isLoaded={!userLoading} fitContent={true}>
+              <ScaleFade in={!!authUser}>
                 <Avatar
                   alignSelf={'center'}
                   justifySelf={'center'}
@@ -82,7 +62,7 @@ const Header: FC = () => {
                   borderRadius={authUser ? '50%' : '5px'}
                   boxShadow={'normal'}
                 />
-              </Skeleton>
+              </ScaleFade>
             ) : userLoading ? (
               <Spinner m="auto" />
             ) : (
@@ -91,67 +71,98 @@ const Header: FC = () => {
           </Square>
         </MenuButton>
 
-        {/* TODO: update user */}
-        <MenuList>
-          {/* Mass switch */}
-          <MenuOptionGroup defaultValue={Unit.kilogram} title="Unit toggles" type="radio">
-            <MenuItemOption closeOnSelect={false} value={Unit.kilogram}>
-              Kilograms
-            </MenuItemOption>
-            <MenuItemOption closeOnSelect={false} value={Unit.pound}>
-              Pounds
-            </MenuItemOption>
-          </MenuOptionGroup>
-
-          <MenuDivider />
-
-          <MenuOptionGroup defaultValue={Unit.litre} title="" type="radio">
-            <MenuItemOption closeOnSelect={false} value={Unit.litre}>
-              Litres
-            </MenuItemOption>
-            <MenuItemOption closeOnSelect={false} value={Unit.quart}>
-              Quarts
-            </MenuItemOption>
-          </MenuOptionGroup>
-
-          <MenuDivider />
-
-          {/* <MenuGroup title="Groceries">
-            <Flex flexDir={'row'}>
-              <MenuItem as={Text} flex={10}>
-                <Text onClick={() => console.log('list')}>My Lists</Text>
-              </MenuItem>
-              <MenuItem flex={1}>
-                <IconButton
-                  flex={0}
-                  variant={'outline'}
-                  aria-label="New List"
-                  icon={<AddIcon />}
-                  onClick={() => console.log('new list')}
-                />
-              </MenuItem>
-            </Flex>
-          </MenuGroup> */}
-
-          <MenuDivider />
-
-          <MenuGroup title="Links">
-            <MenuItem as={NextLink} href={'/about'}>
-              Tutorial
-            </MenuItem>
-            <MenuItem as={NextLink} href={'/about'}>
-              About
-            </MenuItem>
-          </MenuGroup>
-
-          <MenuDivider />
-
-          <MenuGroup title="Profile">
-            <MenuItem onClick={loginHandler}>{authUser ? 'Logout' : 'Login'}</MenuItem>
-          </MenuGroup>
-        </MenuList>
+        <DropdownMenu />
       </Menu>
     </Box>
+  );
+};
+
+const DropdownMenu: FC = () => {
+  const { authUser, login, logout } = useAuth();
+
+  const loginHandler = useCallback(async () => {
+    if (!authUser) login();
+    else logout();
+  }, [authUser, login, logout]);
+
+  const { currentUnits, setCurrentUnits } = useUnit();
+
+  const debouncedUnits = useDebouncedState(currentUnits, 1000);
+
+  // TODO?: update user and/or authUser after unit toggles
+  return (
+    <MenuList>
+      {/* Mass switch */}
+      <MenuOptionGroup
+        defaultValue={currentUnits.mass}
+        title="Unit toggles"
+        type="radio"
+        onChange={e => {
+          setCurrentUnits({ ...currentUnits, mass: e as unknown as UnitCategory['mass'] });
+        }}
+      >
+        <MenuItemOption closeOnSelect={false} value={Unit.kilogram}>
+          Kilograms
+        </MenuItemOption>
+        <MenuItemOption closeOnSelect={false} value={Unit.pound}>
+          Pounds
+        </MenuItemOption>
+      </MenuOptionGroup>
+
+      <MenuDivider />
+
+      <MenuOptionGroup
+        defaultValue={currentUnits.volume}
+        title=""
+        type="radio"
+        onChange={e => {
+          setCurrentUnits({ ...currentUnits, volume: e as unknown as UnitCategory['volume'] });
+        }}
+      >
+        <MenuItemOption closeOnSelect={false} value={Unit.litre}>
+          Litres
+        </MenuItemOption>
+        <MenuItemOption closeOnSelect={false} value={Unit.quart}>
+          Quarts
+        </MenuItemOption>
+      </MenuOptionGroup>
+
+      <MenuDivider />
+
+      {authUser ? (
+        <>
+          <MenuGroup title="Groceries">
+            <MenuItem as={NextLink} href={'/'}>
+              Home
+            </MenuItem>
+            <MenuItem as={NextLink} href={'/groceries'}>
+              <Text onClick={() => console.log('list')}>My Lists</Text>
+            </MenuItem>
+          </MenuGroup>
+          <MenuDivider />
+        </>
+      ) : null}
+
+      <MenuGroup title="Links">
+        <MenuItem as={NextLink} href={'/functions'}>
+          Functions
+        </MenuItem>
+        <MenuItem as={NextLink} href={'/about'}>
+          About
+        </MenuItem>
+      </MenuGroup>
+
+      <MenuDivider />
+
+      <MenuGroup title="Profile">
+        {authUser ? (
+          <MenuItem as={NextLink} href={'/preferences'}>
+            Preferences
+          </MenuItem>
+        ) : null}
+        <MenuItem onClick={loginHandler}>{authUser ? 'Logout' : 'Login'}</MenuItem>
+      </MenuGroup>
+    </MenuList>
   );
 };
 

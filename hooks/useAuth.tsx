@@ -15,15 +15,15 @@ import useUser from './useUser';
 export const AuthContext = createContext<AuthContextType>({
   authUser: undefined,
   loading: false,
-  login: async () => void 0,
-  logout: async () => void 0,
+  login: () => void 0,
+  logout: () => void 0,
 });
 
 type AuthContextType = {
   authUser: WithId<User> | undefined;
   loading: boolean;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
+  login: () => void;
+  logout: () => void;
 };
 
 // Public auth hook
@@ -32,12 +32,12 @@ export const useAuth = (): AuthContextType => useContext(AuthContext);
 // Initial values of Auth Context (AuthContextType)
 export const useProvideAuth = (): AuthContextType => {
   const [authUser, setAuthUser] = useState<WithId<User> | undefined>(undefined);
-  const [{ getUser, createUser }, _createUserLoading] = useUser();
+  const [{ retrieveUser, getUser }, updatedUser, _createUserLoading] = useUser();
   const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
   const auth = getAuth();
 
-  const login = async (): Promise<void> => {
+  const login = useCallback(() => {
     setLoading(true);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
@@ -48,9 +48,9 @@ export const useProvideAuth = (): AuthContextType => {
     // provider.addScope('email');
 
     signInWithPopup(auth, provider); // signInWithRedirect(auth, provider) doesn't work for mobile for now
-  };
+  }, [auth]);
 
-  const logout = async (): Promise<void> => {
+  const logout = useCallback(() => {
     signOut(auth)
       .then(() => {
         // Sign-out successful.
@@ -63,7 +63,7 @@ export const useProvideAuth = (): AuthContextType => {
         console.log('Sign out error:', error);
       });
     setLoading(false);
-  };
+  }, [auth, router]);
 
   /* Every page load, checks if there is a user authenticated from Google services (not Pricey db)
    * If there is one (aka after signing in), go to handleRedirect to getRedirectResults
@@ -71,24 +71,23 @@ export const useProvideAuth = (): AuthContextType => {
    * If user refreshes page, there will be no redirect result: get user
    */
   const handleAuthChange = useCallback(
-    async (user: FirebaseUser | null) => {
-      if (user) {
-        setAuthUser(
-          (await getUser(user.uid)) ||
-            (await createUser({
-              uid: user.uid,
-              email: user.email || '',
-              photoURL: user.photoURL || '',
-              displayName: user.displayName || '',
-            })),
-        );
-        setLoading(false);
+    async (firebaseUser: FirebaseUser | null) => {
+      if (firebaseUser) {
+        const retrievedUser = await retrieveUser({
+          uid: firebaseUser.uid,
+          displayName: firebaseUser.displayName || '',
+          email: firebaseUser.email || '',
+          photoURL: firebaseUser.photoURL || '',
+        });
+
+        if (retrievedUser) setAuthUser(retrievedUser);
       } else {
         setAuthUser(undefined);
         console.log('User is not logged');
       }
+      setLoading(false);
     },
-    [createUser, getUser],
+    [retrieveUser],
   );
 
   // Auth persistence: detect if user is authenticated or not (on page change, on page refresh)

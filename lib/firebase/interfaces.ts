@@ -58,9 +58,11 @@ export interface Ingredient {
 
 // TODO: grocery list
 export interface GroceryList {
+  name: string;
   ingredients: Ingredient[];
   userId: string;
   public?: boolean;
+  createdAt?: Timestamp | FieldValue;
 }
 
 // Public user data (aka not private auth data)
@@ -115,12 +117,12 @@ const docPoint = <T>(collectionPath: string, ...extraPaths: string[]): DocumentR
  */
 export const db = {
   // Collections
-  groceryCollection: collectionPoint<GroceryList>('groceryList'),
+  groceryListCollection: collectionPoint<GroceryList>('groceryList'),
   ingredientCollection: collectionPoint<Ingredient>('ingredients'),
   userCollection: collectionPoint<User>('users'),
 
   // Docs
-  groceryDoc: (...extraPaths: string[]) => docPoint<GroceryList>('groceryList', ...extraPaths),
+  groceryListDoc: (...extraPaths: string[]) => docPoint<GroceryList>('groceryList', ...extraPaths),
   ingredientDoc: (...extraPaths: string[]) => docPoint<Ingredient>('ingredients', ...extraPaths),
   userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
 };
