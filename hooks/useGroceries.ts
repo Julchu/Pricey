@@ -37,7 +37,7 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
       // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
       //   mass: Unit.kilogram,
       //   volume: Unit.litre,
-      // }).toPrecision(2);
+      // }).toFixed(2);
 
       // const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
@@ -76,7 +76,7 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
       // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
       //   mass: Unit.kilogram,
       //   volume: Unit.litre,
-      // }).toPrecision(2);
+      // }).toFixed(2);
 
       const groceryListDocRef = doc(db.groceryListCollection, groceryListId);
 

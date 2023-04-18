@@ -41,7 +41,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
   const { handleSubmit, control, setValue, getValues, resetField } =
     useFormContext<IngredientFormData>();
 
-  const [newPrice, newAmount, newUnit, newQuantity] = useWatch({
+  const [newPrice, newMeasurement, newUnit, newQuantity] = useWatch({
     control,
     name: ['price', 'measurement', 'unit', 'quantity'],
   });
@@ -88,32 +88,32 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
     [getValues, resetField, updateIngredient],
   );
 
-  const convertedNewPrice = useMemo(() => {
-    return priceConverter(priceCalculator(newPrice, newAmount), newUnit, currentUnits);
-  }, [currentUnits, newAmount, newPrice, newUnit]);
+  const newPricePerMeasurement = useMemo(
+    () =>
+      priceConverter(priceCalculator(newPrice, newMeasurement, newQuantity), newUnit, currentUnits),
+    [currentUnits, newMeasurement, newPrice, newQuantity, newUnit],
+  );
 
-  const convertedExistingPrice =
+  const currentPricePerMeasurement =
     useMemo(() => {
       if (ingredientInfo)
-        return priceConverter(
-          priceCalculator(ingredientInfo.price, 1),
-          ingredientInfo?.unit,
-          currentUnits,
-        );
-    }, [ingredientInfo, currentUnits]) || 0;
+        return priceConverter(ingredientInfo.price, ingredientInfo?.unit, currentUnits);
+    }, [ingredientInfo, currentUnits]) || NaN;
 
-  const convertedExistingUnit = useMemo(() => {
+  const currentPricePerItem = useMemo(
+    () => priceConverter(priceCalculator(newPrice, newQuantity), newUnit, currentUnits),
+    [currentUnits, newPrice, newQuantity, newUnit],
+  );
+
+  const currentUnit = useMemo(() => {
     if (ingredientInfo) return unitConverter(ingredientInfo.unit, currentUnits);
   }, [currentUnits, ingredientInfo]);
 
   // TODO: verify/clean up unit version
   const delta = useMemo(() => {
-    if (convertedNewPrice)
-      return getPercentChange(
-        convertedExistingPrice,
-        priceCalculator(convertedNewPrice, newQuantity),
-      );
-  }, [convertedExistingPrice, convertedNewPrice, newQuantity]);
+    if (newPricePerMeasurement)
+      return getPercentChange(currentPricePerMeasurement, newPricePerMeasurement);
+  }, [currentPricePerMeasurement, newPricePerMeasurement]);
 
   return (
     <Card
@@ -165,8 +165,8 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
         </Tooltip>
 
         <Text display={'block'} overflow={'hidden'}>
-          {ingredientInfo?.price ? currencyFormatter.format(convertedExistingPrice) : 'price'}/
-          {ingredientInfo?.unit ? convertedExistingUnit : 'unit'}
+          {ingredientInfo?.price ? currencyFormatter.format(currentPricePerMeasurement) : 'price'}/
+          {ingredientInfo?.unit ? currentUnit : 'unit'}
         </Text>
 
         <Stat>
@@ -193,7 +193,7 @@ export const NewIngredientCard: FC = () => {
 
   const { handleSubmit, control, reset } = useFormContext<IngredientFormData>();
 
-  const [newName, newPrice, newQuantity, newUnit, newAmount] = useWatch({
+  const [newName, newPrice, newQuantity, newUnit, newMeasurement] = useWatch({
     control,
     name: ['name', 'price', 'quantity', 'unit', 'measurement'],
   });
@@ -213,24 +213,37 @@ export const NewIngredientCard: FC = () => {
   const onSubmit = useCallback(
     async (data: IngredientFormData): Promise<void> => {
       await submitIngredient(data);
-      // reset();
+      reset();
     },
     [reset, submitIngredient],
   );
 
   /* Preview new ingredient information: memoizing reduces rerenders/function calls
-   * previewPrice: converting price/quantity cents to dollar (100 -> $1.00)
-   * convertedPreviewPrice: converted dropdown unit's price to user's current unit price
+   * pricePerMeasurement: converted price per dropdown unit amount per item
+   * pricePerItem: converted price per item, ignoring measurement unit amount
    * convertedUnit: converted dropdown unit to user's appropriate (mass, volume) current unit
    */
-  const previewPrice = useMemo(
-    () => priceCalculator(newPrice, newQuantity),
-    [newPrice, newQuantity],
+  /* Price example: $6.97 for box of 12 x 0.355L cans of Coke
+   * Price: 6.97
+   * Measurement: 0.355
+   * Unit: L
+   * Quantity: 12
+   * Price per item: 6.97 / 12
+   * Price per measurement per item: 6.97 / 0.355 / 12
+   * ---
+   * Price example: $7.50 for deal of 2 x 1.89L cartons of almond milk
+   * Price per item: 7.5 / 2
+   * Price per measurement per item: 7.5 / 1.89 / 2
+   */
+  const pricePerMeasurement = useMemo(
+    () =>
+      priceConverter(priceCalculator(newPrice, newMeasurement, newQuantity), newUnit, currentUnits),
+    [currentUnits, newMeasurement, newPrice, newQuantity, newUnit],
   );
 
-  const convertedPreviewPrice = useMemo(
-    () => priceConverter(priceCalculator(previewPrice, newAmount), newUnit, currentUnits),
-    [currentUnits, newAmount, newUnit, previewPrice],
+  const pricePerItem = useMemo(
+    () => priceConverter(priceCalculator(newPrice, newQuantity), newUnit, currentUnits),
+    [currentUnits, newPrice, newQuantity, newUnit],
   );
 
   const convertedUnit = useMemo(
@@ -293,13 +306,13 @@ export const NewIngredientCard: FC = () => {
 
         {/* price / unit */}
         <Text display={'block'} overflow={'hidden'}>
-          {newPrice && newAmount ? currencyFormatter.format(convertedPreviewPrice) : 'price'}/
+          {newPrice && newMeasurement ? currencyFormatter.format(pricePerMeasurement) : 'price'}/
           {newUnit ? convertedUnit : 'unit'}
         </Text>
 
         {/* Shows price / unit * measurement */}
         <Text display={'block'} overflow={'hidden'}>
-          {previewPrice ? currencyFormatter.format(previewPrice) : ''}
+          {pricePerItem ? currencyFormatter.format(pricePerItem) : ''}
           &nbsp;each
         </Text>
       </CardBody>

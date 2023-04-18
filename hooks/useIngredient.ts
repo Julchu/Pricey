@@ -30,60 +30,23 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       if (!authUser) return;
       setLoading(true);
 
-      const cost = dinero({ amount: 50, currency: CAD });
-      const cost2 = dinero({ amount: 530, currency: CAD });
-
-      const aaaa = multiply(cost, {
-        amount: toSnapshot(cost2).amount,
-        scale: toSnapshot(cost2).scale,
-      });
-
-      const [divisor, scale] = getScale(0.3555559587928739487293874928374987239487234);
-
-      // console.log(decimalToFraction(measurement));
-      console.log(divisor, scale);
-
-      // const costPerUnit = multiply(cost, {
-      //   amount: getScale(1 / measurement)[0],
-      //   scale,
-      // });
-
-      // console.log(toSnapshot(d1));
-
-      const previewPrice = 0; //priceCalculator(price, measurement);
-      /* Price example: $6.97 for box of 12 x 0.355L cans of Coke
-       * Price: 6.97
-       * Measurement: 0.355
-       * Unit: L
-       * Quantity: 12
-       * Price per measurement: 6.97 / 0.355
-       * Price per quantity: 6.97 / 12
-       * Price per measurement per quantity: 6.97 / 0.355 / 12
-       * ---
-       * Price example: $7.50 for deal of 2 x 1.89L cartons of almond milk
-       * Price per measurement:
+      /* Save price per measurement per quantity
+       * When displaying data, can measure based on current measurement and quantity to compare prices
        */
-      // const pricePerAmount;
-
-      const convertedUnit = unitConverter(unit, { mass: Unit.kilogram, volume: Unit.litre });
-      const convertedPreviewPrice = priceConverter(
-        0 /* priceCalculator(previewPrice, quantity) */,
-        unit,
-        {
-          mass: Unit.kilogram,
-          volume: Unit.litre,
-        },
-      ).toPrecision(2);
-
-      const trimmedName = name.trim().toLocaleLowerCase('en-US');
+      const pricePerMeasurement = priceCalculator(price, measurement, quantity);
+      const convertedUnit = unitConverter(unit);
+      const convertedPricePerMeasurement = priceConverter(pricePerMeasurement, unit, {
+        mass: Unit.kilogram,
+        volume: Unit.litre,
+      }).toFixed(2);
 
       // Creating doc with auto-generated id
       const ingredientDocRef = doc(db.ingredientCollection);
 
       // Ensuring all fields are passed by typechecking Ingredient
       const newIngredient: Ingredient = {
-        name: trimmedName,
-        price: parseFloat(convertedPreviewPrice),
+        name: name.trim().toLocaleLowerCase('en-US'),
+        price: parseFloat(convertedPricePerMeasurement),
         unit: convertedUnit,
         userId: authUser.uid,
         createdAt: serverTimestamp(),
@@ -94,7 +57,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         /* If you want to auto generate an ID, use addDoc() + collection()
          * If you want to manually set the ID, use setDoc() + doc()
          */
-        // await setDoc(ingredientDocRef, newIngredient);
+        await setDoc(ingredientDocRef, newIngredient);
       } catch (e) {
         setError(e as Error);
       }
@@ -107,11 +70,11 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(
     async ({ ingredientId, price, measurement, quantity, unit, location, image }) => {
-      const previewPrice = priceCalculator(price, measurement);
-      const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
+      const pricePerMeasurement = priceCalculator(price, measurement, quantity);
+      const convertedPreviewPrice = priceConverter(pricePerMeasurement, unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,
-      }).toPrecision(2);
+      }).toFixed(2);
 
       const ingredientDocRef = doc(db.ingredientCollection, ingredientId);
 

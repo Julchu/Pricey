@@ -33,6 +33,10 @@ export const priceConverter = (price: number, fromUnit: Unit, toUnits: UnitCateg
   return price;
 };
 
+/* Gets current individual unit and converts to individual toUnit based on category
+ * If selected unit is mass (Unit.pound) and currentUnits = { mass: Unit.kilogram, volume: Unit.litres }
+ * Return opposite mass (Unit.litres)
+ */
 export const unitConverter = (
   fromUnit: Unit,
   toUnits: UnitCategory = { mass: Unit.kilogram, volume: Unit.litre },
@@ -40,6 +44,15 @@ export const unitConverter = (
   if (isMass(fromUnit)) return toUnits.mass;
   else if (isVolume(fromUnit)) return toUnits.volume;
   return Unit.item;
+};
+
+export const priceCalculator = (price: number, measurement: number, quantity?: number): number => {
+  return (
+    (price * 100) /
+    (measurement > 0 ? measurement : 1) /
+    (quantity && quantity > 0 ? quantity : 1) /
+    100
+  );
 };
 
 export const currencyFormatter = new Intl.NumberFormat(undefined, {
@@ -56,6 +69,3 @@ export const percentageFormatter = new Intl.NumberFormat(undefined, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
-
-export const priceCalculator = (price: number, measurement: number, quantity: number): number =>
-  (price * 100) / (quantity > 0 ? quantity : 1) / 100;
