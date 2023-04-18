@@ -52,7 +52,7 @@ const Functions: FC = () => {
             price: 1,
             quantity: 0,
             unit: '' as Unit,
-            amount: 0,
+            measurement: 0,
             submitter: '',
           });
         }}

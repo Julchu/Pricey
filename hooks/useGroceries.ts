@@ -31,7 +31,7 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
       if (authUser?.id != userId) return;
       setLoading(true);
 
-      // const previewPrice = priceCalculator(price, amount);
+      // const previewPrice = priceCalculator(price, measurement);
 
       // const convertedUnit = unitConverter(unit, { mass: Unit.kilogram, volume: Unit.litre });
       // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
@@ -72,7 +72,7 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
   const updateGroceryList = useCallback<GroceryListMethods['updateGroceryList']>(
     async ({ groceryListId, name, ingredients, userId, public, createdAt }) => {
       if (authUser?.id != userId) return;
-      // const previewPrice = priceCalculator(price, amount);
+      // const previewPrice = priceCalculator(price, measurement);
       // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
       //   mass: Unit.kilogram,
       //   volume: Unit.litre,
@@ -83,7 +83,7 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
       // const updatedIngredient = filterNullableObject({
       //   ingredientId,
       //   price: parseFloat(convertedPreviewPrice),
-      //   amount,
+      //   measurement,
       //   quantity,
       //   unit,
       //   location,

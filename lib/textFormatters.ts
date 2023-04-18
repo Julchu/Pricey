@@ -1,6 +1,12 @@
 import { Unit, UnitCategory } from './firebase/interfaces';
 
-// TODO: move convertors outside of hook; any form triggers rerendering of unit conversion
+export const filterNullableObject = (obj: Record<string, unknown>): Record<string, unknown> => {
+  return Object.entries(obj).reduce<Record<string, unknown>>((previousObject, [key, value]) => {
+    if (value) previousObject[key] = value;
+    return previousObject;
+  }, {});
+};
+
 export const isMass = (unit: Unit): boolean => unit === Unit.kilogram || unit === Unit.pound;
 export const isVolume = (unit?: Unit): boolean => unit === Unit.litre || unit === Unit.quart;
 
@@ -51,12 +57,5 @@ export const percentageFormatter = new Intl.NumberFormat(undefined, {
   maximumFractionDigits: 2,
 });
 
-export const priceCalculator = (price: number, quantity: number): number =>
+export const priceCalculator = (price: number, measurement: number, quantity: number): number =>
   (price * 100) / (quantity > 0 ? quantity : 1) / 100;
-
-export const filterNullableObject = (obj: Record<string, unknown>): Record<string, unknown> => {
-  return Object.entries(obj).reduce<Record<string, unknown>>((previousObject, [key, value]) => {
-    if (value) previousObject[key] = value;
-    return previousObject;
-  }, {});
-};

@@ -45,12 +45,12 @@ const IngredientForm: FC = () => {
           },
         }}
         {...register('name', { required: true })}
+        isInvalid={errors.name?.type === 'required'}
         placeholder={
           errors.name?.type === 'required'
             ? 'Ingredient name is required'
-            : 'Search for an ingredient'
+            : 'Search for an ingredient*'
         }
-        isInvalid={errors.name?.type === 'required'}
       />
 
       {/* Price input */}
@@ -77,10 +77,10 @@ const IngredientForm: FC = () => {
           validate: price => validateIsNumber(price),
         })}
         isInvalid={errors.price?.type === 'required' || errors.price?.type === 'validate'}
-        placeholder={'Price'}
+        placeholder={'Price*'}
       />
 
-      {/* Amount input */}
+      {/* Measurement input */}
       <Input
         type={'number'}
         letterSpacing={'2px'}
@@ -97,14 +97,16 @@ const IngredientForm: FC = () => {
             color: 'red',
           },
         }}
-        {...register('amount', {
+        {...register('measurement', {
           valueAsNumber: true,
           required: true,
           min: 0,
-          validate: amount => validateIsNumber(amount),
+          validate: measurement => validateIsNumber(measurement),
         })}
-        isInvalid={errors.amount?.type === 'required' || errors.amount?.type === 'validate'}
-        placeholder={'Amount'}
+        isInvalid={
+          errors.measurement?.type === 'required' || errors.measurement?.type === 'validate'
+        }
+        placeholder={'Measurements*'}
       />
 
       <Select
@@ -128,7 +130,7 @@ const IngredientForm: FC = () => {
         })}
         color={selectedUnit ? 'black' : 'grey'}
         isInvalid={errors.unit?.type === 'required'}
-        placeholder={'Unit'}
+        placeholder={'Unit*'}
       >
         {Object.values(Unit).map((unit, index) => {
           return (

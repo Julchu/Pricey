@@ -14,7 +14,7 @@ export type IngredientFormData = {
   price: number;
   quantity: number;
   unit: Unit;
-  amount: number;
+  measurement: number;
   submitter: string;
   location?: string;
   image?: string;
@@ -36,7 +36,7 @@ const IngredientList: FC = () => {
     defaultValues: {
       name: '',
       price: undefined,
-      amount: undefined,
+      measurement: undefined,
       unit: undefined,
       quantity: undefined,
       submitter: authUser?.uid,

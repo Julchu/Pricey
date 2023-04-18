@@ -26,17 +26,54 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   const { authUser } = useAuth();
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
-    async ({ name, price, amount, quantity = 1, unit, image }) => {
+    async ({ name, price, measurement, quantity, unit, image }) => {
       if (!authUser) return;
       setLoading(true);
 
-      const previewPrice = priceCalculator(price, amount);
+      const cost = dinero({ amount: 50, currency: CAD });
+      const cost2 = dinero({ amount: 530, currency: CAD });
+
+      const aaaa = multiply(cost, {
+        amount: toSnapshot(cost2).amount,
+        scale: toSnapshot(cost2).scale,
+      });
+
+      const [divisor, scale] = getScale(0.3555559587928739487293874928374987239487234);
+
+      // console.log(decimalToFraction(measurement));
+      console.log(divisor, scale);
+
+      // const costPerUnit = multiply(cost, {
+      //   amount: getScale(1 / measurement)[0],
+      //   scale,
+      // });
+
+      // console.log(toSnapshot(d1));
+
+      const previewPrice = 0; //priceCalculator(price, measurement);
+      /* Price example: $6.97 for box of 12 x 0.355L cans of Coke
+       * Price: 6.97
+       * Measurement: 0.355
+       * Unit: L
+       * Quantity: 12
+       * Price per measurement: 6.97 / 0.355
+       * Price per quantity: 6.97 / 12
+       * Price per measurement per quantity: 6.97 / 0.355 / 12
+       * ---
+       * Price example: $7.50 for deal of 2 x 1.89L cartons of almond milk
+       * Price per measurement:
+       */
+      // const pricePerAmount;
 
       const convertedUnit = unitConverter(unit, { mass: Unit.kilogram, volume: Unit.litre });
-      const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
-        mass: Unit.kilogram,
-        volume: Unit.litre,
-      }).toPrecision(2);
+      const convertedPreviewPrice = priceConverter(
+        0 /* priceCalculator(previewPrice, quantity) */,
+        unit,
+        {
+          mass: Unit.kilogram,
+          volume: Unit.litre,
+        },
+      ).toPrecision(2);
 
       const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
@@ -57,7 +94,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
         /* If you want to auto generate an ID, use addDoc() + collection()
          * If you want to manually set the ID, use setDoc() + doc()
          */
-        await setDoc(ingredientDocRef, newIngredient);
+        // await setDoc(ingredientDocRef, newIngredient);
       } catch (e) {
         setError(e as Error);
       }
@@ -69,8 +106,8 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   );
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(
-    async ({ ingredientId, price, amount, quantity, unit, location, image }) => {
-      const previewPrice = priceCalculator(price, amount);
+    async ({ ingredientId, price, measurement, quantity, unit, location, image }) => {
+      const previewPrice = priceCalculator(price, measurement);
       const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,
@@ -81,7 +118,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
       const updatedIngredient = filterNullableObject({
         ingredientId,
         price: parseFloat(convertedPreviewPrice),
-        amount,
+        measurement,
         quantity,
         unit,
         location,

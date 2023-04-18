@@ -41,9 +41,9 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
   const { handleSubmit, control, setValue, getValues, resetField } =
     useFormContext<IngredientFormData>();
 
-  const [newPrice, newAmount, newUnit] = useWatch({
+  const [newPrice, newAmount, newUnit, newQuantity] = useWatch({
     control,
-    name: ['price', 'amount', 'unit'],
+    name: ['price', 'measurement', 'unit', 'quantity'],
   });
 
   // Check if text is overflowing
@@ -73,7 +73,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
         name: data.name,
         price: getValues('price'),
         quantity: getValues('quantity'),
-        amount: getValues('amount'),
+        measurement: getValues('measurement'),
         unit: getValues('unit'),
         submitter: getValues('submitter'),
       };
@@ -83,7 +83,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       resetField('price');
       resetField('quantity');
       resetField('unit');
-      resetField('amount');
+      resetField('measurement');
     },
     [getValues, resetField, updateIngredient],
   );
@@ -106,9 +106,14 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
     if (ingredientInfo) return unitConverter(ingredientInfo.unit, currentUnits);
   }, [currentUnits, ingredientInfo]);
 
+  // TODO: verify/clean up unit version
   const delta = useMemo(() => {
-    if (convertedNewPrice) return getPercentChange(convertedExistingPrice, convertedNewPrice);
-  }, [convertedExistingPrice, convertedNewPrice]);
+    if (convertedNewPrice)
+      return getPercentChange(
+        convertedExistingPrice,
+        priceCalculator(convertedNewPrice, newQuantity),
+      );
+  }, [convertedExistingPrice, convertedNewPrice, newQuantity]);
 
   return (
     <Card
@@ -190,7 +195,7 @@ export const NewIngredientCard: FC = () => {
 
   const [newName, newPrice, newQuantity, newUnit, newAmount] = useWatch({
     control,
-    name: ['name', 'price', 'quantity', 'unit', 'amount'],
+    name: ['name', 'price', 'quantity', 'unit', 'measurement'],
   });
 
   // Check if text is overflowing
@@ -208,7 +213,7 @@ export const NewIngredientCard: FC = () => {
   const onSubmit = useCallback(
     async (data: IngredientFormData): Promise<void> => {
       await submitIngredient(data);
-      reset();
+      // reset();
     },
     [reset, submitIngredient],
   );
@@ -292,7 +297,7 @@ export const NewIngredientCard: FC = () => {
           {newUnit ? convertedUnit : 'unit'}
         </Text>
 
-        {/* Shows price / unit * amount */}
+        {/* Shows price / unit * measurement */}
         <Text display={'block'} overflow={'hidden'}>
           {previewPrice ? currencyFormatter.format(previewPrice) : ''}
           &nbsp;each
