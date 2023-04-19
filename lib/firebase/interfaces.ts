@@ -74,7 +74,10 @@ export interface User {
   location?: Address;
   createdAt?: Timestamp;
   role: Role;
-  preferences?: UnitCategory;
+  preferences?: {
+    units: UnitCategory;
+    colorMode: 'light' | 'dark';
+  };
   // Preferences, like prefered units
 }
 

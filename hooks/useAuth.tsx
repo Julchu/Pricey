@@ -1,4 +1,12 @@
-import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useState,
+} from 'react';
 import {
   getAuth,
   onAuthStateChanged,
@@ -91,7 +99,7 @@ export const useProvideAuth = (): AuthContextType => {
   );
 
   // Auth persistence: detect if user is authenticated or not (on page change, on page refresh)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, handleAuthChange);
     return () => unsubscribe();
   }, [auth, handleAuthChange]);

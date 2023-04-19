@@ -9,6 +9,12 @@ import {
   Td,
   Tfoot,
   Button,
+  Box,
+  Center,
+  Container,
+  Divider,
+  Flex,
+  Heading,
 } from '@chakra-ui/react';
 import { FC } from 'react';
 import NextLink from 'next/link';
@@ -30,45 +36,61 @@ const MyGroceries: FC<{ groceryListCreator: string }> = ({ groceryListCreator })
 
   return (
     <>
-      <NextLink href={`${authUser?.id}/Cheese`}>
-        <Button>New List</Button>
-      </NextLink>
-      <TableContainer>
-        <Table variant="striped" colorScheme="teal">
-          <TableCaption>Imperial to metric conversion factors</TableCaption>
-          <Thead>
-            <Tr>
-              <Th>To convert</Th>
-              <Th>into</Th>
-              <Th isNumeric>multiply by</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            <Tr>
-              <Td>inches</Td>
-              <Td>millimetres (mm)</Td>
-              <Td isNumeric>25.4</Td>
-            </Tr>
-            <Tr>
-              <Td>feet</Td>
-              <Td>centimetres (cm)</Td>
-              <Td isNumeric>30.48</Td>
-            </Tr>
-            <Tr>
-              <Td>yards</Td>
-              <Td>metres (m)</Td>
-              <Td isNumeric>0.91444</Td>
-            </Tr>
-          </Tbody>
-          <Tfoot>
-            <Tr>
-              <Th>To convert</Th>
-              <Th>into</Th>
-              <Th isNumeric>multiply by</Th>
-            </Tr>
-          </Tfoot>
-        </Table>
-      </TableContainer>
+      <Flex flexDir={'column'}>
+        <Box m={'header'} h={'40px'}>
+          <Center>
+            <Heading>Grocery List</Heading>
+          </Center>
+        </Box>
+      </Flex>
+
+      <Divider boxShadow={'focus'} />
+
+      <Container>
+        There are many benefits to a joint design and development system. Not only does it bring
+        benefits to the design team, but it also brings benefits to engineering teams. It makes sure
+        that our experiences have a consistent look and feel, not just in our design specs, but in
+        production
+        <NextLink href={`${authUser?.id}/Cheese`}>
+          <Button>New List</Button>
+        </NextLink>
+        <TableContainer>
+          <Table variant="striped" colorScheme="teal">
+            <TableCaption>Imperial to metric conversion factors</TableCaption>
+            <Thead>
+              <Tr>
+                <Th>To convert</Th>
+                <Th>into</Th>
+                <Th isNumeric>multiply by</Th>
+              </Tr>
+            </Thead>
+            <Tbody>
+              <Tr>
+                <Td>inches</Td>
+                <Td>millimetres (mm)</Td>
+                <Td isNumeric>25.4</Td>
+              </Tr>
+              <Tr>
+                <Td>feet</Td>
+                <Td>centimetres (cm)</Td>
+                <Td isNumeric>30.48</Td>
+              </Tr>
+              <Tr>
+                <Td>yards</Td>
+                <Td>metres (m)</Td>
+                <Td isNumeric>0.91444</Td>
+              </Tr>
+            </Tbody>
+            <Tfoot>
+              <Tr>
+                <Th>To convert</Th>
+                <Th>into</Th>
+                <Th isNumeric>multiply by</Th>
+              </Tr>
+            </Tfoot>
+          </Table>
+        </TableContainer>
+      </Container>
     </>
   );
 };

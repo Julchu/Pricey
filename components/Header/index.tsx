@@ -16,6 +16,8 @@ import {
   Box,
   Text,
   ScaleFade,
+  useColorMode,
+  Button,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FC, useCallback } from 'react';

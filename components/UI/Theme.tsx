@@ -7,7 +7,7 @@ const montserrat = Montserrat({
   subsets: ['latin'],
 });
 
-export const theme = {
+const theme = {
   colors: {
     blue: '#0000FF',
     green: 'lightcoral',
@@ -35,4 +35,12 @@ export const theme = {
   components: {
     Button,
   },
+  config: {
+    initialColorMode: 'light',
+    useSystemColorMode: false,
+  },
+  initialColorMode: 'dark',
+  useSystemColorMode: false,
 };
+
+export default theme;
