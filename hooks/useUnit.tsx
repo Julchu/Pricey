@@ -1,5 +1,6 @@
 import { createContext, FC, ReactNode, useContext, useEffect, useState } from 'react';
 import { Unit, UnitCategory } from '../lib/firebase/interfaces';
+import { useAuth } from './useAuth';
 
 // Private context value types, set in Context Provider
 type UnitProps = {
@@ -36,14 +37,11 @@ export const useUnit = (): UnitContextType => {
 };
 
 export const UnitProvider: FC<{ children: ReactNode }> = ({ children }) => {
+  const { authUser } = useAuth();
   const [currentUnits, setCurrentUnits] = useState<UnitCategory>({
-    mass: Unit.kilogram,
-    volume: Unit.litre,
+    mass: authUser?.preferences?.mass || Unit.kilogram,
+    volume: authUser?.preferences?.volume || Unit.litre,
   });
-
-  useEffect(() => {
-    console.log(currentUnits);
-  }, [currentUnits]);
 
   return (
     <UnitContext.Provider value={{ currentUnits, setCurrentUnits }}>

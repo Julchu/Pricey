@@ -89,6 +89,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
     [],
   );
 
+  // Ex: await updateUser({ mass: Unit.kilogram, volume: Unit.litre } as Partial<WithId<User>>
   const updateUser = useCallback<UseUserMethods['updateUser']>(async userData => {
     try {
       setLoading(true);

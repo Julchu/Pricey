@@ -8,7 +8,7 @@ import {
   unitConverter,
 } from '../lib/textFormatters';
 import { useAuth } from './useAuth';
-import { IngredientFormData } from '../components/Dashboard';
+import { IngredientFormData } from '../components/HomeDashboard';
 
 type IngredientMethods = {
   submitIngredient: (

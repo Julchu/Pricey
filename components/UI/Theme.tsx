@@ -1,4 +1,5 @@
 import { Montserrat } from 'next/font/google';
+import Button from './Buttons';
 
 // Import the weights and subsets, add any other config here as well
 const montserrat = Montserrat({
@@ -26,5 +27,12 @@ export const theme = {
     hover: `rgba(100, 100, 111, 0.2) 0px 7px 29px 0px`,
     focus: `rgba(0, 0, 0, 0.35) 0px 5px 15px`,
     under: `rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px`,
+  },
+  space: {
+    header: '20px',
+  },
+
+  components: {
+    Button,
   },
 };

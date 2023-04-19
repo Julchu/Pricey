@@ -2,7 +2,7 @@ import { Grid, Input, Select } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Unit } from '../../lib/firebase/interfaces';
-import { IngredientFormData } from '../Dashboard';
+import { IngredientFormData } from '../HomeDashboard';
 
 // TODO: after submitting an ingredient, reset search to empty
 const IngredientForm: FC = () => {

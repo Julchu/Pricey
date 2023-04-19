@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import IngredientList from '../components/Dashboard';
+import IngredientList from '../components/HomeDashboard';
 import Layout from '../components/Layout';
 
 const IndexPage: NextPage = () => {

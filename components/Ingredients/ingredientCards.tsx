@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient, WithId } from '../../lib/firebase/interfaces';
-import { IngredientFormData } from '../Dashboard';
+import { IngredientFormData } from '../HomeDashboard';
 import { useUnit } from '../../hooks/useUnit';
 import {
   priceCalculator,
@@ -100,16 +100,10 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
         return priceConverter(ingredientInfo.price, ingredientInfo?.unit, currentUnits);
     }, [ingredientInfo, currentUnits]) || NaN;
 
-  const currentPricePerItem = useMemo(
-    () => priceConverter(priceCalculator(newPrice, newQuantity), newUnit, currentUnits),
-    [currentUnits, newPrice, newQuantity, newUnit],
-  );
-
   const currentUnit = useMemo(() => {
     if (ingredientInfo) return unitConverter(ingredientInfo.unit, currentUnits);
   }, [currentUnits, ingredientInfo]);
 
-  // TODO: verify/clean up unit version
   const delta = useMemo(() => {
     if (newPricePerMeasurement)
       return getPercentChange(currentPricePerMeasurement, newPricePerMeasurement);
@@ -149,7 +143,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
         cursor={'pointer'}
         textAlign={'center'}
       >
-        <Text display={'block'}>Update</Text>
+        <Text display={'block'}>{highlighted ? 'Update' : <span>&nbsp;</span>}</Text>
 
         <Tooltip isDisabled={!overflowing} hasArrow label={ingredientInfo?.name} placement={'top'}>
           <Text
