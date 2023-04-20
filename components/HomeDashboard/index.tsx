@@ -2,7 +2,7 @@ import { limit, onSnapshot, query, where } from 'firebase/firestore';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, Ingredient, Unit, WithDocId } from '../../lib/firebase/interfaces';
-import { Divider, Flex, Grid, GridItem } from '@chakra-ui/react';
+import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import { IngredientCard, NewIngredientCard } from '../Ingredients/ingredientCards';
 import IngredientForm from '../Ingredients/ingredientForm';
 import { useAuth } from '../../hooks/useAuth';
