@@ -88,7 +88,7 @@ const About: FC = () => {
   return (
     <>
       <Flex flexDir={'column'}>
-        <Box m={'header'} h={'40px'}>
+        <Box m={{ sm: 'header' }} h={'40px'}>
           <Center>
             <Heading>About Pricey</Heading>
           </Center>
@@ -97,7 +97,25 @@ const About: FC = () => {
 
       {/* <Divider boxShadow={'focus'} /> */}
 
-      <Flex flexDir={'column'} mt="20px">
+      <Flex flexDir={'column'}>
+        <Heading as={'h1'} textAlign={'center'} mt={'header'}>
+          Contributors
+        </Heading>
+
+        <Grid
+          mt={'header'}
+          gap={{ sm: '30px' }}
+          templateColumns={{
+            base: '1fr 1fr',
+            sm: 'repeat(auto-fit, 200px)',
+          }}
+          justifyContent={'center'}
+        >
+          {contributors.map(({ name, link, imageSrc }, index) => (
+            <Profile key={`contributor_${index}`} name={name} link={link} imageSrc={imageSrc} />
+          ))}
+        </Grid>
+
         <Center>
           <Flex flexDir={'row'}>
             <LinkBox as={Box}>
@@ -115,26 +133,6 @@ const About: FC = () => {
             </LinkBox>
           </Flex>
         </Center>
-
-        <Box>
-          <Heading as={'h1'} textAlign={'center'} mt={'25px'}>
-            Contributors
-          </Heading>
-
-          <Grid
-            mt={'25px'}
-            gap={{ sm: '30px' }}
-            templateColumns={{
-              base: '1fr 1fr',
-              sm: 'repeat(auto-fit, 200px)',
-            }}
-            justifyContent={'center'}
-          >
-            {contributors.map(({ name, link, imageSrc }, index) => (
-              <Profile key={`contributor_${index}`} name={name} link={link} imageSrc={imageSrc} />
-            ))}
-          </Grid>
-        </Box>
       </Flex>
     </>
   );

@@ -32,6 +32,7 @@ const theme = extendTheme({
   // Header size: 40px, with margin top/bottom 20px each
   space: {
     header: '20px',
+    side: '30px',
   },
 
   size: {

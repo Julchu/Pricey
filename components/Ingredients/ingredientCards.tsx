@@ -119,6 +119,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
       boxShadow={highlighted ? 'under' : 'normal'}
       _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
+      _focus={{ boxShadow: 'focus' }}
     >
       {/* Image */}
       <CardHeader height={'180px'} position={'relative'}>
@@ -249,11 +250,11 @@ export const NewIngredientCard: FC = () => {
     <Card
       ml={{ base: '30px', sm: 'unset' }}
       letterSpacing={'2px'}
-      borderRadius={'5px'}
       scrollSnapAlign={'center'}
+      borderRadius={'5px'}
       w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
       transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-      boxShadow={{ sm: 'normal' }}
+      boxShadow={'normal'}
       _hover={{ boxShadow: 'hover' }}
       _focus={{ boxShadow: 'focus' }}
     >

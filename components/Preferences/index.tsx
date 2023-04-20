@@ -11,8 +11,11 @@ import {
   UseRadioProps,
   HStack,
   Divider,
+  Text,
+  Spacer,
 } from '@chakra-ui/react';
-import { FC, useCallback } from 'react';
+import { useRouter } from 'next/router';
+import { FC, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 import useUser from '../../hooks/useUser';
@@ -86,7 +89,13 @@ const Preferences: FC = () => {
   const volumeGroup = volumeRootProps();
   const colorGroup = colorRootProps();
 
-  if (!authUser) return null;
+  const router = useRouter();
+  useEffect(() => {
+    if (!authUser) {
+      router.replace(`/`);
+    } else {
+    }
+  }, [authUser, router]);
 
   return (
     <>
@@ -98,9 +107,11 @@ const Preferences: FC = () => {
         </Box>
       </Flex>
 
-      <Container>
-        <form>
-          <HStack {...massGroup} my={'header'} ml={'auto'}>
+      <form>
+        <Container>
+          <HStack {...massGroup} my={'header'}>
+            <Text>Mass</Text>
+            <Spacer />
             {massOptions.map(value => (
               <RadioButton key={value} {...massRadioProps({ value })} />
             ))}
@@ -108,7 +119,9 @@ const Preferences: FC = () => {
 
           <Divider boxShadow={'focus'} />
 
-          <HStack {...volumeGroup} my={'header'} ml={'auto'}>
+          <HStack {...volumeGroup} my={'header'}>
+            <Text>Volume</Text>
+            <Spacer />
             {volumeOptions.map(value => (
               <RadioButton key={value} {...volumeRadioProps({ value })} />
             ))}
@@ -116,17 +129,23 @@ const Preferences: FC = () => {
 
           <Divider boxShadow={'focus'} />
 
-          <HStack {...colorGroup} my={'header'} ml={'auto'}>
+          <HStack {...colorGroup} my={'header'}>
+            <Text>Color mode </Text>
+            <Spacer />
             {colorOptions.map(value => (
               <RadioButton key={value} {...colorRadioProps({ value })} />
             ))}
           </HStack>
 
-          <Button isLoading={userLoading || authLoading} onClick={handleSubmit(onSubmitHandler)}>
-            Save preferences
-          </Button>
-        </form>
-      </Container>
+          <Divider boxShadow={'focus'} />
+
+          <HStack my={'header'}>
+            <Button isLoading={userLoading || authLoading} onClick={handleSubmit(onSubmitHandler)}>
+              Save preferences
+            </Button>
+          </HStack>
+        </Container>
+      </form>
     </>
   );
 };

@@ -5,7 +5,7 @@ import Header from '../Header';
 const Layout: FC<{ children: ReactNode }> = ({ children }) => {
   return (
     <Box height={{ base: '100svh', sm: '100vh' }} width={{ sm: '100vw' }}>
-      <Container maxW="container.xl">
+      <Container maxW={'container.xl'} p={{ base: '0px' }} h="100%">
         <Header />
 
         {children}

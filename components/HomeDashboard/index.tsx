@@ -97,7 +97,7 @@ const IngredientList: FC = () => {
           {/* <Divider boxShadow={'focus'} /> */}
 
           <Grid
-            mx={{ base: 'unset', sm: '30px' }}
+            p={{ base: '30px', sm: '0px 30px' }}
             mt={'20px'}
             autoFlow={{ base: 'column', sm: 'row' }}
             rowGap={'30px'}
@@ -107,8 +107,9 @@ const IngredientList: FC = () => {
             scrollSnapType={['x mandatory', 'none']}
             templateColumns={{
               base: 'repeat(auto-fill, minmax(150px, 1fr))',
-              sm: 'repeat(auto-fill, minmax(250px, 1fr))',
+              sm: 'repeat(auto-fill, 250px)',
             }}
+            justifyContent={{ sm: 'space-between' }}
           >
             {!foundIngredient ? (
               <GridItem>
@@ -121,8 +122,8 @@ const IngredientList: FC = () => {
 
               return (
                 <GridItem
-                  ml={{ base: foundIngredient ? '30px' : '', sm: 'unset' }}
-                  mr={{ base: index === filteredResults.length - 1 ? '30px' : '', sm: 'unset' }}
+                  ml={{ base: foundIngredient ? '30px' : '' }}
+                  mr={{ base: index === filteredResults.length - 1 ? '30px' : '' }}
                   key={`${item.name}_${index}`}
                 >
                   <IngredientCard ingredientInfo={item} highlighted={highlighted} />

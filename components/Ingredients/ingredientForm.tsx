@@ -20,11 +20,10 @@ const IngredientForm: FC = () => {
 
   return (
     <Grid
-      m={{ base: '0px 30px 20px', sm: '20px 0px' }}
+      m={{ base: '0px 30px', sm: '20px 0px' }}
       templateColumns={{ base: 'repeat(2, 1fr)', sm: 'repeat(6, 1fr)' }}
       rowGap={{ base: '20px' }}
       columnGap={{ base: '20px', sm: '30px' }}
-      w={{ sm: '100%' }}
     >
       {/* Ingredient name input */}
       <Input
@@ -106,14 +105,14 @@ const IngredientForm: FC = () => {
         isInvalid={
           errors.measurement?.type === 'required' || errors.measurement?.type === 'validate'
         }
-        placeholder={'Measurements*'}
+        placeholder={'Capacity*'}
       />
 
       <Select
         letterSpacing={'2px'}
-        border={'none'}
         boxShadow={'normal'}
         borderRadius={'5px'}
+        border={'none'}
         transition={'box-shadow 0.2s ease-in-out'}
         _hover={{ boxShadow: 'hover' }}
         _focus={{ boxShadow: 'focus' }}
