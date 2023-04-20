@@ -71,7 +71,7 @@ const IngredientList: FC = () => {
       ignoreLocation: true,
     });
 
-    const results = fuse.search(searchIngredient);
+    const results = fuse.search(searchIngredient || '');
     const found = results.find(result => result.score && result.score < 0.00001)?.item || {
       documentId: '',
     };
