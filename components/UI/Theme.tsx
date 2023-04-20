@@ -1,3 +1,4 @@
+import { extendTheme } from '@chakra-ui/react';
 import { Montserrat } from 'next/font/google';
 import Button from './Buttons';
 
@@ -7,7 +8,7 @@ const montserrat = Montserrat({
   subsets: ['latin'],
 });
 
-const theme = {
+const theme = extendTheme({
   colors: {
     blue: '#0000FF',
     green: 'lightcoral',
@@ -41,6 +42,11 @@ const theme = {
   components: {
     Button,
   },
-};
+  // Color mode (light/dark)
+  config: {
+    initialColorMode: 'dark',
+    useSystemColorMode: false,
+  },
+});
 
 export default theme;

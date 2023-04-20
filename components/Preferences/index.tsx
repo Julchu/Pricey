@@ -71,7 +71,7 @@ const Preferences: FC = () => {
 
   const { getRootProps: colorRootProps, getRadioProps: colorRadioProps } = useRadioGroup({
     name: 'colorPreferences',
-    defaultValue: authUser?.preferences?.colorMode || Color.dark,
+    defaultValue: authUser?.preferences?.colorMode || Color.light,
     onChange: selectedOption => {
       setValue('colorMode', selectedOption as Color);
       setColorMode(selectedOption);
