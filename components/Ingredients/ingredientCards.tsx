@@ -12,7 +12,7 @@ import {
   AbsoluteCenter,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { Ingredient, WithId } from '../../lib/firebase/interfaces';
+import { Ingredient, WithDocId } from '../../lib/firebase/interfaces';
 import { IngredientFormData } from '../HomeDashboard';
 import { useUnit } from '../../hooks/useUnit';
 import {
@@ -26,7 +26,7 @@ import {
 import useIngredient from '../../hooks/useIngredient';
 
 type CardProps = {
-  ingredientInfo: WithId<Ingredient>;
+  ingredientInfo: WithDocId<Ingredient>;
   highlighted?: boolean;
 };
 
@@ -59,9 +59,9 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
 
   // Modify form data for update submission
   const onUpdateTransform = useCallback(
-    async (data: WithId<Ingredient>): Promise<void> => {
+    async (data: WithDocId<Ingredient>): Promise<void> => {
       setValue('name', data.name);
-      setValue('ingredientId', data.id);
+      setValue('ingredientId', data.documentId);
     },
     [setValue],
   );
@@ -129,7 +129,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       </CardHeader>
 
       {/* Card line */}
-      <Divider boxShadow={'focus'} borderColor={'lightgrey'} />
+      {/* <Divider boxShadow={'focus'} borderColor={'lightgrey'} /> */}
 
       {/* Info */}
       <CardBody
@@ -266,7 +266,7 @@ export const NewIngredientCard: FC = () => {
       </CardHeader>
 
       {/* Card line */}
-      <Divider boxShadow={'focus'} borderColor={'lightgrey'} />
+      {/* <Divider boxShadow={'focus'} borderColor={'lightgrey'} /> */}
 
       <CardBody
         onClick={handleSubmit(onSubmit)}

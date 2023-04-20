@@ -13,7 +13,7 @@ import {
 import { firestore } from './index';
 import { CollectionReference } from '@firebase/firestore';
 
-export type WithId<T> = { id?: string } & T;
+export type WithDocId<T> = { documentId?: string } & T;
 
 export enum Unit {
   // Mass
@@ -27,10 +27,21 @@ export enum Unit {
   item = 'item',
 }
 
+export type MassType = Unit.kilogram | Unit.pound;
+
+export type VolumeType = Unit.litre | Unit.quart;
+
 export type UnitCategory = {
-  mass: Unit.kilogram | Unit.pound;
-  volume: Unit.litre | Unit.quart;
+  mass: MassType;
+  volume: VolumeType;
 };
+
+export enum Color {
+  light = 'light',
+  dark = 'dark',
+}
+
+export type ColorMode = Color.light | Color.dark;
 
 export enum Season {
   spring = 'Spring',
@@ -61,7 +72,7 @@ export interface GroceryList {
   name: string;
   ingredients: Ingredient[];
   userId: string;
-  public?: boolean;
+  viewable?: boolean;
   createdAt?: Timestamp | FieldValue;
 }
 
@@ -75,8 +86,8 @@ export interface User {
   createdAt?: Timestamp;
   role: Role;
   preferences?: {
-    units: UnitCategory;
-    colorMode: 'light' | 'dark';
+    units?: UnitCategory;
+    colorMode?: Color;
   };
   // Preferences, like prefered units
 }

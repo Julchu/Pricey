@@ -4,9 +4,7 @@ import {
   Menu,
   MenuButton,
   Circle,
-  Square,
   Avatar,
-  Spinner,
   MenuList,
   MenuOptionGroup,
   MenuItemOption,
@@ -15,9 +13,8 @@ import {
   MenuGroup,
   Box,
   Text,
-  ScaleFade,
-  useColorMode,
-  Button,
+  SkeletonCircle,
+  AbsoluteCenter,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FC, useCallback } from 'react';
@@ -27,7 +24,7 @@ import { useUnit } from '../../hooks/useUnit';
 import { Unit, UnitCategory } from '../../lib/firebase/interfaces';
 
 const Header: FC = () => {
-  const { authUser, loading: userLoading } = useAuth();
+  const { authUser, authLoading } = useAuth();
 
   return (
     <Box justifyContent={'space-between'} display={{ base: 'flex', sm: 'block' }}>
@@ -46,31 +43,38 @@ const Header: FC = () => {
           transition="all 0.2s"
           aria-label={'Open menu'}
           cursor={'pointer'}
-          borderRadius={authUser ? '50%' : '5px'}
+          borderRadius={authUser || authLoading ? '50%' : '5px'}
           boxShadow={'normal'}
           _hover={{ boxShadow: 'hover' }}
           _expanded={{ boxShadow: 'focus' }}
           _focus={{ boxShadow: 'focus' }}
           pos={'relative'}
         >
-          <Square>
-            {authUser ? (
-              <ScaleFade in={!!authUser}>
-                <Avatar
-                  alignSelf={'center'}
-                  justifySelf={'center'}
-                  m="auto"
-                  src={authUser?.photoURL}
-                  borderRadius={authUser ? '50%' : '5px'}
-                  boxShadow={'normal'}
-                />
-              </ScaleFade>
-            ) : userLoading ? (
-              <Spinner m="auto" />
-            ) : (
-              <HamburgerIcon color={'black'} alignSelf={'center'} justifySelf={'center'} m="auto" />
-            )}
-          </Square>
+          {/* Double AbsoluteCenters for centering skeleton circle */}
+          <AbsoluteCenter>
+            {/* 48px is the default? size of Avatar */}
+            <SkeletonCircle isLoaded={!authLoading} size="48px">
+              <AbsoluteCenter>
+                {authUser ? (
+                  <Avatar
+                    alignSelf={'center'}
+                    justifySelf={'center'}
+                    m="auto"
+                    src={authUser?.photoURL}
+                    borderRadius={authUser ? '50%' : '5px'}
+                    boxShadow={'normal'}
+                  />
+                ) : (
+                  <HamburgerIcon
+                    color={'black'}
+                    alignSelf={'center'}
+                    justifySelf={'center'}
+                    m="auto"
+                  />
+                )}
+              </AbsoluteCenter>
+            </SkeletonCircle>
+          </AbsoluteCenter>
         </MenuButton>
 
         <DropdownMenu />
@@ -93,7 +97,7 @@ const DropdownMenu: FC = () => {
 
   // TODO?: update user and/or authUser after unit toggles
   return (
-    <MenuList>
+    <MenuList boxShadow={'normal'}>
       {/* Mass switch */}
       <MenuOptionGroup
         defaultValue={currentUnits.mass}

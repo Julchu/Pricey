@@ -27,8 +27,8 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
   const { authUser } = useAuth();
 
   const submitGroceryList = useCallback<GroceryListMethods['submitGroceryList']>(
-    async ({ name, ingredients, userId, public = false, createdAt }) => {
-      if (authUser?.id != userId) return;
+    async ({ name, ingredients, userId, viewable = false }) => {
+      if (authUser?.documentId != userId) return;
       setLoading(true);
 
       // const previewPrice = priceCalculator(price, measurement);
@@ -70,8 +70,8 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
   );
 
   const updateGroceryList = useCallback<GroceryListMethods['updateGroceryList']>(
-    async ({ groceryListId, name, ingredients, userId, public, createdAt }) => {
-      if (authUser?.id != userId) return;
+    async ({ groceryListId, name, ingredients, userId, viewable }) => {
+      if (authUser?.documentId != userId) return;
       // const previewPrice = priceCalculator(price, measurement);
       // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
       //   mass: Unit.kilogram,

@@ -1,19 +1,15 @@
 import { Flex, Link, Spinner, Text } from '@chakra-ui/react';
-import { FC, useEffect } from 'react';
+import { FC } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import useIngredient from '../../hooks/useIngredient';
 import useUser from '../../hooks/useUser';
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
-import { WithId, User, Unit } from '../../lib/firebase/interfaces';
+import { WithDocId, User, Unit } from '../../lib/firebase/interfaces';
 
 const Functions: FC = () => {
-  const { authUser, loading: userLoading, login, logout } = useAuth();
+  const { authUser, authLoading, login, logout } = useAuth();
   const [{ updateIngredient }] = useIngredient();
   const [{ updateUser }] = useUser();
-
-  useEffect(() => {
-    if (authUser) console.log('dashboard useAuth:', authUser);
-  }, [authUser]);
 
   return (
     <Flex flexDir={'column'}>
@@ -65,7 +61,9 @@ const Functions: FC = () => {
         cursor={'pointer'}
         _hover={{ textDecoration: 'underline' }}
         onClick={async () => {
-          await updateUser({ mass: Unit.kilogram, volume: Unit.litre } as Partial<WithId<User>>);
+          await updateUser({ preferences: { mass: Unit.kilogram, volume: Unit.litre } } as Partial<
+            WithDocId<User>
+          >);
         }}
       >
         Update User
@@ -91,7 +89,7 @@ const Functions: FC = () => {
         </Link>
       )}
 
-      {userLoading ? (
+      {authLoading ? (
         <>
           <Spinner />
           <Text>User loading</Text>

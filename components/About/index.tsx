@@ -95,9 +95,9 @@ const About: FC = () => {
         </Box>
       </Flex>
 
-      <Divider boxShadow={'focus'} />
+      {/* <Divider boxShadow={'focus'} /> */}
 
-      <Flex flexDir={'column'} h="100%" mt="20px">
+      <Flex flexDir={'column'} mt="20px">
         <Center>
           <Flex flexDir={'row'}>
             <LinkBox as={Box}>

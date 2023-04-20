@@ -39,8 +39,8 @@ export const useUnit = (): UnitContextType => {
 export const UnitProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const { authUser } = useAuth();
   const [currentUnits, setCurrentUnits] = useState<UnitCategory>({
-    mass: authUser?.preferences?.mass || Unit.kilogram,
-    volume: authUser?.preferences?.volume || Unit.litre,
+    mass: authUser?.preferences?.units?.mass || Unit.kilogram,
+    volume: authUser?.preferences?.units?.volume || Unit.litre,
   });
 
   return (

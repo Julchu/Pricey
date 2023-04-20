@@ -12,7 +12,6 @@ import {
   Box,
   Center,
   Container,
-  Divider,
   Flex,
   Heading,
 } from '@chakra-ui/react';
@@ -26,7 +25,7 @@ export type GroceryFormData = {
   name: string;
   ingredients: Ingredient[];
   userId: string;
-  public?: boolean;
+  viewable?: boolean;
 };
 
 const MyGroceries: FC<{ groceryListCreator: string }> = ({ groceryListCreator }) => {
@@ -44,14 +43,14 @@ const MyGroceries: FC<{ groceryListCreator: string }> = ({ groceryListCreator })
         </Box>
       </Flex>
 
-      <Divider boxShadow={'focus'} />
+      {/* <Divider boxShadow={'focus'} /> */}
 
       <Container>
         There are many benefits to a joint design and development system. Not only does it bring
         benefits to the design team, but it also brings benefits to engineering teams. It makes sure
         that our experiences have a consistent look and feel, not just in our design specs, but in
         production
-        <NextLink href={`${authUser?.id}/Cheese`}>
+        <NextLink href={`${authUser?.documentId}/Cheese`}>
           <Button>New List</Button>
         </NextLink>
         <TableContainer>

@@ -28,19 +28,19 @@ const theme = {
     focus: `rgba(0, 0, 0, 0.35) 0px 5px 15px`,
     under: `rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px`,
   },
+  // Header size: 40px, with margin top/bottom 20px each
   space: {
     header: '20px',
   },
 
+  size: {
+    header: '40px',
+  },
+
+  // Modifying default components
   components: {
     Button,
   },
-  config: {
-    initialColorMode: 'light',
-    useSystemColorMode: false,
-  },
-  initialColorMode: 'dark',
-  useSystemColorMode: false,
 };
 
 export default theme;

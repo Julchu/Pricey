@@ -1,12 +1,4 @@
-import {
-  createContext,
-  FC,
-  ReactNode,
-  useCallback,
-  useContext,
-  useLayoutEffect,
-  useState,
-} from 'react';
+import { createContext, FC, ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 import {
   getAuth,
   onAuthStateChanged,
@@ -16,20 +8,22 @@ import {
   User as FirebaseUser,
 } from '@firebase/auth';
 
-import { User, WithId } from '../lib/firebase/interfaces';
+import { db, User, WithDocId } from '../lib/firebase/interfaces';
 import { useRouter } from 'next/router';
 import useUser from './useUser';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { useColorMode } from '@chakra-ui/react';
 
 export const AuthContext = createContext<AuthContextType>({
   authUser: undefined,
-  loading: false,
+  authLoading: false,
   login: () => void 0,
   logout: () => void 0,
 });
 
 type AuthContextType = {
-  authUser: WithId<User> | undefined;
-  loading: boolean;
+  authUser: WithDocId<User> | undefined;
+  authLoading: boolean;
   login: () => void;
   logout: () => void;
 };
@@ -39,14 +33,15 @@ export const useAuth = (): AuthContextType => useContext(AuthContext);
 
 // Initial values of Auth Context (AuthContextType)
 export const useProvideAuth = (): AuthContextType => {
-  const [authUser, setAuthUser] = useState<WithId<User> | undefined>(undefined);
-  const [{ retrieveUser, getUser }, updatedUser, _createUserLoading] = useUser();
-  const [loading, setLoading] = useState<boolean>(false);
+  const { setColorMode } = useColorMode();
+  const [authUser, setAuthUser] = useState<WithDocId<User> | undefined>(undefined);
+  const [{ retrieveUser }, _updatedUser, _createUserLoading] = useUser();
+  const [authLoading, setAuthLoading] = useState<boolean>(false);
   const router = useRouter();
   const auth = getAuth();
 
   const login = useCallback(() => {
-    setLoading(true);
+    setAuthLoading(true);
     const provider = new GoogleAuthProvider();
     provider.setCustomParameters({ prompt: 'select_account' });
 
@@ -70,7 +65,7 @@ export const useProvideAuth = (): AuthContextType => {
         // An error happened.
         console.log('Sign out error:', error);
       });
-    setLoading(false);
+    setAuthLoading(false);
   }, [auth, router]);
 
   /* Every page load, checks if there is a user authenticated from Google services (not Pricey db)
@@ -93,18 +88,51 @@ export const useProvideAuth = (): AuthContextType => {
         setAuthUser(undefined);
         console.log('User is not logged');
       }
-      setLoading(false);
+      setAuthLoading(false);
     },
     [retrieveUser],
   );
 
+  // Check for any db change in user's document and update authUser
+  useEffect(() => {
+    if (!authUser?.documentId) return;
+    const unsubscribe = onSnapshot(doc(db.userCollection, authUser?.documentId), querySnapshot => {
+      const user = querySnapshot.data();
+      if (user) {
+        setAuthUser(prev =>
+          prev
+            ? {
+                ...prev,
+                documentId: querySnapshot.id,
+                uid: user.uid,
+                email: user.email,
+                photoURL: user.photoURL,
+                name: user.name,
+                location: user.location,
+                role: user.role,
+                preferences: {
+                  units: user.preferences?.units,
+                  colorMode: user.preferences?.colorMode,
+                },
+              }
+            : undefined,
+        );
+        setColorMode(user.preferences?.colorMode);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [authUser?.documentId, setColorMode]);
+
   // Auth persistence: detect if user is authenticated or not (on page change, on page refresh)
-  useLayoutEffect(() => {
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, handleAuthChange);
     return () => unsubscribe();
   }, [auth, handleAuthChange]);
 
-  return { authUser, loading, login, logout };
+  return { authUser, authLoading, login, logout };
 };
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {

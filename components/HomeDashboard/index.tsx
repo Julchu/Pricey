@@ -1,7 +1,7 @@
 import { limit, onSnapshot, query, where } from 'firebase/firestore';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { db, Ingredient, Unit, WithId } from '../../lib/firebase/interfaces';
+import { db, Ingredient, Unit, WithDocId } from '../../lib/firebase/interfaces';
 import { Divider, Flex, Grid, GridItem } from '@chakra-ui/react';
 import { IngredientCard, NewIngredientCard } from '../Ingredients/ingredientCards';
 import IngredientForm from '../Ingredients/ingredientForm';
@@ -21,7 +21,7 @@ export type IngredientFormData = {
 };
 
 const IngredientList: FC = () => {
-  const { authUser, loading: userLoading } = useAuth();
+  const { authUser } = useAuth();
 
   // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
   /* Manual ingredient search
@@ -29,7 +29,7 @@ const IngredientList: FC = () => {
    * searchIngredient: user input into search box; not used for query
    */
   const [foundIngredient, setFoundIngredient] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<WithId<Ingredient>[]>([]);
+  const [searchResults, setSearchResults] = useState<WithDocId<Ingredient>[]>([]);
 
   // IngredientForm submission
   const methods = useForm<IngredientFormData>({
@@ -52,9 +52,9 @@ const IngredientList: FC = () => {
       const q = query(db.ingredientCollection, where('userId', '==', authUser.uid), limit(30));
 
       onSnapshot(q, querySnapshot => {
-        const ingredientInfoList: WithId<Ingredient>[] = [];
+        const ingredientInfoList: WithDocId<Ingredient>[] = [];
         querySnapshot.forEach(doc => {
-          ingredientInfoList.push({ ...doc.data(), id: doc.id });
+          ingredientInfoList.push({ ...doc.data(), documentId: doc.id });
         });
         setSearchResults(ingredientInfoList);
       });
@@ -73,9 +73,9 @@ const IngredientList: FC = () => {
 
     const results = fuse.search(searchIngredient);
     const found = results.find(result => result.score && result.score < 0.00001)?.item || {
-      id: '',
+      documentId: '',
     };
-    if (found.id) setFoundIngredient(found.id);
+    if (found.documentId) setFoundIngredient(found.documentId);
     else setFoundIngredient('');
 
     return searchIngredient
@@ -94,7 +94,7 @@ const IngredientList: FC = () => {
             <IngredientForm />
           </Flex>
 
-          <Divider boxShadow={'focus'} />
+          {/* <Divider boxShadow={'focus'} /> */}
 
           <Grid
             mx={{ base: 'unset', sm: '30px' }}
@@ -117,7 +117,7 @@ const IngredientList: FC = () => {
             ) : null}
 
             {filteredResults?.map((item, index) => {
-              const highlighted = item.id === foundIngredient;
+              const highlighted = item.documentId === foundIngredient;
 
               return (
                 <GridItem
