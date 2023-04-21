@@ -2,7 +2,20 @@ import { limit, onSnapshot, query, where } from 'firebase/firestore';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { db, Ingredient, Unit, WithDocId } from '../../lib/firebase/interfaces';
-import { Flex, Grid, GridItem } from '@chakra-ui/react';
+import {
+  AbsoluteCenter,
+  Button,
+  ButtonGroup,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  Center,
+  Flex,
+  Grid,
+  GridItem,
+  Image,
+} from '@chakra-ui/react';
 import { IngredientCard, NewIngredientCard } from '../Ingredients/ingredientCards';
 import IngredientForm from '../Ingredients/ingredientForm';
 import { useAuth } from '../../hooks/useAuth';
@@ -97,7 +110,8 @@ const IngredientList: FC = () => {
           {/* <Divider boxShadow={'focus'} /> */}
 
           <Grid
-            p={{ base: '30px', sm: '0px 30px' }}
+            // px: 0px required for mobile when no ingredients found
+            p={{ base: '30px 0px', sm: '0px 30px' }}
             mt={'20px'}
             autoFlow={{ base: 'column', sm: 'row' }}
             rowGap={'30px'}

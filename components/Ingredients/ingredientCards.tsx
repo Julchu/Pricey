@@ -10,6 +10,12 @@ import {
   Stat,
   Tooltip,
   AbsoluteCenter,
+  IconButton,
+  HStack,
+  Center,
+  Button,
+  ButtonGroup,
+  CardFooter,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient, WithDocId } from '../../lib/firebase/interfaces';
@@ -24,6 +30,7 @@ import {
   unitConverter,
 } from '../../lib/textFormatters';
 import useIngredient from '../../hooks/useIngredient';
+import { DownloadIcon } from '@chakra-ui/icons';
 
 type CardProps = {
   ingredientInfo: WithDocId<Ingredient>;
@@ -122,7 +129,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       _focus={{ boxShadow: 'focus' }}
     >
       {/* Image */}
-      <CardHeader height={'180px'} position={'relative'}>
+      <CardHeader>
         {/* TODO: image uploading */}
         <AbsoluteCenter w="100%">
           <Image src={'/media/foodPlaceholder.png'} alt={'Food placeholder'} />
@@ -138,11 +145,6 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
           await onUpdateTransform(ingredientInfo);
           handleSubmit(onUpdateSubmit)();
         }}
-        h={'100%'}
-        w={'100%'}
-        padding={'15px 30px'}
-        cursor={'pointer'}
-        textAlign={'center'}
       >
         <Text display={'block'}>{highlighted ? 'Update' : <span>&nbsp;</span>}</Text>
 
@@ -247,19 +249,9 @@ export const NewIngredientCard: FC = () => {
   );
 
   return (
-    <Card
-      ml={{ base: '30px', sm: 'unset' }}
-      letterSpacing={'2px'}
-      scrollSnapAlign={'center'}
-      borderRadius={'5px'}
-      w={{ base: 'calc(100vw - 60px)', sm: '250px' }}
-      transition={{ sm: 'box-shadow 0.2s ease-in-out' }}
-      boxShadow={'normal'}
-      _hover={{ boxShadow: 'hover' }}
-      _focus={{ boxShadow: 'focus' }}
-    >
+    <Card>
       {/* Image */}
-      <CardHeader height={'180px'} position={'relative'}>
+      <CardHeader>
         <AbsoluteCenter>
           {/* TODO: image uploading */}
           <Image src={'/media/imageUploadIcon.png'} alt={'Upload image'} borderRadius={'lg'} />

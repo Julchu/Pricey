@@ -1,6 +1,9 @@
 import { extendTheme } from '@chakra-ui/react';
 import { Montserrat } from 'next/font/google';
-import Button from './Buttons';
+import Button from './Button';
+import Card from './Card';
+import Input from './Input';
+import Select from './Select';
 
 // Import the weights and subsets, add any other config here as well
 const montserrat = Montserrat({
@@ -42,6 +45,9 @@ const theme = extendTheme({
   // Modifying default components
   components: {
     Button,
+    Input,
+    Select,
+    Card,
   },
   // Color mode (light/dark)
   config: {

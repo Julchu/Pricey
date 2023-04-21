@@ -29,46 +29,16 @@ const IngredientForm: FC = () => {
       <Input
         type={'search'}
         gridColumn={{ base: '1/3', sm: '1/3' }}
-        letterSpacing={'2px'}
-        transition={'box-shadow 0.2s ease-in-out'}
-        border={'none'}
-        borderRadius={'5px'}
-        boxShadow={'normal'}
-        _hover={{ boxShadow: 'hover' }}
-        _focus={{ boxShadow: 'focus' }}
-        _invalid={{
-          color: 'red',
-          _placeholder: {
-            fontWeight: 600,
-            color: 'red',
-          },
-        }}
         {...register('name', { required: true })}
         isInvalid={errors.name?.type === 'required'}
         placeholder={
-          errors.name?.type === 'required'
-            ? 'Ingredient name is required'
-            : 'Search for an ingredient*'
+          errors.name?.type === 'required' ? 'Ingredient name missing' : 'Search for an ingredient*'
         }
       />
 
       {/* Price input */}
       <Input
         type={'number'}
-        letterSpacing={'2px'}
-        transition={'box-shadow 0.2s ease-in-out'}
-        border={'none'}
-        borderRadius={'5px'}
-        boxShadow={'normal'}
-        _hover={{ boxShadow: { base: 'hover' } }}
-        _focus={{ boxShadow: { base: 'focus' } }}
-        _invalid={{
-          color: 'red',
-          _placeholder: {
-            fontWeight: 600,
-            color: 'red',
-          },
-        }}
         {...register('price', {
           valueAsNumber: true,
           required: true,
@@ -82,20 +52,6 @@ const IngredientForm: FC = () => {
       {/* Measurement input */}
       <Input
         type={'number'}
-        letterSpacing={'2px'}
-        transition={'box-shadow 0.2s ease-in-out'}
-        border={'none'}
-        borderRadius={'5px'}
-        boxShadow={'normal'}
-        _hover={{ boxShadow: 'hover' }}
-        _focus={{ boxShadow: 'focus' }}
-        _invalid={{
-          color: 'red',
-          _placeholder: {
-            fontWeight: 600,
-            color: 'red',
-          },
-        }}
         {...register('measurement', {
           valueAsNumber: true,
           required: true,
@@ -109,21 +65,6 @@ const IngredientForm: FC = () => {
       />
 
       <Select
-        letterSpacing={'2px'}
-        boxShadow={'normal'}
-        borderRadius={'5px'}
-        border={'none'}
-        transition={'box-shadow 0.2s ease-in-out'}
-        _hover={{ boxShadow: 'hover' }}
-        _focus={{ boxShadow: 'focus' }}
-        _placeholder={{ color: 'red' }}
-        _invalid={{
-          color: 'red',
-          fontWeight: 600,
-          _placeholder: {
-            color: 'red',
-          },
-        }}
         {...register('unit', {
           required: true,
         })}
@@ -143,20 +84,6 @@ const IngredientForm: FC = () => {
       {/* Item quantity */}
       <Input
         type={'number'}
-        letterSpacing={'2px'}
-        transition={'box-shadow 0.2s ease-in-out'}
-        border={'none'}
-        borderRadius={'5px'}
-        boxShadow={'normal'}
-        _hover={{ boxShadow: 'hover' }}
-        _focus={{ boxShadow: 'focus' }}
-        _invalid={{
-          color: 'red',
-          _placeholder: {
-            fontWeight: 600,
-            color: 'red',
-          },
-        }}
         {...register('quantity', {
           valueAsNumber: true,
           required: false,
@@ -177,7 +104,6 @@ export default IngredientForm;
 /* TODO: create custom dropdown menu for unit */
 
 /* Unit selector */
-
 /* <Menu closeOnSelect={false}>
   <MenuButton
     bg={'white'}

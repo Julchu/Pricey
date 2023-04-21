@@ -110,10 +110,7 @@ export const useProvideAuth = (): AuthContextType => {
                 name: user.name,
                 location: user.location,
                 role: user.role,
-                preferences: {
-                  units: user.preferences?.units,
-                  colorMode: user.preferences?.colorMode,
-                },
+                preferences: user.preferences,
               }
             : undefined,
         );

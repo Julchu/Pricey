@@ -88,6 +88,8 @@ export interface User {
   preferences?: {
     units?: UnitCategory;
     colorMode?: Color;
+    displayName?: string;
+    dismissedTutorial?: boolean;
   };
   // Preferences, like prefered units
 }

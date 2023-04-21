@@ -13,7 +13,11 @@ import {
   Divider,
   Text,
   Spacer,
+  Avatar,
+  Input,
+  VStack,
 } from '@chakra-ui/react';
+import { getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { FC, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
@@ -21,6 +25,7 @@ import { useAuth } from '../../hooks/useAuth';
 import useUser from '../../hooks/useUser';
 import {
   Color,
+  db,
   MassType,
   Unit,
   UnitCategory,
@@ -32,32 +37,41 @@ import {
 type PreferencesFormData = {
   units: UnitCategory;
   colorMode: 'light' | 'dark';
+  displayName: string;
 };
 
 const Preferences: FC = () => {
   const { authUser, authLoading } = useAuth();
   const [{ updateUser }, userLoading] = useUser();
+  const router = useRouter();
 
   const { setColorMode } = useColorMode();
 
   // IngredientForm submission
-  const { setValue, handleSubmit } = useForm<PreferencesFormData>({
+  const { setValue, handleSubmit, register } = useForm<PreferencesFormData>({
     defaultValues: {
       units: {
         mass: authUser?.preferences?.units?.mass || Unit.kilogram,
         volume: authUser?.preferences?.units?.volume || Unit.litre,
       },
       colorMode: authUser?.preferences?.colorMode || 'dark',
+      displayName: authUser?.preferences?.displayName || '',
     },
   });
 
+  const validateIsUnique = async (displayName: string): Promise<boolean> => {
+    const q = query(db.userCollection, where('preferences.displayName', '==', displayName));
+    return (await getDocs(q)).size === 0;
+  };
+
   const onSubmitHandler = useCallback(
-    async (data: PreferencesFormData) => {
-      await updateUser({ preferences: data, documentId: authUser?.documentId } as Partial<
+    async (preferenceData: PreferencesFormData) => {
+      await updateUser({ preferences: preferenceData, documentId: authUser?.documentId } as Partial<
         WithDocId<User>
       >);
+      router.push('/');
     },
-    [authUser?.documentId, updateUser],
+    [authUser?.documentId, router, updateUser],
   );
 
   const { getRootProps: massRootProps, getRadioProps: massRadioProps } = useRadioGroup({
@@ -89,7 +103,6 @@ const Preferences: FC = () => {
   const volumeGroup = volumeRootProps();
   const colorGroup = colorRootProps();
 
-  const router = useRouter();
   useEffect(() => {
     if (!authUser) {
       router.replace(`/`);
@@ -108,7 +121,20 @@ const Preferences: FC = () => {
       </Flex>
 
       <form>
-        <Container>
+        <Container p={{ base: '30px', sm: 'unset' }}>
+          <Center>
+            <VStack my={'header'} spacing={4}>
+              <Avatar name={authUser?.name} size={'lg'} />
+              <Input
+                placeholder={authUser?.name || 'Display name'}
+                {...register('displayName', {
+                  validate: async (displayName: string) => {
+                    if (displayName) return await validateIsUnique(displayName);
+                  },
+                })}
+              />
+            </VStack>
+          </Center>
           <HStack {...massGroup} my={'header'}>
             <Text>Mass</Text>
             <Spacer />
@@ -139,11 +165,16 @@ const Preferences: FC = () => {
 
           <Divider boxShadow={'focus'} />
 
-          <HStack my={'header'}>
-            <Button isLoading={userLoading || authLoading} onClick={handleSubmit(onSubmitHandler)}>
-              Save preferences
-            </Button>
-          </HStack>
+          <Center>
+            <HStack my={'header'}>
+              <Button
+                isLoading={userLoading || authLoading}
+                onClick={handleSubmit(onSubmitHandler)}
+              >
+                Save Preferences
+              </Button>
+            </HStack>
+          </Center>
         </Container>
       </form>
     </>
