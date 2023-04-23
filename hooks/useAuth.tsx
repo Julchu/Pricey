@@ -118,9 +118,7 @@ export const useProvideAuth = (): AuthContextType => {
       }
     });
 
-    return () => {
-      unsubscribe();
-    };
+    return () => unsubscribe();
   }, [authUser?.documentId, setColorMode]);
 
   // Auth persistence: detect if user is authenticated or not (on page change, on page refresh)

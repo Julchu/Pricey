@@ -89,6 +89,7 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   const updateUser = useCallback<UseUserMethods['updateUser']>(async userData => {
     setUserLoading(true);
     const updatedInfo = filterNullableObject(userData);
+
     try {
       // Associate auth info to a specific user in db for public data:
       const userDocRef = doc(db.userCollection, userData.documentId);

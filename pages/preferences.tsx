@@ -15,6 +15,10 @@ const AboutPage: NextPage = () => {
   // }
   // console.log(authUser);
 
+  // useEffect(() => {
+  //   if (!authUser) router.push('/');
+  // }, [authUser, router]);
+
   return (
     <>
       <Head>

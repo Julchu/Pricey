@@ -23,7 +23,7 @@ import {
 } from '@chakra-ui/react';
 import { getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import { FC, useCallback, useEffect, useLayoutEffect } from 'react';
+import { FC, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 import useUser from '../../hooks/useUser';
@@ -45,7 +45,7 @@ type PreferencesFormData = {
 };
 
 const Preferences: FC = () => {
-  const { authUser, authLoading, login } = useAuth();
+  const { authUser, authLoading } = useAuth();
   const [{ updateUser }, userLoading] = useUser();
   const { setColorMode } = useColorMode();
   const router = useRouter();
@@ -125,12 +125,10 @@ const Preferences: FC = () => {
   const volumeGroup = volumeRootProps();
   const colorGroup = colorRootProps();
 
-  // useEffect(() => {
-  //   if (!authUser) router.push('/');
-  // }, [authUser, login, router]);
+  // Setting displayName input if page is refreshed
   useEffect(() => {
-    console.log(authUser);
-  }, [authUser]);
+    setValue('displayName', authUser?.preferences?.displayName || '');
+  }, [authUser?.preferences?.displayName, setValue]);
 
   return (
     <>
@@ -147,6 +145,7 @@ const Preferences: FC = () => {
           <Center>
             <VStack my={'header'} spacing={4}>
               <Avatar name={authUser?.name} size={'lg'} />
+
               <Skeleton isLoaded={authUser?.preferences && !authLoading}>
                 <Input
                   isInvalid={errors.displayName?.type === 'validate'}
@@ -163,27 +162,28 @@ const Preferences: FC = () => {
               </Skeleton>
             </VStack>
           </Center>
-          {/* <Skeleton isLoaded={authUser && !authLoading}> */}
-          <HStack {...massGroup} my={'header'}>
-            <Text>Mass</Text>
-            <Spacer />
-            {massOptions.map(value => (
-              <RadioButton key={value} {...massRadioProps({ value })} />
-            ))}
-          </HStack>
-          {/* </Skeleton> */}
+
+          <Skeleton isLoaded={authUser && !authLoading}>
+            <HStack {...massGroup} my={'header'}>
+              <Text>Mass</Text>
+              <Spacer />
+              {massOptions.map(value => (
+                <RadioButton key={value} {...massRadioProps({ value })} />
+              ))}
+            </HStack>
+          </Skeleton>
 
           <Divider boxShadow={'focus'} />
 
-          {/* <Skeleton isLoaded={authUser && !authLoading}> */}
-          <HStack {...volumeGroup} my={'header'}>
-            <Text>Volume</Text>
-            <Spacer />
-            {volumeOptions.map(value => (
-              <RadioButton key={value} {...volumeRadioProps({ value })} />
-            ))}
-          </HStack>
-          {/* </Skeleton> */}
+          <Skeleton isLoaded={authUser && !authLoading}>
+            <HStack {...volumeGroup} my={'header'}>
+              <Text>Volume</Text>
+              <Spacer />
+              {volumeOptions.map(value => (
+                <RadioButton key={value} {...volumeRadioProps({ value })} />
+              ))}
+            </HStack>
+          </Skeleton>
 
           <Divider boxShadow={'focus'} />
 
