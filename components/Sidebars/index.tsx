@@ -16,7 +16,7 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import NextLink from 'next/link';
+import { Link } from '@chakra-ui/next-js';
 import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { SidebarEnums, SidebarTypes, useSidebar } from '../../hooks/useSidebar';
@@ -48,13 +48,13 @@ const UserActionSidebar: FC = () => {
   const { closeSidebar } = useSidebar();
   const { toggleUnit, currentUnits } = useUnit();
 
-  const logoutHandler = useCallback(async () => {
-    await logout();
+  const logoutHandler = useCallback(() => {
+    logout();
     closeSidebar();
   }, [logout, closeSidebar]);
 
-  const loginHandler = useCallback(async () => {
-    await login();
+  const loginHandler = useCallback(() => {
+    login();
     closeSidebar();
   }, [login, closeSidebar]);
 
@@ -68,7 +68,7 @@ const UserActionSidebar: FC = () => {
         <Stack>
           <LinkBox as={Box}>
             <Button>
-              <LinkOverlay as={NextLink} href={'/about'}>
+              <LinkOverlay as={Link} href={'/about'}>
                 About Pricey
               </LinkOverlay>
             </Button>

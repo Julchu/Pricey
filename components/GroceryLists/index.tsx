@@ -16,7 +16,7 @@ import {
   Heading,
 } from '@chakra-ui/react';
 import { FC } from 'react';
-import NextLink from 'next/link';
+import { Link } from '@chakra-ui/next-js';
 import { useAuth } from '../../hooks/useAuth';
 import { Ingredient } from '../../lib/firebase/interfaces';
 
@@ -50,9 +50,9 @@ const MyGroceries: FC<{ groceryListCreator: string }> = ({ groceryListCreator })
         benefits to the design team, but it also brings benefits to engineering teams. It makes sure
         that our experiences have a consistent look and feel, not just in our design specs, but in
         production
-        <NextLink href={`${authUser?.documentId}/Cheese`}>
+        <Link href={`${authUser?.documentId}/Cheese`}>
           <Button>New List</Button>
-        </NextLink>
+        </Link>
         <TableContainer>
           <Table variant="striped" colorScheme="teal">
             <TableCaption>Imperial to metric conversion factors</TableCaption>

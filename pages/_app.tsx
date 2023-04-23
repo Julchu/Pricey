@@ -1,4 +1,5 @@
 import { ChakraProvider } from '@chakra-ui/react';
+import { CacheProvider } from '@chakra-ui/next-js';
 import { FC } from 'react';
 import type { AppProps } from 'next/app';
 import { AuthProvider } from '../hooks/useAuth';
@@ -8,15 +9,17 @@ import { SidebarProvider } from '../hooks/useSidebar';
 
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
-    <ChakraProvider theme={theme}>
-      <AuthProvider>
-        <SidebarProvider>
-          <UnitProvider>
-            <Component {...pageProps} />
-          </UnitProvider>
-        </SidebarProvider>
-      </AuthProvider>
-    </ChakraProvider>
+    <CacheProvider>
+      <ChakraProvider theme={theme} cssVarsRoot={':root'}>
+        <AuthProvider>
+          <SidebarProvider>
+            <UnitProvider>
+              <Component {...pageProps} />
+            </UnitProvider>
+          </SidebarProvider>
+        </AuthProvider>
+      </ChakraProvider>
+    </CacheProvider>
   );
 };
 

@@ -16,10 +16,14 @@ import {
   Avatar,
   Input,
   VStack,
+  useToast,
+  CloseButton,
+  UseToastOptions,
+  Skeleton,
 } from '@chakra-ui/react';
 import { getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect, useLayoutEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../../hooks/useAuth';
 import useUser from '../../hooks/useUser';
@@ -41,14 +45,19 @@ type PreferencesFormData = {
 };
 
 const Preferences: FC = () => {
-  const { authUser, authLoading } = useAuth();
+  const { authUser, authLoading, login } = useAuth();
   const [{ updateUser }, userLoading] = useUser();
-  const router = useRouter();
-
   const { setColorMode } = useColorMode();
+  const router = useRouter();
+  const toast = useToast();
 
-  // IngredientForm submission
-  const { setValue, handleSubmit, register } = useForm<PreferencesFormData>({
+  // Preferences ReactHookForm
+  const {
+    setValue,
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm<PreferencesFormData>({
     defaultValues: {
       units: {
         mass: authUser?.preferences?.units?.mass || Unit.kilogram,
@@ -69,11 +78,24 @@ const Preferences: FC = () => {
       await updateUser({ preferences: preferenceData, documentId: authUser?.documentId } as Partial<
         WithDocId<User>
       >);
-      router.push('/');
+
+      if (!toast.isActive('preferencesSaved'))
+        toast({
+          title: 'Preferences saved',
+          description: "We've saved your user preferences",
+          status: 'success',
+          duration: 5000,
+          isClosable: true,
+          id: 'preferencesSaved',
+          variant: 'info',
+          // render: props => CustomToast(props),
+          containerStyle: { letterSpacing: '2px' },
+        });
     },
-    [authUser?.documentId, router, updateUser],
+    [authUser?.documentId, toast, updateUser],
   );
 
+  // Custom Radio Group buttons
   const { getRootProps: massRootProps, getRadioProps: massRadioProps } = useRadioGroup({
     name: 'massPreferences',
     defaultValue: authUser?.preferences?.units?.mass || Unit.kilogram,
@@ -103,12 +125,12 @@ const Preferences: FC = () => {
   const volumeGroup = volumeRootProps();
   const colorGroup = colorRootProps();
 
+  // useEffect(() => {
+  //   if (!authUser) router.push('/');
+  // }, [authUser, login, router]);
   useEffect(() => {
-    if (!authUser) {
-      router.replace(`/`);
-    } else {
-    }
-  }, [authUser, router]);
+    console.log(authUser);
+  }, [authUser]);
 
   return (
     <>
@@ -125,16 +147,23 @@ const Preferences: FC = () => {
           <Center>
             <VStack my={'header'} spacing={4}>
               <Avatar name={authUser?.name} size={'lg'} />
-              <Input
-                placeholder={authUser?.name || 'Display name'}
-                {...register('displayName', {
-                  validate: async (displayName: string) => {
-                    if (displayName) return await validateIsUnique(displayName);
-                  },
-                })}
-              />
+              <Skeleton isLoaded={authUser?.preferences && !authLoading}>
+                <Input
+                  isInvalid={errors.displayName?.type === 'validate'}
+                  placeholder={
+                    authUser?.preferences?.displayName || authUser?.name || 'Display name'
+                  }
+                  {...register('displayName', {
+                    validate: async (displayName: string) => {
+                      if (displayName !== authUser?.preferences?.displayName)
+                        return await validateIsUnique(displayName);
+                    },
+                  })}
+                />
+              </Skeleton>
             </VStack>
           </Center>
+          {/* <Skeleton isLoaded={authUser && !authLoading}> */}
           <HStack {...massGroup} my={'header'}>
             <Text>Mass</Text>
             <Spacer />
@@ -142,9 +171,11 @@ const Preferences: FC = () => {
               <RadioButton key={value} {...massRadioProps({ value })} />
             ))}
           </HStack>
+          {/* </Skeleton> */}
 
           <Divider boxShadow={'focus'} />
 
+          {/* <Skeleton isLoaded={authUser && !authLoading}> */}
           <HStack {...volumeGroup} my={'header'}>
             <Text>Volume</Text>
             <Spacer />
@@ -152,16 +183,19 @@ const Preferences: FC = () => {
               <RadioButton key={value} {...volumeRadioProps({ value })} />
             ))}
           </HStack>
+          {/* </Skeleton> */}
 
           <Divider boxShadow={'focus'} />
 
-          <HStack {...colorGroup} my={'header'}>
-            <Text>Color mode </Text>
-            <Spacer />
-            {colorOptions.map(value => (
-              <RadioButton key={value} {...colorRadioProps({ value })} />
-            ))}
-          </HStack>
+          <Skeleton isLoaded={authUser && !authLoading}>
+            <HStack {...colorGroup} my={'header'}>
+              <Text>Color mode </Text>
+              <Spacer />
+              {colorOptions.map(value => (
+                <RadioButton key={value} {...colorRadioProps({ value })} />
+              ))}
+            </HStack>
+          </Skeleton>
 
           <Divider boxShadow={'focus'} />
 
@@ -209,6 +243,34 @@ const RadioButton: FC<UseRadioProps> = props => {
       >
         {props.value}
       </Box>
+    </Box>
+  );
+};
+
+const CustomToast: FC<UseToastOptions & { onClose: () => void }> = ({
+  title,
+  description,
+  onClose,
+}) => {
+  return (
+    <Box
+      letterSpacing={'2px'}
+      border={'none'}
+      outline={'none'}
+      borderRadius={'5px'}
+      boxShadow={'normal'}
+      transition={'box-shadow 0.2s ease-in-out'}
+      _hover={{ boxShadow: 'hover' }}
+      _focus={{ boxShadow: 'focus' }}
+      fontWeight={'medium'}
+      // height={'40px'}
+      padding={'auto'}
+    >
+      <Center>
+        <Text>{title}</Text>
+        <Text>{description}</Text>
+        <CloseButton onClick={() => onClose()} />
+      </Center>
     </Box>
   );
 };

@@ -3,6 +3,7 @@ import { Montserrat } from 'next/font/google';
 import Button from './Button';
 import Card from './Card';
 import Input from './Input';
+import Menu from './Menu';
 import Select from './Select';
 
 // Import the weights and subsets, add any other config here as well
@@ -11,10 +12,11 @@ const montserrat = Montserrat({
   subsets: ['latin'],
 });
 
-const theme = extendTheme({
+const theme = {
   colors: {
     blue: '#0000FF',
-    green: 'lightcoral',
+    coral: 'lightcoral',
+    placeholder: '#a9a9a9',
   },
   fonts: {
     heading: montserrat.style.fontFamily,
@@ -48,12 +50,14 @@ const theme = extendTheme({
     Input,
     Select,
     Card,
+    Menu,
   },
   // Color mode (light/dark)
   config: {
     initialColorMode: 'dark',
-    useSystemColorMode: false,
+    useSystemColorMode: true,
+    cssVarPrefix: 'pricey',
   },
-});
+};
 
-export default theme;
+export default extendTheme(theme);

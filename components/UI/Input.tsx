@@ -31,6 +31,9 @@ const baseStyle = definePartsStyle({
         color: 'red',
       },
     },
+    _placeholder: {
+      color: 'placeholder',
+    },
     // Dark mode alternatives
     _dark: {},
   },
