@@ -609,7 +609,7 @@
   dependencies:
     "@chakra-ui/utils" "2.0.15"
 
-"@chakra-ui/react@^2.5.5":
+"@chakra-ui/react@^2.5.1":
   version "2.5.5"
   resolved "https://registry.yarnpkg.com/@chakra-ui/react/-/react-2.5.5.tgz#5ae2450ec0d10d63e1314747466f21cf542032ff"
   integrity sha512-aBVMUtdWv2MrptD/tKSqICPsuJ+I+jvauegffO1qPUDlK3RrXIDeOHkLGWohgXNcjY5bGVWguFEzJm97//0ooQ==
@@ -4158,7 +4158,7 @@ forwarded@0.2.0:
   resolved "https://registry.yarnpkg.com/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
   integrity sha512-buRG0fpBtRHSTCOASe6hD258tEubFoRLb4ZNA6NxMVHNw2gOcwHo9wyablzMzOA5z9xA9L1KNjk/Nt6MT9aYow==
 
-framer-motion@^10.12.4:
+framer-motion@^10.0.0:
   version "10.12.4"
   resolved "https://registry.yarnpkg.com/framer-motion/-/framer-motion-10.12.4.tgz#905fdfa5b63dae53a63d2549b29aef6193eb78c7"
   integrity sha512-9gLtv8T6dui0tujHROR+VM3kdJyKiFCFiD94IQE+0OuX6LaIyXtdVpviokVdrHSb1giWhmmX4yzoucALMx6mtw==
