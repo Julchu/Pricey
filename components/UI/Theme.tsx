@@ -16,7 +16,6 @@ const theme = {
   colors: {
     blue: '#0000FF',
     coral: 'lightcoral',
-    placeholder: '#a9a9a9',
   },
   fonts: {
     heading: montserrat.style.fontFamily,
