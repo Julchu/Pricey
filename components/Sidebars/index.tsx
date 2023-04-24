@@ -17,7 +17,6 @@ import {
   Text,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
-// import { Link } from '@chakra-ui/next-js';
 import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { SidebarEnums, SidebarTypes, useSidebar } from '../../hooks/useSidebar';
