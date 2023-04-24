@@ -53,8 +53,6 @@ const theme = {
   },
   // Color mode (light/dark)
   config: {
-    initialColorMode: 'dark',
-    useSystemColorMode: true,
     cssVarPrefix: 'pricey',
   },
 };

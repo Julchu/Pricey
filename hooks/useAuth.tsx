@@ -114,7 +114,7 @@ export const useProvideAuth = (): AuthContextType => {
               }
             : undefined,
         );
-        setColorMode(user.preferences?.colorMode);
+        setColorMode(user.preferences?.colorMode || 'light');
       }
     });
 

@@ -139,7 +139,7 @@ const DropdownMenu: FC = () => {
         <>
           <MenuGroup title="Groceries">
             <MenuItem as={NextLink} href={'/'}>
-              Home
+              Ingredients
             </MenuItem>
             <MenuItem as={NextLink} href={'/groceries'}>
               <Text onClick={() => console.log('list')}>My Lists</Text>
