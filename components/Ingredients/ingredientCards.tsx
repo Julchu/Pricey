@@ -3,19 +3,12 @@ import {
   Text,
   Image,
   Card,
-  Divider,
   CardHeader,
   CardBody,
   StatArrow,
   Stat,
   Tooltip,
   AbsoluteCenter,
-  IconButton,
-  HStack,
-  Center,
-  Button,
-  ButtonGroup,
-  CardFooter,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient, WithDocId } from '../../lib/firebase/interfaces';
@@ -30,7 +23,6 @@ import {
   unitConverter,
 } from '../../lib/textFormatters';
 import useIngredient from '../../hooks/useIngredient';
-import { DownloadIcon } from '@chakra-ui/icons';
 
 type CardProps = {
   ingredientInfo: WithDocId<Ingredient>;
