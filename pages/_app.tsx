@@ -10,7 +10,7 @@ import { SidebarProvider } from '../hooks/useSidebar';
 const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <CacheProvider>
-      <ChakraProvider theme={theme} cssVarsRoot={':root'}>
+      <ChakraProvider theme={theme}>
         <AuthProvider>
           <SidebarProvider>
             <UnitProvider>

@@ -16,7 +16,8 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react';
-import { Link } from '@chakra-ui/next-js';
+import NextLink from 'next/link';
+// import { Link } from '@chakra-ui/next-js';
 import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { SidebarEnums, SidebarTypes, useSidebar } from '../../hooks/useSidebar';
@@ -68,7 +69,7 @@ const UserActionSidebar: FC = () => {
         <Stack>
           <LinkBox as={Box}>
             <Button>
-              <LinkOverlay as={Link} href={'/about'}>
+              <LinkOverlay as={NextLink} href={'/about'}>
                 About Pricey
               </LinkOverlay>
             </Button>

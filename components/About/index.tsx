@@ -13,6 +13,7 @@ import {
   Divider,
 } from '@chakra-ui/react';
 import { FC } from 'react';
+import NextLink from 'next/link';
 import { Link } from '@chakra-ui/next-js';
 import { openInNewTab } from '../../lib/openLink';
 
@@ -121,7 +122,7 @@ const About: FC = () => {
             <LinkBox as={Box}>
               <Heading as={'h1'} textAlign={'center'}>
                 GitHub&nbsp;
-                <LinkOverlay as={Link} href={'https://github.com/julchu/Pricey'}>
+                <LinkOverlay as={NextLink} href={'https://github.com/julchu/Pricey'}>
                   <Icon viewBox="0 0 16 16">
                     <path
                       fillRule="evenodd"

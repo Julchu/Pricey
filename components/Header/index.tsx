@@ -16,7 +16,8 @@ import {
   SkeletonCircle,
   AbsoluteCenter,
 } from '@chakra-ui/react';
-import { Link } from '@chakra-ui/next-js';
+import NextLink from 'next/link';
+// import { Link } from '@chakra-ui/next-js';
 import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useDebouncedState } from '../../hooks/useDebouncedState';
@@ -28,11 +29,11 @@ const Header: FC = () => {
 
   return (
     <Box justifyContent={'space-between'} display={{ base: 'flex', sm: 'block' }}>
-      <Link href={'/'}>
+      <NextLink href={'/'}>
         <Heading color={'lightcoral'} float={{ base: 'left' }} m={'20px 30px'} h={'40px'}>
           Pricey
         </Heading>
-      </Link>
+      </NextLink>
 
       <Menu>
         <MenuButton
@@ -138,10 +139,10 @@ const DropdownMenu: FC = () => {
       {authUser ? (
         <>
           <MenuGroup title="Groceries">
-            <MenuItem as={Link} href={'/'}>
+            <MenuItem as={NextLink} href={'/'}>
               Home
             </MenuItem>
-            <MenuItem as={Link} href={'/groceries'}>
+            <MenuItem as={NextLink} href={'/groceries'}>
               <Text onClick={() => console.log('list')}>My Lists</Text>
             </MenuItem>
           </MenuGroup>
@@ -150,10 +151,10 @@ const DropdownMenu: FC = () => {
       ) : null}
 
       <MenuGroup title="Links">
-        <MenuItem as={Link} href={'/functions'}>
+        <MenuItem as={NextLink} href={'/functions'}>
           Functions
         </MenuItem>
-        <MenuItem as={Link} href={'/about'}>
+        <MenuItem as={NextLink} href={'/about'}>
           About
         </MenuItem>
       </MenuGroup>
@@ -162,7 +163,7 @@ const DropdownMenu: FC = () => {
 
       <MenuGroup title="Profile">
         {authUser ? (
-          <MenuItem as={Link} href={'/preferences'}>
+          <MenuItem as={NextLink} href={'/preferences'}>
             Preferences
           </MenuItem>
         ) : null}
