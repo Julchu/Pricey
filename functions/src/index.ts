@@ -1,11 +1,12 @@
-import * as functions from 'firebase-functions';
+// import * as functions from 'firebase-functions';
 
-// Start writing Firebase Functions
-// https://firebase.google.com/docs/functions/typescript
-// http://localhost:5001/anyprojectid/us-central1/helloWorld
-const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info('Hello logs!', { structuredData: true });
-  response.send('Hello from Firebase!');
-});
+// // Start writing Firebase Functions
+// // https://firebase.google.com/docs/functions/typescript
+// // http://localhost:5001/anyprojectid/us-central1/helloWorld
+// const helloWorld = functions.https.onRequest((request, response) => {
+//   functions.logger.info('Hello logs!', { structuredData: true });
+//   response.send('Hello from Firebase!');
+// });
 
-export { helloWorld };
+// export { helloWorld };
+export {};
