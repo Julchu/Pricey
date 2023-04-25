@@ -19,9 +19,8 @@ import {
 import NextLink from 'next/link';
 import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
-import { useDebouncedState } from '../../hooks/useDebouncedState';
 import { useUnit } from '../../hooks/useUnit';
-import { Unit, UnitCategory } from '../../lib/firebase/interfaces';
+import { Role, Unit, UnitCategory } from '../../lib/firebase/interfaces';
 
 const Header: FC = () => {
   const { authUser, authLoading } = useAuth();
@@ -93,8 +92,6 @@ const DropdownMenu: FC = () => {
 
   const { currentUnits, setCurrentUnits } = useUnit();
 
-  const debouncedUnits = useDebouncedState(currentUnits, 1000);
-
   // TODO?: update user and/or authUser after unit toggles
   return (
     <MenuList boxShadow={'normal'}>
@@ -150,9 +147,11 @@ const DropdownMenu: FC = () => {
       ) : null}
 
       <MenuGroup title="Links">
-        <MenuItem as={NextLink} href={'/functions'}>
-          Functions
-        </MenuItem>
+        {authUser?.role === Role.admin ? (
+          <MenuItem as={NextLink} href={'/functions'}>
+            Functions
+          </MenuItem>
+        ) : null}
         <MenuItem as={NextLink} href={'/about'}>
           About
         </MenuItem>

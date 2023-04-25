@@ -36,7 +36,7 @@ export const useProvideAuth = (): AuthContextType => {
   const { setColorMode } = useColorMode();
   const [authUser, setAuthUser] = useState<WithDocId<User> | undefined>(undefined);
   const [{ retrieveUser }, _updatedUser, _createUserLoading] = useUser();
-  const [authLoading, setAuthLoading] = useState<boolean>(false);
+  const [authLoading, setAuthLoading] = useState<boolean>(true);
   const router = useRouter();
   const auth = getAuth();
 

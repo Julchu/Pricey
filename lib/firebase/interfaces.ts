@@ -85,13 +85,13 @@ export interface User {
   location?: Address;
   createdAt?: Timestamp;
   role: Role;
+  // Preferences, like prefered units
   preferences?: {
     units?: UnitCategory;
     colorMode?: Color;
     displayName?: string;
     dismissedTutorial?: boolean;
   };
-  // Preferences, like prefered units
 }
 
 /* TODO: create Time-to-live (TTL) grocery list w/ ingredients */

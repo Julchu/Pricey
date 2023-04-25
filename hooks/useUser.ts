@@ -88,12 +88,12 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   // Be sure to pass user's documentId in userData
   const updateUser = useCallback<UseUserMethods['updateUser']>(async userData => {
     setUserLoading(true);
-    const updatedInfo = filterNullableObject(userData);
+    const { documentId, ...rest } = filterNullableObject(userData);
 
     try {
       // Associate auth info to a specific user in db for public data:
-      const userDocRef = doc(db.userCollection, userData.documentId);
-      await updateDoc(userDocRef, updatedInfo);
+      const userDocRef = doc(db.userCollection, documentId as string);
+      await updateDoc(userDocRef, rest as Partial<User>);
       const updatedUser = await getDoc(userDocRef);
 
       if (updatedUser.exists()) {

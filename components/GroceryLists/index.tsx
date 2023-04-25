@@ -14,11 +14,17 @@ import {
   Container,
   Flex,
   Heading,
+  Text,
+  Spacer,
+  HStack,
 } from '@chakra-ui/react';
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import { useAuth } from '../../hooks/useAuth';
-import { Ingredient } from '../../lib/firebase/interfaces';
+import { db, GroceryList, Ingredient, User, WithDocId } from '../../lib/firebase/interfaces';
+import { doc, documentId, limit, onSnapshot, or, query, where } from 'firebase/firestore';
+// import firebase from 'firebase/app'
+// import 'firebase/firestore'
 
 export type GroceryFormData = {
   groceryListId?: string;
@@ -28,10 +34,33 @@ export type GroceryFormData = {
   viewable?: boolean;
 };
 
-const MyGroceries: FC<{ groceryListCreator: string }> = ({ groceryListCreator }) => {
+/**
+ * @param groceryListCreator: URL parameter
+ * @purpose Firestore query to fetch grocery lists
+ * * if no groceryListCreator, logged in user's docId
+ * * else groceryListCreator as preferences.displayName or groceryListCreator as docId
+ */
+const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator }) => {
   const { authUser } = useAuth();
+  const [groceryLists, setGroceryLists] = useState<GroceryList[]>([]);
 
-  // TODO: use user-chosen username instead of user's documentId
+  useEffect(() => {
+    const q = query(
+      db.groceryListCollection,
+      where('userId', '==', groceryListCreator ? groceryListCreator : authUser?.documentId),
+    );
+
+    onSnapshot(q, querySnapshot => {
+      const queryListResults: WithDocId<GroceryList>[] = [];
+      querySnapshot.forEach(doc => {
+        queryListResults.push({ ...doc.data(), documentId: doc.id });
+      });
+      setGroceryLists(queryListResults);
+    });
+  }, [authUser?.documentId, groceryListCreator]);
+
+  // Pre-make new list (but not save) with auto-generated document id
+  const newListDocRef = doc(db.groceryListCollection);
 
   return (
     <>
@@ -43,55 +72,48 @@ const MyGroceries: FC<{ groceryListCreator: string }> = ({ groceryListCreator })
         </Box>
       </Flex>
 
-      {/* <Divider boxShadow={'focus'} /> */}
+      <Box p={{ base: '30px 0px', sm: '0px 30px' }} mt={'header'}>
+        <HStack>
+          <Spacer />
 
-      <Container>
-        There are many benefits to a joint design and development system. Not only does it bring
-        benefits to the design team, but it also brings benefits to engineering teams. It makes sure
-        that our experiences have a consistent look and feel, not just in our design specs, but in
-        production
-        <NextLink href={`${authUser?.documentId}/Cheese`}>
-          <Button>New List</Button>
-        </NextLink>
+          {authUser && !groceryListCreator ? (
+            <Button as={NextLink} href={`groceries/${authUser?.documentId}/${newListDocRef.id}`}>
+              New List
+            </Button>
+          ) : null}
+        </HStack>
         <TableContainer>
           <Table variant="striped" colorScheme="teal">
-            <TableCaption>Imperial to metric conversion factors</TableCaption>
             <Thead>
               <Tr>
-                <Th>To convert</Th>
-                <Th>into</Th>
-                <Th isNumeric>multiply by</Th>
+                <Th>Name</Th>
+                <Th>Ingredients</Th>
+                <Th isNumeric>Price</Th>
               </Tr>
             </Thead>
             <Tbody>
-              <Tr>
-                <Td>inches</Td>
-                <Td>millimetres (mm)</Td>
-                <Td isNumeric>25.4</Td>
-              </Tr>
-              <Tr>
-                <Td>feet</Td>
-                <Td>centimetres (cm)</Td>
-                <Td isNumeric>30.48</Td>
-              </Tr>
-              <Tr>
-                <Td>yards</Td>
-                <Td>metres (m)</Td>
-                <Td isNumeric>0.91444</Td>
-              </Tr>
+              {groceryLists.map((list, index) => {
+                return (
+                  <Tr key={`list_${index}`}>
+                    <Td>inches</Td>
+                    <Td>millimetres (mm)</Td>
+                    <Td isNumeric>25.4</Td>)
+                  </Tr>
+                );
+              })}
             </Tbody>
             <Tfoot>
               <Tr>
-                <Th>To convert</Th>
-                <Th>into</Th>
-                <Th isNumeric>multiply by</Th>
+                <Th>Name</Th>
+                <Th>Ingredients</Th>
+                <Th isNumeric>Price</Th>
               </Tr>
             </Tfoot>
           </Table>
         </TableContainer>
-      </Container>
+      </Box>
     </>
   );
 };
 
-export default MyGroceries;
+export default GroceryLists;

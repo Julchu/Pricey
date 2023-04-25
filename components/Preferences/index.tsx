@@ -91,8 +91,10 @@ const Preferences: FC = () => {
           // render: props => CustomToast(props),
           containerStyle: { letterSpacing: '2px' },
         });
+
+      router.push('/');
     },
-    [authUser?.documentId, toast, updateUser],
+    [authUser?.documentId, router, toast, updateUser],
   );
 
   // Custom Radio Group buttons
