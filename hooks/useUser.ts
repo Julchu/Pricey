@@ -90,7 +90,6 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   // Be sure to pass user's documentId in userData
   const updateUser = useCallback<UseUserMethods['updateUser']>(async userData => {
     setUserLoading(true);
-    // if (authUser?.documentId != userId) return;
     const updatedInfo = filterNullableObject(userData);
 
     try {
