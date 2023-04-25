@@ -1,9 +1,9 @@
 import Head from 'next/head';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import EditList from '../../../../components/GroceryLists/newList';
-import Layout from '../../../../components/Layout';
-import { useAuth } from '../../../../hooks/useAuth';
+import EditList from '../../../components/GroceryLists/newList';
+import Layout from '../../../components/Layout';
+import { useAuth } from '../../../hooks/useAuth';
 
 // Shows initial empty grocery list form
 const GroceryListPage: NextPage = () => {

@@ -6,13 +6,11 @@ import GroceryLists from '../../components/GroceryLists';
 import { AuthUnauthorized } from '../../components/AuthGuards';
 
 /* Paths:
- * pricey.app/groceries (index): shows logged-in user's list of grocery lists
- * pricey.app/groceries/new (new): create new grocery list
- * pricey.app/groceries/<groceryListId> (index): fetches <groceryListId> list (if public)
- * pricey.app/groceries/<groceryListId>/edit (edit): fetches <groceryListId> list if logged-in user is groceryListCreator
+ * pricey.app/profile (index): shows logged-in user's list of grocery lists (same as pages/groceries/index)
+ * pricey.app/profile/<groceryListCreator> (index): fetches <groceryListCreator>'s list of grocery lists
  */
 // Shows initial empty grocery list form
-const GroceryCreatorPage: NextPage = () => {
+const ProfilePage: NextPage = () => {
   const { authUser } = useAuth();
 
   if (!authUser) return <AuthUnauthorized />;
@@ -31,4 +29,4 @@ const GroceryCreatorPage: NextPage = () => {
   );
 };
 
-export default GroceryCreatorPage;
+export default ProfilePage;
