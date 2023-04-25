@@ -1,23 +1,16 @@
-import { doc, DocumentReference, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, DocumentReference, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { db, GroceryList, Ingredient, Unit } from '../lib/firebase/interfaces';
-import {
-  priceCalculator,
-  filterNullableObject,
-  priceConverter,
-  unitConverter,
-} from '../lib/textFormatters';
+import { GroceryListFormData } from '../components/GroceryLists/newList';
+import { db, GroceryList } from '../lib/firebase/interfaces';
 import { useAuth } from './useAuth';
-import image from 'next/image';
-import { GroceryFormData } from '../components/GroceryLists';
 
 type GroceryListMethods = {
   submitGroceryList: (
-    groceryListData: GroceryFormData,
+    groceryListData: GroceryListFormData,
   ) => Promise<DocumentReference<GroceryList> | undefined>;
 
   updateGroceryList: (
-    groceryListData: GroceryFormData,
+    groceryListData: GroceryListFormData,
   ) => Promise<DocumentReference<GroceryList> | undefined>;
 };
 
@@ -27,38 +20,27 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
   const { authUser } = useAuth();
 
   const submitGroceryList = useCallback<GroceryListMethods['submitGroceryList']>(
-    async ({ name, ingredients, userId, viewable = false }) => {
-      if (authUser?.documentId != userId) return;
+    async ({ name, ingredients, viewable = false }) => {
+      if (!authUser) return;
       setLoading(true);
-
-      // const previewPrice = priceCalculator(price, measurement);
-
-      // const convertedUnit = unitConverter(unit, { mass: Unit.kilogram, volume: Unit.litre });
-      // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
-      //   mass: Unit.kilogram,
-      //   volume: Unit.litre,
-      // }).toFixed(2);
-
-      // const trimmedName = name.trim().toLocaleLowerCase('en-US');
 
       // Creating doc with auto-generated id
       const groceryListDocRef = doc(db.groceryListCollection);
 
       // Ensuring all fields are passed by typechecking Ingredient
-      // const newIngredient: Ingredient = {
-      //   name: trimmedName,
-      //   price: parseFloat(convertedPreviewPrice),
-      //   unit: convertedUnit,
-      //   userId: authUser.uid,
-      //   createdAt: serverTimestamp(),
-      //   image,
-      // };
+      const newList: GroceryList = {
+        name: name.trim(),
+        ingredients,
+        viewable,
+        userId: authUser.uid,
+        createdAt: serverTimestamp(),
+      };
 
       try {
         /* If you want to auto generate an ID, use addDoc() + collection()
          * If you want to manually set the ID, use setDoc() + doc()
          */
-        // await setDoc(groceryListDocRef, newIngredient);
+        await setDoc(groceryListDocRef, newList);
       } catch (e) {
         setError(e as Error);
       }
@@ -70,8 +52,8 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
   );
 
   const updateGroceryList = useCallback<GroceryListMethods['updateGroceryList']>(
-    async ({ groceryListId, name, ingredients, userId, viewable }) => {
-      if (authUser?.documentId != userId) return;
+    async ({ groceryListId, name, ingredients, viewable }) => {
+      if (!authUser) return;
       // const previewPrice = priceCalculator(price, measurement);
       // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
       //   mass: Unit.kilogram,
@@ -98,65 +80,10 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
 
       return groceryListDocRef;
     },
-    [],
+    [authUser?.documentId],
   );
 
   return [{ submitGroceryList, updateGroceryList }, loading, error];
 };
 
 export default useGroceryList;
-
-// Examples
-/* If you want to auto generate an ID, use addDoc() + collection()
- * If you want to manually set the ID, use setDoc() + doc()
- */
-
-/* Add: auto-generate doc and give it ID automatically
- * addDoc(collection requires odd-numbered path)
- * Ex: db, collection: <collectionName>; becomes collectionName/0tG4ooMGjsdiyMfbjP3x
- * Ex: db, collection: <collectionName>, <documentName>, <subCollectionName>; collectionName/0tG4ooMGjsdiyMfbjP3x/strawberry
- */
-
-/* const ingredientsCollectionRef = collection(db, 'ingredients').withConverter(ingredientsConverter);
-try {
-  const docRef = await addDoc(ingredientsCollectionRef, {
-    name,
-    price,
-    unit,
-    location,
-  });
-  console.log('Document written with ID: ', docRef.id);
-} catch (e) {
-  setError(e as Error);
-}
-
-return ingredientsCollectionRef; */
-
-/* Setting (adding): create or overwrite a single document with manually-named document IDs
- * setDoc(collection requires even-numbered path)
- * Ex: db, collection: <collectionName>, <documentName>
- */
-
-/* const ingredientDocumentRef = doc(db, 'ingredients').withConverter(ingredientsConverter);
-try {
-  await setDoc(ingredientDocumentRef, {
-    name: name.trim().toLocaleLowerCase('en-US'),
-    price,
-    unit,
-    location,
-  });
-} catch (e) {
-  setError(e as Error);
-}
-
-return ingredientDocumentRef;
-
-// Setting key as ingredient name, value as the ingredient's name
-await setDoc(
-  ingredientDocumentRef,
-  {
-    [`${trimmedName}`]: ingredientInfo,
-  },
-  { merge: true },
-);
-*/

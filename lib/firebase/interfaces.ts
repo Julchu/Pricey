@@ -61,7 +61,6 @@ export interface Ingredient {
   unit: Unit;
   image?: string;
   userId: string;
-  count?: number | FieldValue;
   season?: Season;
   createdAt?: Timestamp | FieldValue;
   lastUpdated?: Timestamp | FieldValue;
@@ -70,9 +69,9 @@ export interface Ingredient {
 // TODO: grocery list
 export interface GroceryList {
   name: string;
-  ingredients: Ingredient[];
-  userId: string;
+  ingredients: (Ingredient & { quantity: number; unit: Unit })[];
   viewable?: boolean;
+  userId: string;
   createdAt?: Timestamp | FieldValue;
 }
 
@@ -85,12 +84,17 @@ export interface User {
   location?: Address;
   createdAt?: Timestamp;
   role: Role;
-  // Preferences, like prefered units
+  /**
+   * @param: prefered units
+   * @param: dark/light mode
+   * @param: display name
+   * @param: publically viewable grocery list profile */
   preferences?: {
     units?: UnitCategory;
     colorMode?: Color;
     displayName?: string;
     dismissedTutorial?: boolean;
+    public?: boolean;
   };
 }
 

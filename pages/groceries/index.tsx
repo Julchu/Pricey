@@ -4,12 +4,13 @@ import Head from 'next/head';
 import { useAuth } from '../../hooks/useAuth';
 import Layout from '../../components/Layout';
 import GroceryLists from '../../components/GroceryLists';
+import { AuthUnauthorized } from '../../components/AuthGuards';
 
 // Shows initial empty grocery list form
 const GroceryCreatorPage: NextPage = () => {
   const { authUser } = useAuth();
 
-  if (!authUser?.documentId) return null;
+  if (!authUser) return <AuthUnauthorized />;
   return (
     <>
       <Head>

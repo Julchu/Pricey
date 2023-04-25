@@ -1,11 +1,9 @@
-//  editable grocery list
-import { Box } from '@chakra-ui/react';
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import NewList from '../../../components/GroceryLists/newList';
-import Layout from '../../../components/Layout';
-import { useAuth } from '../../../hooks/useAuth';
+import ViewList from '../../../../components/GroceryLists/newList';
+import Layout from '../../../../components/Layout';
+import { useAuth } from '../../../../hooks/useAuth';
 
 // Shows initial empty grocery list form
 const GroceryListPage: NextPage = () => {
@@ -22,7 +20,7 @@ const GroceryListPage: NextPage = () => {
       </Head>
 
       <Layout>
-        <NewList
+        <ViewList
           groceryListCreator={groceryListCreator as string}
           groceryListId={groceryListId as string}
         />

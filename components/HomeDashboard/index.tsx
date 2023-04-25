@@ -15,7 +15,6 @@ export type IngredientFormData = {
   quantity: number;
   unit: Unit;
   measurement: number;
-  submitter: string;
   location?: string;
   image?: string;
 };
@@ -39,7 +38,6 @@ const IngredientList: FC = () => {
       measurement: undefined,
       unit: undefined,
       quantity: undefined,
-      submitter: authUser?.uid,
     },
   });
 
@@ -89,50 +87,48 @@ const IngredientList: FC = () => {
     <form>
       {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
-        <>
-          <Flex flexDir={{ base: 'column', sm: 'row' }}>
-            <IngredientForm />
-          </Flex>
+        <Flex flexDir={{ base: 'column', sm: 'row' }}>
+          <IngredientForm />
+        </Flex>
 
-          {/* <Divider boxShadow={'focus'} /> */}
+        {/* <Divider boxShadow={'focus'} /> */}
 
-          <Grid
-            // px: 0px required for mobile when no ingredients found
-            p={{ base: '30px 0px', sm: '0px 30px' }}
-            mt={'20px'}
-            autoFlow={{ base: 'column', sm: 'row' }}
-            rowGap={'30px'}
-            columnGap={{ base: '100%', sm: '30px' }}
-            overflowX={{ base: 'scroll', sm: 'visible' }}
-            overflowY={{ base: 'hidden', sm: 'visible' }}
-            scrollSnapType={['x mandatory', 'none']}
-            templateColumns={{
-              base: 'repeat(auto-fill, minmax(150px, 1fr))',
-              sm: 'repeat(auto-fill, 250px)',
-            }}
-            justifyContent={{ sm: 'space-between' }}
-          >
-            {!foundIngredient ? (
-              <GridItem>
-                <NewIngredientCard />
+        <Grid
+          // px: 0px required for mobile when no ingredients found
+          p={{ base: '30px 0px', sm: '0px 30px' }}
+          mt={'header'}
+          autoFlow={{ base: 'column', sm: 'row' }}
+          rowGap={'30px'}
+          columnGap={{ base: '100%', sm: '30px' }}
+          overflowX={{ base: 'scroll', sm: 'visible' }}
+          overflowY={{ base: 'hidden', sm: 'visible' }}
+          scrollSnapType={['x mandatory', 'none']}
+          templateColumns={{
+            base: 'repeat(auto-fill, minmax(150px, 1fr))',
+            sm: 'repeat(auto-fill, 250px)',
+          }}
+          justifyContent={{ sm: 'space-between' }}
+        >
+          {!foundIngredient ? (
+            <GridItem>
+              <NewIngredientCard />
+            </GridItem>
+          ) : null}
+
+          {filteredResults?.map((item, index) => {
+            const highlighted = item.documentId === foundIngredient;
+
+            return (
+              <GridItem
+                ml={{ base: foundIngredient ? '30px' : '' }}
+                mr={{ base: index === filteredResults.length - 1 ? '30px' : '' }}
+                key={`${item.name}_${index}`}
+              >
+                <IngredientCard ingredientInfo={item} highlighted={highlighted} />
               </GridItem>
-            ) : null}
-
-            {filteredResults?.map((item, index) => {
-              const highlighted = item.documentId === foundIngredient;
-
-              return (
-                <GridItem
-                  ml={{ base: foundIngredient ? '30px' : '' }}
-                  mr={{ base: index === filteredResults.length - 1 ? '30px' : '' }}
-                  key={`${item.name}_${index}`}
-                >
-                  <IngredientCard ingredientInfo={item} highlighted={highlighted} />
-                </GridItem>
-              );
-            })}
-          </Grid>
-        </>
+            );
+          })}
+        </Grid>
       </FormProvider>
     </form>
   );

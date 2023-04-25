@@ -11,6 +11,7 @@ import {
 import { useCallback, useState } from 'react';
 import { db, User, Role, WithDocId, Unit } from '../lib/firebase/interfaces';
 import { filterNullableObject } from '../lib/textFormatters';
+import { useAuth } from './useAuth';
 
 type AuthData = {
   uid: string;
@@ -29,6 +30,7 @@ interface UseUserMethods {
 const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   const [error, setError] = useState<Error>();
   const [userLoading, setUserLoading] = useState<boolean>(false);
+  const { authUser } = useAuth();
 
   const getUser = useCallback<UseUserMethods['getUser']>(async docId => {
     setUserLoading(true);
@@ -88,12 +90,13 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   // Be sure to pass user's documentId in userData
   const updateUser = useCallback<UseUserMethods['updateUser']>(async userData => {
     setUserLoading(true);
-    const { documentId, ...rest } = filterNullableObject(userData);
+    // if (authUser?.documentId != userId) return;
+    const updatedInfo = filterNullableObject(userData);
 
     try {
       // Associate auth info to a specific user in db for public data:
-      const userDocRef = doc(db.userCollection, documentId as string);
-      await updateDoc(userDocRef, rest as Partial<User>);
+      const userDocRef = doc(db.userCollection, authUser?.documentId);
+      await updateDoc(userDocRef, updatedInfo);
       const updatedUser = await getDoc(userDocRef);
 
       if (updatedUser.exists()) {

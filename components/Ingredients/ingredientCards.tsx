@@ -74,7 +74,6 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
         quantity: getValues('quantity'),
         measurement: getValues('measurement'),
         unit: getValues('unit'),
-        submitter: getValues('submitter'),
       };
 
       await updateIngredient(currentIngredient);

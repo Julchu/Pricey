@@ -49,7 +49,6 @@ const Functions: FC = () => {
             quantity: 0,
             unit: '' as Unit,
             measurement: 0,
-            submitter: '',
           });
         }}
       >

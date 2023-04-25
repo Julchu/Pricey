@@ -35,7 +35,6 @@ import {
   UnitCategory,
   User,
   VolumeType,
-  WithDocId,
 } from '../../lib/firebase/interfaces';
 
 type PreferencesFormData = {
@@ -75,9 +74,7 @@ const Preferences: FC = () => {
 
   const onSubmitHandler = useCallback(
     async (preferenceData: PreferencesFormData) => {
-      await updateUser({ preferences: preferenceData, documentId: authUser?.documentId } as Partial<
-        WithDocId<User>
-      >);
+      await updateUser({ preferences: preferenceData } as Partial<User>);
 
       if (!toast.isActive('preferencesSaved'))
         toast({
@@ -94,7 +91,7 @@ const Preferences: FC = () => {
 
       router.push('/');
     },
-    [authUser?.documentId, router, toast, updateUser],
+    [router, toast, updateUser],
   );
 
   // Custom Radio Group buttons

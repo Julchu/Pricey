@@ -1,38 +1,24 @@
 import {
   TableContainer,
   Table,
-  TableCaption,
   Thead,
   Tr,
   Th,
   Tbody,
   Td,
-  Tfoot,
   Button,
   Box,
   Center,
-  Container,
   Flex,
   Heading,
-  Text,
   Spacer,
   HStack,
 } from '@chakra-ui/react';
 import { FC, useEffect, useState } from 'react';
 import NextLink from 'next/link';
 import { useAuth } from '../../hooks/useAuth';
-import { db, GroceryList, Ingredient, User, WithDocId } from '../../lib/firebase/interfaces';
-import { doc, documentId, limit, onSnapshot, or, query, where } from 'firebase/firestore';
-// import firebase from 'firebase/app'
-// import 'firebase/firestore'
-
-export type GroceryFormData = {
-  groceryListId?: string;
-  name: string;
-  ingredients: Ingredient[];
-  userId: string;
-  viewable?: boolean;
-};
+import { db, GroceryList, WithDocId } from '../../lib/firebase/interfaces';
+import { onSnapshot, query, where } from 'firebase/firestore';
 
 /**
  * @param groceryListCreator: URL parameter
@@ -59,9 +45,6 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
     });
   }, [authUser?.documentId, groceryListCreator]);
 
-  // Pre-make new list (but not save) with auto-generated document id
-  const newListDocRef = doc(db.groceryListCollection);
-
   return (
     <>
       <Flex flexDir={'column'}>
@@ -77,7 +60,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
           <Spacer />
 
           {authUser && !groceryListCreator ? (
-            <Button as={NextLink} href={`groceries/${authUser?.documentId}/${newListDocRef.id}`}>
+            <Button as={NextLink} href={`groceries/${authUser?.documentId}/new`}>
               New List
             </Button>
           ) : null}
@@ -102,14 +85,12 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                 );
               })}
             </Tbody>
-            <Tfoot>
-              <Tr>
-                <Th>Name</Th>
-                <Th>Ingredients</Th>
-                <Th isNumeric>Price</Th>
-              </Tr>
-            </Tfoot>
           </Table>
+          {groceryLists.length === 0 ? (
+            <Center my={'header'}>
+              <Heading>Create a new list</Heading>
+            </Center>
+          ) : null}
         </TableContainer>
       </Box>
     </>
