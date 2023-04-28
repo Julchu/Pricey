@@ -1,7 +1,7 @@
 import { doc, DocumentReference, serverTimestamp, setDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { GroceryListFormData } from '../components/GroceryLists/newList';
-import { db, GroceryList } from '../lib/firebase/interfaces';
+import { GroceryListFormData } from '../components/GroceryLists';
+import { db, GroceryList, Unit } from '../lib/firebase/interfaces';
 import { useAuth } from './useAuth';
 
 type GroceryListMethods = {
@@ -27,12 +27,22 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
       // Creating doc with auto-generated id
       const groceryListDocRef = doc(db.groceryListCollection);
 
+      // TODO: convert ingredients to Ingredient
+
+      /* 
+      { name: string; price?: number; amount?: number; unit?: Unit; quantity?:
+         */
+
       // Ensuring all fields are passed by typechecking Ingredient
       const newList: GroceryList = {
         name: name.trim(),
-        ingredients,
+        ingredients: ingredients.map(
+          ({ name: ingredientName, price = 1, amount, unit = Unit.item }) => {
+            return { name: ingredientName, price, amount, unit, userId: authUser.documentId };
+          },
+        ),
         viewable,
-        userId: authUser.uid,
+        userId: authUser.documentId,
         createdAt: serverTimestamp(),
       };
 

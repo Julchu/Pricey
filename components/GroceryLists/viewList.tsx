@@ -1,8 +1,8 @@
 import { Flex, Box, Center, Heading } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
+import { GroceryListFormData } from '.';
 import useGroceryList from '../../hooks/useGroceries';
-import { GroceryListFormData } from './newList';
 
 const ViewList: FC<{ groceryListCreator: string; groceryListId: string }> = ({
   groceryListCreator,

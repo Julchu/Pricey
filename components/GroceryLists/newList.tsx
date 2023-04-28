@@ -1,38 +1,55 @@
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import { Flex, Box, Input, Button, HStack, Select, Spacer, IconButton } from '@chakra-ui/react';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { GroceryListFormData } from '.';
+import { useAuth } from '../../hooks/useAuth';
 import useGroceryList from '../../hooks/useGroceries';
-import { Ingredient, Unit } from '../../lib/firebase/interfaces';
-
-export type GroceryListFormData = {
-  groceryListId?: string;
-  name: string;
-  ingredients: (Ingredient & { quantity: number; unit: Unit })[];
-  viewable?: boolean;
-};
+import { Unit } from '../../lib/firebase/interfaces';
+import { validateIsNumber } from '../../lib/textFormatters';
 
 const NewList: FC<{ groceryListCreator: string; groceryListId: string }> = ({
   groceryListCreator,
   groceryListId,
 }) => {
   // TODO: query for user-chosen grocery list name as groceryListId
-
+  const { authUser } = useAuth();
   const [{ submitGroceryList }, loading] = useGroceryList();
 
-  const { register, control, watch, handleSubmit } = useForm<GroceryListFormData>({
+  const {
+    register,
+    control,
+    watch,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GroceryListFormData>({
     defaultValues: {
       name: '',
-      ingredients: [{ name: '', price: undefined, unit: undefined }],
+      ingredients: [
+        { name: '', price: undefined, quantity: undefined, amount: undefined, unit: undefined },
+      ],
       viewable: false,
     },
   });
 
   const selectedUnit = watch(`ingredients`);
 
-  const { fields, append, remove } = useFieldArray({ name: 'ingredients', control });
+  const {
+    fields: fieldsIngredient,
+    append: appendIngredient,
+    remove: removeIngredient,
+  } = useFieldArray({
+    name: 'ingredients',
+    control,
+  });
 
-  const onSubmitHandler = useCallback(() => {}, []);
+  const onSubmitHandler = useCallback(
+    async (groceryListData: GroceryListFormData) => {
+      if (!errors) await submitGroceryList(groceryListData);
+      else console.log(errors);
+    },
+    [errors, submitGroceryList],
+  );
 
   return (
     <form>
@@ -43,19 +60,43 @@ const NewList: FC<{ groceryListCreator: string; groceryListId: string }> = ({
       </Flex>
 
       <Box p={{ base: '30px 0px', sm: '0px 30px' }} mt={'header'}>
-        {fields.map((field, index) => (
+        {fieldsIngredient.map((field, index) => (
           <HStack key={field.id} my={'header'}>
             <Input
-              placeholder={'Ingredient price'}
-              {...register(`ingredients.${index}.price`, { required: true })}
+              placeholder={'Ingredient name'}
+              isInvalid={errors.ingredients?.[index]?.name?.type === 'required'}
+              {...register(`ingredients.${index}.name`, { required: true })}
             />
-            <Input placeholder={'Quantity'} />
-            <Select
-              {...register(`ingredients.${index}.unit`, {
-                required: true,
+
+            <Input
+              type={'number'}
+              isInvalid={errors.ingredients?.[index]?.price?.type === 'validate'}
+              placeholder={'Ingredient price'}
+              {...register(`ingredients.${index}.price`, {
+                valueAsNumber: true,
+                min: 0,
+                validate: price => {
+                  if (price) return validateIsNumber(price);
+                },
               })}
+            />
+
+            <Input
+              type={'number'}
+              isInvalid={errors.ingredients?.[index]?.amount?.type === 'validate'}
+              placeholder={'Amount'}
+              {...register(`ingredients.${index}.amount`, {
+                valueAsNumber: true,
+                min: 1,
+                validate: price => {
+                  if (price) return validateIsNumber(price);
+                },
+              })}
+            />
+
+            <Select
+              {...register(`ingredients.${index}.unit`, {})}
               color={selectedUnit[index].unit ? 'black' : 'grey'}
-              // isInvalid={errors.unit?.type === 'required'}
               placeholder={'Unit*'}
             >
               {Object.values(Unit).map((unit, index) => {
@@ -67,18 +108,35 @@ const NewList: FC<{ groceryListCreator: string; groceryListId: string }> = ({
               })}
             </Select>
 
+            <Input
+              type={'number'}
+              isInvalid={errors.ingredients?.[index]?.quantity?.type === 'validate'}
+              placeholder={'Quantity'}
+              {...register(`ingredients.${index}.quantity`, {
+                valueAsNumber: true,
+                min: 1,
+                validate: price => {
+                  if (price) return validateIsNumber(price);
+                },
+              })}
+            />
+
             <IconButton
               aria-label="Remove ingredient"
               icon={<DeleteIcon />}
-              onClick={() => remove(index)}
+              onClick={() => removeIngredient(index)}
             />
           </HStack>
         ))}
         <HStack>
-          <IconButton aria-label="Add ingredient" icon={<AddIcon />} onClick={() => append({})} />
+          <IconButton
+            aria-label="Add ingredient"
+            icon={<AddIcon />}
+            onClick={() => appendIngredient({})}
+          />
 
           <Spacer />
-          <Button onClick={() => handleSubmit(onSubmitHandler)}>Save list</Button>
+          <Button onClick={handleSubmit(onSubmitHandler)}>Save list</Button>
         </HStack>
       </Box>
     </form>

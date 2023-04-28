@@ -2,6 +2,7 @@ import { Grid, Input, Select } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Unit } from '../../lib/firebase/interfaces';
+import { validateIsNumber } from '../../lib/textFormatters';
 import { IngredientFormData } from '../HomeDashboard';
 
 // TODO: after submitting an ingredient, reset search to empty
@@ -13,10 +14,6 @@ const IngredientForm: FC = () => {
   } = useFormContext<IngredientFormData>();
 
   const selectedUnit = useWatch({ control, name: 'unit' });
-
-  const validateIsNumber = (value: number): boolean => {
-    return !!value;
-  };
 
   return (
     <Grid
@@ -86,7 +83,6 @@ const IngredientForm: FC = () => {
         type={'number'}
         {...register('quantity', {
           valueAsNumber: true,
-          required: false,
           min: 1,
           validate: quantity => {
             if (quantity) return validateIsNumber(quantity);

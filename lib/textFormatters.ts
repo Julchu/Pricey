@@ -69,3 +69,7 @@ export const percentageFormatter = new Intl.NumberFormat(undefined, {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
 });
+
+export const validateIsNumber = (value: number): boolean => {
+  return !!value;
+};

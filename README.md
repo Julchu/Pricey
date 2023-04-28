@@ -1,7 +1,5 @@
 # Pricey
 
-> https://thepriceyapp.web.app/functions
-
 Tracking personal price thresholds and lowest price of items we purchase on a recurring basis.
 
 Convert prices per unit when grocery stores purposefully hide them or markup and discount them while hiding their actual prices per unit

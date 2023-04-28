@@ -13,7 +13,7 @@ import {
 import { firestore } from './index';
 import { CollectionReference } from '@firebase/firestore';
 
-export type WithDocId<T> = { documentId?: string } & T;
+export type WithDocId<T> = { documentId: string } & T;
 
 export enum Unit {
   // Mass
@@ -60,16 +60,18 @@ export interface Ingredient {
   price: number;
   unit: Unit;
   image?: string;
+  /** @param amount and @param quantity used for @interfaceGroceryList */
+  amount?: number;
+  quantity?: number;
   userId: string;
   season?: Season;
   createdAt?: Timestamp | FieldValue;
   lastUpdated?: Timestamp | FieldValue;
 }
 
-// TODO: grocery list
 export interface GroceryList {
   name: string;
-  ingredients: (Ingredient & { quantity: number; unit: Unit })[];
+  ingredients: Ingredient[];
   viewable?: boolean;
   userId: string;
   createdAt?: Timestamp | FieldValue;
