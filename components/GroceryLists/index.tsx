@@ -17,6 +17,8 @@ import {
   IconButton,
   HStack,
   useMediaQuery,
+  Select,
+  Spacer,
 } from '@chakra-ui/react';
 
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
@@ -126,226 +128,256 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
 
   return (
     <form>
-      {/* Header inputs */}
-      <Flex
-        flexDir={{ base: 'column', sm: 'row' }}
-        // display={{
-        //   base: expandedIndex.length && expandedIndex[0] > -1 ? 'none' : 'flex',
-        //   sm: 'flex',
-        // }}
-      >
-        <Grid
-          m={{ base: '0px 30px', sm: '20px 0px' }}
-          templateColumns={{ base: 'repeat(2, 1fr)', sm: 'repeat(6, 1fr)' }}
-          rowGap={{ base: '20px' }}
-          columnGap={{ base: '20px', sm: '30px' }}
+      <FormProvider {...methods}>
+        {/* Header inputs */}
+        <Flex
+          flexDir={{ base: 'column', sm: 'row' }}
+          // display={{
+          //   base: expandedIndex.length && expandedIndex[0] > -1 ? 'none' : 'flex',
+          //   sm: 'flex',
+          // }}
         >
-          <Input
-            gridColumn={{ base: '1/3', sm: '1/3' }}
-            placeholder={'Grocery list name'}
-            {...register('name', { required: true })}
-          />
+          <Grid
+            m={{ base: '0px 30px', sm: '20px 0px' }}
+            templateColumns={{ base: 'repeat(2, 1fr)', sm: 'repeat(6, 1fr)' }}
+            rowGap={{ base: '20px' }}
+            columnGap={{ base: '20px', sm: '30px' }}
+          >
+            <Input
+              isInvalid={errors.name?.type === 'required'}
+              gridColumn={{ base: '1/3', sm: '1/3' }}
+              placeholder={'Grocery list name'}
+              {...register('name', { required: true })}
+            />
 
-          <Input
-            placeholder={'Grocery'}
-            onChange={e => updateIngredient(0, { name: e.target.value })}
-          />
-          <Input
-            placeholder={'Grocery'}
-            onChange={e => updateIngredient(1, { name: e.target.value })}
-          />
-          <Input
-            placeholder={'Grocery'}
-            onChange={e => updateIngredient(2, { name: e.target.value })}
-          />
-          <Input
-            placeholder={'Grocery'}
-            onChange={e => updateIngredient(3, { name: e.target.value })}
-          />
-        </Grid>
-      </Flex>
+            <Input
+              placeholder={'Grocery'}
+              onChange={e => updateIngredient(0, { name: e.target.value })}
+            />
+            <Input
+              placeholder={'Grocery'}
+              onChange={e => updateIngredient(1, { name: e.target.value })}
+            />
+            <Input
+              placeholder={'Grocery'}
+              onChange={e => updateIngredient(2, { name: e.target.value })}
+            />
+            <Input
+              placeholder={'Grocery'}
+              onChange={e => updateIngredient(3, { name: e.target.value })}
+            />
+          </Grid>
+        </Flex>
 
-      {/* "Table" */}
-      <Flex p={{ base: '30px 0px', sm: '0px 30px' }} mt={'header'} flexDir={'column'}>
-        {/* "Table" Header */}
-        <Grid
-          templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
-          w="100%"
-          p="12px 16px"
-          columnGap={'20px'}
-          textTransform={'uppercase'}
-        >
-          <Text as={'b'} textTransform={'uppercase'} textAlign={'start'}>
-            Name
-          </Text>
-          <Text as={'b'} textTransform={'uppercase'} textAlign={'start'}>
-            Ingredients
-          </Text>
-          <Text as={'b'} textTransform={'uppercase'} textAlign={'end'}>
-            Price
-          </Text>
-        </Grid>
-        <Accordion index={expandedIndex}>
-          {filteredResults.map((list, index) => {
-            return (
-              <AccordionItem key={`list_${index}`}>
-                <AccordionButton
-                  onClick={() => {
-                    setExpandedIndex(previousArray => {
-                      if (previousArray.length && previousArray[0] === index) return [];
-                      else return [index];
-                    });
-                  }}
-                >
-                  <Grid
-                    templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
-                    w="100%"
-                    // p="12px 0px"
-                    textAlign={'start'}
-                    columnGap={'20px'}
+        {/* "Table" */}
+        <Flex p={{ base: '30px 0px', sm: '0px 30px' }} mt={'header'} flexDir={'column'}>
+          {/* "Table" Header */}
+          <Grid
+            templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
+            w="100%"
+            p="12px 16px"
+            columnGap={'20px'}
+            textTransform={'uppercase'}
+          >
+            <Text as={'b'} textTransform={'uppercase'} textAlign={'start'}>
+              Name
+            </Text>
+            <Text as={'b'} textTransform={'uppercase'} textAlign={'start'}>
+              Ingredients
+            </Text>
+            <Text as={'b'} textTransform={'uppercase'} textAlign={'end'}>
+              Price
+            </Text>
+          </Grid>
+          <Accordion index={expandedIndex}>
+            {filteredResults.map((list, index) => {
+              return (
+                <AccordionItem key={`list_${index}`}>
+                  <AccordionButton
+                    onClick={() => {
+                      setExpandedIndex(previousArray => {
+                        if (previousArray.length && previousArray[0] === index) return [];
+                        else return [index];
+                      });
+                    }}
                   >
-                    <Text>{list.name}</Text>
+                    <Grid
+                      templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
+                      w="100%"
+                      // p="12px 0px"
+                      textAlign={'start'}
+                      columnGap={'20px'}
+                    >
+                      <Text>{list.name}</Text>
 
-                    <Flex flexWrap={'wrap'} gap={'10px'}>
-                      {list.ingredients.map((ingredient, index) => {
-                        return (
-                          <Box key={`ingredient_${index}`}>
-                            <Badge>{ingredient.name}</Badge>
-                          </Box>
-                        );
-                      })}
-                    </Flex>
+                      <Flex flexWrap={'wrap'} gap={'10px'}>
+                        {list.ingredients.map((ingredient, index) => {
+                          return (
+                            <Box key={`ingredient_${index}`}>
+                              <Badge>{ingredient.name}</Badge>
+                            </Box>
+                          );
+                        })}
+                      </Flex>
 
-                    <Text textAlign={'end'}>$24</Text>
-                    <GridItem textAlign={'center'}>
-                      <AccordionIcon />
-                    </GridItem>
-                  </Grid>
-                </AccordionButton>
+                      <Text textAlign={'end'}>$24</Text>
+                      <GridItem textAlign={'center'}>
+                        <AccordionIcon />
+                      </GridItem>
+                    </Grid>
+                  </AccordionButton>
 
-                <AccordionPanel
-                  pos={{ base: expandedIndex.length ? 'absolute' : 'unset', sm: 'unset' }}
-                  top={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
-                  right={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
-                  h={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
-                  w={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
-                  zIndex={99}
-                >
-                  <Grid templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}>
-                    <GridItem />
-                    <GridItem>
-                      {list.ingredients.map(({ name, amount, unit, quantity, price }, index) => {
-                        return (
-                          <Grid
-                            templateColumns={'1fr 1fr 1fr 1fr 1fr'}
-                            columnGap={'20px'}
-                            key={`expandedIngredient_${index}`}
-                          >
-                            {name ? <Button>{name}</Button> : <Box />}
-                            {amount ? <Button>{amount}</Button> : <Box />}
-                            {unit ? <Button>{unit}</Button> : <Box />}
-                            {quantity ? <Button>{quantity}</Button> : <Box />}
-                            {price ? <Button>{price}</Button> : <Box />}
-                          </Grid>
-                        );
-                      })}
-                    </GridItem>
-                  </Grid>
-                </AccordionPanel>
-              </AccordionItem>
-            );
-          })}
+                  <AccordionPanel
+                    pos={{ base: expandedIndex.length ? 'absolute' : 'unset', sm: 'unset' }}
+                    top={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
+                    right={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
+                    h={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
+                    w={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
+                    zIndex={99}
+                  >
+                    <Grid templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}>
+                      <GridItem />
+                      <GridItem>
+                        {list.ingredients.map(({ name, amount, unit, quantity, price }, index) => {
+                          return (
+                            <Grid
+                              templateColumns={'1fr 1fr 1fr 1fr 1fr'}
+                              columnGap={'20px'}
+                              key={`expandedIngredient_${index}`}
+                            >
+                              {name ? <Button>{name}</Button> : <Box />}
+                              {amount ? <Button>{amount}</Button> : <Box />}
+                              {unit ? <Button>{unit}</Button> : <Box />}
+                              {quantity ? <Button>{quantity}</Button> : <Box />}
+                              {price ? <Button>{price}</Button> : <Box />}
+                            </Grid>
+                          );
+                        })}
+                      </GridItem>
+                    </Grid>
+                  </AccordionPanel>
+                </AccordionItem>
+              );
+            })}
 
-          {/* Start new list */}
-          <AccordionItem>
-            <AccordionButton
-              as={Box}
-              cursor={'pointer'}
-              onClick={() => {
-                setExpandedIndex(previousArray => {
-                  if (previousArray.length && previousArray[0] === filteredResults.length)
-                    return [];
-                  else return [filteredResults.length];
-                });
-              }}
-            >
-              <Grid
-                templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
-                w="100%"
-                p="12px 0px"
-                textAlign={'start'}
-                columnGap={'20px'}
+            {/* Start new list */}
+            <AccordionItem>
+              <AccordionButton
+                py={0}
+                as={Box}
+                cursor={'pointer'}
+                onClick={() => {
+                  setExpandedIndex(previousArray => {
+                    if (previousArray.length && previousArray[0] === filteredResults.length)
+                      return [];
+                    else return [filteredResults.length];
+                  });
+                }}
               >
-                {authUser && !groceryListCreator ? (
-                  <Button
-                    onClick={handleSubmit(onSubmitHandler)}
-                    whiteSpace={'normal'}
-                    wordBreak={'break-word'}
-                    h={'fit-content'}
-                    /**
-                     * @default minHeight: 10
-                     * @default paddingY: 2
-                     */
-                    minHeight={10}
-                    paddingY={2}
-                  >
-                    <Text>Save {newListName ? newListName : ' new list'}</Text>
-                  </Button>
-                ) : null}
-                <Flex flexWrap={'wrap'} gap={'10px'} alignItems={'center'}>
-                  {ingredients.map((field, index) => (
-                    <Box key={`ingredient_${index}`}>
-                      <Badge>{field.name}</Badge>
-                    </Box>
-                  ))}
-                </Flex>
-                <GridItem />
-                <GridItem textAlign={'center'}>
-                  <AccordionIcon />
-                </GridItem>
-              </Grid>
-            </AccordionButton>
-
-            <AccordionPanel>
-              {fieldsIngredient.map((field, index) => (
                 <Grid
-                  key={field.id}
-                  templateColumns={'1fr 1fr 1fr 1fr 1fr 0.1fr'}
+                  templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
                   w="100%"
-                  pb="12px"
+                  p="12px 0px"
                   textAlign={'start'}
                   columnGap={'20px'}
                 >
-                  <Input {...register(`ingredients.${index}.name`)} />
-                  <Input {...register(`ingredients.${index}.price`)} />
-                  <Input {...register(`ingredients.${index}.amount`)} />
-                  <Input {...register(`ingredients.${index}.unit`)} />
-                  <Input {...register(`ingredients.${index}.quantity`)} />
-                  <IconButton
-                    aria-label="Remove ingredient"
-                    icon={<DeleteIcon />}
-                    onClick={() => removeIngredient(index)}
-                  />
+                  {authUser && !groceryListCreator ? (
+                    <Button
+                      onClick={handleSubmit(onSubmitHandler)}
+                      whiteSpace={'normal'}
+                      wordBreak={'break-word'}
+                      h={'fit-content'}
+                      /**
+                       * @default minHeight: 10
+                       * @default paddingY: 2
+                       */
+                      minHeight={10}
+                      paddingY={2}
+                    >
+                      <Text>Save {newListName ? newListName : ' new list'}</Text>
+                    </Button>
+                  ) : null}
+                  <Flex flexWrap={'wrap'} gap={'10px'} alignItems={'center'}>
+                    {ingredients.map((field, index) => (
+                      <Box key={`ingredient_${index}`}>
+                        <Badge>{field.name}</Badge>
+                      </Box>
+                    ))}
+                  </Flex>
+                  <GridItem />
+                  <GridItem textAlign={'center'}>
+                    <AccordionIcon />
+                  </GridItem>
                 </Grid>
-              ))}
+              </AccordionButton>
 
-              <IconButton
-                aria-label="Add ingredient"
-                icon={<AddIcon />}
-                onClick={() => appendIngredient({})}
-              />
+              <AccordionPanel>
+                {fieldsIngredient.map((field, index) => (
+                  <Grid
+                    templateColumns={'1.5fr 5.5fr 0.3fr'}
+                    key={field.id}
+                    p="12px 0px"
+                    columnGap={'20px'}
+                  >
+                    <Input {...register(`ingredients.${index}.name`)} />
 
-              {/* <IngredientForm /> */}
-            </AccordionPanel>
-          </AccordionItem>
-        </Accordion>
+                    <Grid
+                      templateColumns={'1fr 1fr 1fr 1fr'}
+                      w="100%"
+                      textAlign={'start'}
+                      columnGap={'20px'}
+                    >
+                      <Input {...register(`ingredients.${index}.price`)} placeholder={'Price'} />
+                      <Input {...register(`ingredients.${index}.amount`)} placeholder={'Amount'} />
 
-        {groceryLists.length === 0 ? (
-          <Center my={'header'}>
-            <Heading>Create a new list</Heading>
-          </Center>
-        ) : null}
-      </Flex>
+                      <Select
+                        {...register(`ingredients.${index}.unit`)}
+                        color={ingredients[index].unit ? 'black' : 'grey'}
+                        isInvalid={errors.ingredients?.[index]?.unit?.type === 'required'}
+                        placeholder={'Unit*'}
+                      >
+                        {Object.values(Unit).map((unit, index) => {
+                          return (
+                            <option key={`${unit}_${index}`} value={unit}>
+                              {unit}
+                            </option>
+                          );
+                        })}
+                      </Select>
+
+                      <Input
+                        {...register(`ingredients.${index}.quantity`)}
+                        placeholder={'Quantity'}
+                      />
+                    </Grid>
+
+                    <IconButton
+                      aria-label="Remove ingredient"
+                      icon={<DeleteIcon />}
+                      onClick={() => removeIngredient(index)}
+                    />
+                  </Grid>
+                ))}
+
+                <HStack>
+                  <Spacer />
+                  <IconButton
+                    aria-label="Add ingredient"
+                    icon={<AddIcon />}
+                    onClick={() => appendIngredient({})}
+                  />
+                </HStack>
+              </AccordionPanel>
+            </AccordionItem>
+          </Accordion>
+
+          {groceryLists.length === 0 ? (
+            <Center my={'header'}>
+              <Heading>Create a new list</Heading>
+            </Center>
+          ) : null}
+        </Flex>
+      </FormProvider>
     </form>
   );
 };
