@@ -184,19 +184,18 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
             Price
           </Text>
         </Grid>
-        <Accordion allowToggle index={expandedIndex}>
+        <Accordion index={expandedIndex}>
           {filteredResults.map((list, index) => {
             return (
-              <AccordionItem
-                key={`list_${index}`}
-                onClick={() => {
-                  setExpandedIndex(previousArray => {
-                    if (previousArray.length && previousArray[0] === index) return [];
-                    else return [index];
-                  });
-                }}
-              >
-                <AccordionButton>
+              <AccordionItem key={`list_${index}`}>
+                <AccordionButton
+                  onClick={() => {
+                    setExpandedIndex(previousArray => {
+                      if (previousArray.length && previousArray[0] === index) return [];
+                      else return [index];
+                    });
+                  }}
+                >
                   <Grid
                     templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
                     w="100%"
@@ -257,15 +256,18 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
           })}
 
           {/* Start new list */}
-          <AccordionItem
-            onClick={() => {
-              setExpandedIndex(previousArray => {
-                if (previousArray.length && previousArray[0] === filteredResults.length) return [];
-                else return [filteredResults.length];
-              });
-            }}
-          >
-            <AccordionButton as={Box} cursor={'pointer'}>
+          <AccordionItem>
+            <AccordionButton
+              as={Box}
+              cursor={'pointer'}
+              onClick={() => {
+                setExpandedIndex(previousArray => {
+                  if (previousArray.length && previousArray[0] === filteredResults.length)
+                    return [];
+                  else return [filteredResults.length];
+                });
+              }}
+            >
               <Grid
                 templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
                 w="100%"
