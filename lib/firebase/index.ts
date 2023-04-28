@@ -59,8 +59,8 @@ try {
     // connectFirestoreEmulator(firestore, '10.88.111.5', 8080);
     // connectAuthEmulator(authentication, 'http://10.88.111.5:9099', { disableWarnings: true });
 
-    // connectFirestoreEmulator(firestore, 'localhost', 8080);
-    // connectAuthEmulator(authentication, 'http://localhost:9099', { disableWarnings: true });
+    connectFirestoreEmulator(firestore, 'localhost', 8080);
+    connectAuthEmulator(authentication, 'http://localhost:9099', { disableWarnings: true });
   }
 } catch (e) {
   console.log(e);

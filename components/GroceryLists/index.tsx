@@ -69,6 +69,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
     fields: fieldsIngredient,
     append: appendIngredient,
     remove: removeIngredient,
+    update: updateIngredient,
   } = useFieldArray({
     name: 'ingredients',
     control,
@@ -147,19 +148,19 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
 
           <Input
             placeholder={'Grocery'}
-            onChange={e => setValue(`ingredients.${0}.name`, e.target.value)}
+            onChange={e => updateIngredient(0, { name: e.target.value })}
           />
           <Input
             placeholder={'Grocery'}
-            onChange={e => setValue(`ingredients.${1}.name`, e.target.value)}
+            onChange={e => updateIngredient(1, { name: e.target.value })}
           />
           <Input
             placeholder={'Grocery'}
-            onChange={e => setValue(`ingredients.${2}.name`, e.target.value)}
+            onChange={e => updateIngredient(2, { name: e.target.value })}
           />
           <Input
             placeholder={'Grocery'}
-            onChange={e => setValue(`ingredients.${3}.name`, e.target.value)}
+            onChange={e => updateIngredient(3, { name: e.target.value })}
           />
         </Grid>
       </Flex>
@@ -306,36 +307,35 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
             </AccordionButton>
 
             <AccordionPanel>
-              <Grid
-                templateColumns={'0.5fr 5fr 0.1fr'}
-                w="100%"
-                p="12px 0px"
-                textAlign={'start'}
-                columnGap={'20px'}
-              >
-                <GridItem />
-
-                <Box>
-                  {fieldsIngredient.map((field, index) => (
-                    <Flex key={field.id} flexDir={'row'}>
-                      <Input {...register(`ingredients.${index}.name`)} />
-                      <IconButton
-                        aria-label="Remove ingredient"
-                        icon={<DeleteIcon />}
-                        onClick={() => removeIngredient(index)}
-                      />
-                    </Flex>
-                  ))}
-
+              {fieldsIngredient.map((field, index) => (
+                <Grid
+                  key={field.id}
+                  templateColumns={'1fr 1fr 1fr 1fr 1fr 0.1fr'}
+                  w="100%"
+                  pb="12px"
+                  textAlign={'start'}
+                  columnGap={'20px'}
+                >
+                  <Input {...register(`ingredients.${index}.name`)} />
+                  <Input {...register(`ingredients.${index}.price`)} />
+                  <Input {...register(`ingredients.${index}.amount`)} />
+                  <Input {...register(`ingredients.${index}.unit`)} />
+                  <Input {...register(`ingredients.${index}.quantity`)} />
                   <IconButton
-                    aria-label="Add ingredient"
-                    icon={<AddIcon />}
-                    onClick={() => appendIngredient({})}
+                    aria-label="Remove ingredient"
+                    icon={<DeleteIcon />}
+                    onClick={() => removeIngredient(index)}
                   />
+                </Grid>
+              ))}
 
-                  {/* <IngredientForm /> */}
-                </Box>
-              </Grid>
+              <IconButton
+                aria-label="Add ingredient"
+                icon={<AddIcon />}
+                onClick={() => appendIngredient({})}
+              />
+
+              {/* <IngredientForm /> */}
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
