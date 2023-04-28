@@ -189,6 +189,8 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
               Price
             </Text>
           </Grid>
+
+          {/* "Table" content */}
           <Accordion index={expandedIndex}>
             {filteredResults.map((list, index) => {
               return (
@@ -261,27 +263,27 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
             })}
 
             {/* Start new list */}
-            <AccordionItem>
-              <AccordionButton
-                py={0}
-                as={Box}
-                cursor={'pointer'}
-                onClick={() => {
-                  setExpandedIndex(previousArray => {
-                    if (previousArray.length && previousArray[0] === filteredResults.length)
-                      return [];
-                    else return [filteredResults.length];
-                  });
-                }}
-              >
-                <Grid
-                  templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
-                  w="100%"
-                  p="12px 0px"
-                  textAlign={'start'}
-                  columnGap={'20px'}
+            {authUser && !groceryListCreator ? (
+              <AccordionItem>
+                <AccordionButton
+                  py={0}
+                  as={Box}
+                  cursor={'pointer'}
+                  onClick={() => {
+                    setExpandedIndex(previousArray => {
+                      if (previousArray.length && previousArray[0] === filteredResults.length)
+                        return [];
+                      else return [filteredResults.length];
+                    });
+                  }}
                 >
-                  {authUser && !groceryListCreator ? (
+                  <Grid
+                    templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
+                    w="100%"
+                    p="12px 0px"
+                    textAlign={'start'}
+                    columnGap={'20px'}
+                  >
                     <Button
                       onClick={handleSubmit(onSubmitHandler)}
                       whiteSpace={'normal'}
@@ -296,79 +298,85 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                     >
                       <Text>Save {newListName ? newListName : ' new list'}</Text>
                     </Button>
-                  ) : null}
-                  <Flex flexWrap={'wrap'} gap={'10px'} alignItems={'center'}>
-                    {ingredients.map((field, index) => (
-                      <Box key={`ingredient_${index}`}>
-                        <Badge>{field.name}</Badge>
-                      </Box>
-                    ))}
-                  </Flex>
-                  <GridItem />
-                  <GridItem textAlign={'center'}>
-                    <AccordionIcon />
-                  </GridItem>
-                </Grid>
-              </AccordionButton>
 
-              <AccordionPanel>
-                {fieldsIngredient.map((field, index) => (
-                  <Grid
-                    templateColumns={'1.5fr 5.5fr 0.3fr'}
-                    key={field.id}
-                    p="12px 0px"
-                    columnGap={'20px'}
-                  >
-                    <Input {...register(`ingredients.${index}.name`)} />
+                    <Flex flexWrap={'wrap'} gap={'10px'} alignItems={'center'}>
+                      {ingredients.map((field, index) => (
+                        <Box key={`ingredient_${index}`}>
+                          <Badge>{field.name}</Badge>
+                        </Box>
+                      ))}
+                    </Flex>
+                    <GridItem />
+                    <GridItem textAlign={'center'}>
+                      <AccordionIcon />
+                    </GridItem>
+                  </Grid>
+                </AccordionButton>
 
+                {/* 1.5 5 0.5 0.3 */}
+                {/* 1.5 5.5 0.3 */}
+                <AccordionPanel>
+                  {fieldsIngredient.map((field, index) => (
                     <Grid
-                      templateColumns={'1fr 1fr 1fr 1fr'}
-                      w="100%"
-                      textAlign={'start'}
+                      templateColumns={'1.5fr 5.5fr 0.3fr'}
+                      key={field.id}
+                      p="12px 0px"
                       columnGap={'20px'}
                     >
-                      <Input {...register(`ingredients.${index}.price`)} placeholder={'Price'} />
-                      <Input {...register(`ingredients.${index}.amount`)} placeholder={'Amount'} />
+                      <Input {...register(`ingredients.${index}.name`)} />
 
-                      <Select
-                        {...register(`ingredients.${index}.unit`)}
-                        color={ingredients[index].unit ? 'black' : 'grey'}
-                        isInvalid={errors.ingredients?.[index]?.unit?.type === 'required'}
-                        placeholder={'Unit*'}
+                      <Grid
+                        templateColumns={'1fr 1fr 1fr 1fr'}
+                        w="100%"
+                        textAlign={'start'}
+                        columnGap={'20px'}
                       >
-                        {Object.values(Unit).map((unit, index) => {
-                          return (
-                            <option key={`${unit}_${index}`} value={unit}>
-                              {unit}
-                            </option>
-                          );
-                        })}
-                      </Select>
+                        <Input {...register(`ingredients.${index}.price`)} placeholder={'Price'} />
+                        <Input
+                          {...register(`ingredients.${index}.amount`)}
+                          placeholder={'Amount'}
+                        />
 
-                      <Input
-                        {...register(`ingredients.${index}.quantity`)}
-                        placeholder={'Quantity'}
+                        <Select
+                          {...register(`ingredients.${index}.unit`)}
+                          color={ingredients[index].unit ? 'black' : 'grey'}
+                          isInvalid={errors.ingredients?.[index]?.unit?.type === 'required'}
+                          placeholder={'Unit*'}
+                        >
+                          {Object.values(Unit).map((unit, index) => {
+                            return (
+                              <option key={`${unit}_${index}`} value={unit}>
+                                {unit}
+                              </option>
+                            );
+                          })}
+                        </Select>
+
+                        <Input
+                          {...register(`ingredients.${index}.quantity`)}
+                          placeholder={'Quantity'}
+                        />
+                      </Grid>
+
+                      <IconButton
+                        aria-label="Remove ingredient"
+                        icon={<DeleteIcon />}
+                        onClick={() => removeIngredient(index)}
                       />
                     </Grid>
+                  ))}
 
+                  <HStack>
+                    <Spacer />
                     <IconButton
-                      aria-label="Remove ingredient"
-                      icon={<DeleteIcon />}
-                      onClick={() => removeIngredient(index)}
+                      aria-label="Add ingredient"
+                      icon={<AddIcon />}
+                      onClick={() => appendIngredient({})}
                     />
-                  </Grid>
-                ))}
-
-                <HStack>
-                  <Spacer />
-                  <IconButton
-                    aria-label="Add ingredient"
-                    icon={<AddIcon />}
-                    onClick={() => appendIngredient({})}
-                  />
-                </HStack>
-              </AccordionPanel>
-            </AccordionItem>
+                  </HStack>
+                </AccordionPanel>
+              </AccordionItem>
+            ) : null}
           </Accordion>
 
           {groceryLists.length === 0 ? (
