@@ -1,15 +1,15 @@
 import { Flex, Link, Spinner, Text } from '@chakra-ui/react';
 import { FC } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import useIngredient from '../../hooks/useIngredient';
-import useUser from '../../hooks/useUser';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import useIngredientHook from '../../hooks/useIngredientHook';
+import useUserHook from '../../hooks/useUserHook';
 import { deleteCollection, getDocuments } from '../../lib/firebase/functions';
 import { WithDocId, User, Unit } from '../../lib/firebase/interfaces';
 
 const Functions: FC = () => {
-  const { authUser, authLoading, login, logout } = useAuth();
-  const [{ updateIngredient }] = useIngredient();
-  const [{ updateUser }] = useUser();
+  const { authUser, authLoading, login, logout } = useAuthContext();
+  const [{ updateIngredient }] = useIngredientHook();
+  const [{ updateUser }] = useUserHook();
 
   return (
     <Flex flexDir={'column'}>

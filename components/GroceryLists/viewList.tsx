@@ -2,13 +2,13 @@ import { Flex, Box, Center, Heading } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { GroceryListFormData } from '.';
-import useGroceryList from '../../hooks/useGroceries';
+import useGroceryListHook from '../../hooks/useGroceryListHook';
 
 const ViewList: FC<{ groceryListCreator: string; groceryListId: string }> = ({
   groceryListCreator,
   groceryListId,
 }) => {
-  const [{ updateGroceryList }, loading] = useGroceryList();
+  const [{ updateGroceryList }, loading] = useGroceryListHook();
   // TODO: query for user-chosen grocery list name as groceryListId
 
   const { register } = useForm<GroceryListFormData>({

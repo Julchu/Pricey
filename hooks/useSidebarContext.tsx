@@ -46,7 +46,7 @@ type SidebarContextType = {
 /* Public sidebar hook
  * const {isSidebarOpen, openSidebar, closeSidebar, toggleSidebar, panelId} = useSidebar();
  */
-export const useSidebar = (): SidebarContextType => {
+export const useSidebarContext = (): SidebarContextType => {
   const { isOpen, setIsOpen, panelId, setPanelId } = useContext(SidebarContext);
 
   // Closes sidebar when new page is loaded (like when navigating using Chakra Link)

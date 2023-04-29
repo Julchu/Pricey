@@ -3,8 +3,8 @@ import { Flex, Box, Input, Button, HStack, Select, Spacer, IconButton } from '@c
 import { FC, useCallback } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { GroceryListFormData } from '.';
-import { useAuth } from '../../hooks/useAuth';
-import useGroceryList from '../../hooks/useGroceries';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import useGroceryListHook from '../../hooks/useGroceryListHook';
 import { Unit } from '../../lib/firebase/interfaces';
 import { validateIsNumber } from '../../lib/textFormatters';
 
@@ -13,8 +13,8 @@ const NewList: FC<{ groceryListCreator: string; groceryListId: string }> = ({
   groceryListId,
 }) => {
   // TODO: query for user-chosen grocery list name as groceryListId
-  const { authUser } = useAuth();
-  const [{ submitGroceryList }, loading] = useGroceryList();
+  const { authUser } = useAuthContext();
+  const [{ submitGroceryList }, loading] = useGroceryListHook();
 
   const {
     register,

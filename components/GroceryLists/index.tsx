@@ -22,12 +22,12 @@ import {
 } from '@chakra-ui/react';
 
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuthContext } from '../../hooks/useAuthContext';
 import { db, GroceryList, Unit, WithDocId } from '../../lib/firebase/interfaces';
 import { onSnapshot, query, where } from 'firebase/firestore';
 import { useForm, FormProvider, useFieldArray } from 'react-hook-form';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
-import useGroceryList from '../../hooks/useGroceries';
+import useGroceryListHook from '../../hooks/useGroceryListHook';
 import Fuse from 'fuse.js';
 
 export type GroceryListFormData = {
@@ -44,8 +44,8 @@ export type GroceryListFormData = {
  * * else groceryListCreator as preferences.displayName or groceryListCreator as docId
  */
 const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator }) => {
-  const { authUser } = useAuth();
-  const [{ submitGroceryList }, loading] = useGroceryList();
+  const { authUser } = useAuthContext();
+  const [{ submitGroceryList }, loading] = useGroceryListHook();
   const [groceryLists, setGroceryLists] = useState<GroceryList[]>([]);
 
   const methods = useForm<GroceryListFormData>({

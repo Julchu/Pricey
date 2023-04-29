@@ -3,11 +3,11 @@ import Head from 'next/head';
 import { AuthUnauthorized } from '../components/AuthGuards';
 import Functions from '../components/Functions';
 import Layout from '../components/Layout';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../hooks/useAuthContext';
 import { Role } from '../lib/firebase/interfaces';
 
 const FunctionsPage: NextPage = () => {
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
 
   return (
     <>

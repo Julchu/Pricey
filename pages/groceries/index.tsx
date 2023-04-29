@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuthContext } from '../../hooks/useAuthContext';
 import Layout from '../../components/Layout';
 import GroceryLists from '../../components/GroceryLists';
 import { AuthUnauthorized } from '../../components/AuthGuards';
@@ -13,7 +13,7 @@ import { AuthUnauthorized } from '../../components/AuthGuards';
  */
 // Shows initial empty grocery list form
 const GroceryCreatorPage: NextPage = () => {
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
 
   if (!authUser) return <AuthUnauthorized />;
   return (

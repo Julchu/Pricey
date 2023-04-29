@@ -15,7 +15,7 @@ type CsvMethods = {
   csvToFirestore: () => void;
 };
 
-const useCSV = (): [CsvMethods, Ingredient[], boolean, Error | undefined] => {
+const useCSVHook = (): [CsvMethods, Ingredient[], boolean, Error | undefined] => {
   const [csvData, setCSVData] = useState<Ingredient[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
@@ -122,4 +122,4 @@ const useCSV = (): [CsvMethods, Ingredient[], boolean, Error | undefined] => {
   return [{ csvToIngredient, csvToFirestore }, csvData, loading, error];
 };
 
-export default useCSV;
+export default useCSVHook;

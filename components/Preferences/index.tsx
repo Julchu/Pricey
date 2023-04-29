@@ -25,8 +25,8 @@ import { getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
 import { FC, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useAuth } from '../../hooks/useAuth';
-import useUser from '../../hooks/useUser';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import useUserHook from '../../hooks/useUserHook';
 import {
   Color,
   db,
@@ -44,8 +44,8 @@ type PreferencesFormData = {
 };
 
 const Preferences: FC = () => {
-  const { authUser, authLoading } = useAuth();
-  const [{ updateUser }, userLoading] = useUser();
+  const { authUser, authLoading } = useAuthContext();
+  const [{ updateUser }, userLoading] = useUserHook();
   const { setColorMode } = useColorMode();
   const router = useRouter();
   const toast = useToast();

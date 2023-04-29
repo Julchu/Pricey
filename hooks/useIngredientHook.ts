@@ -7,7 +7,7 @@ import {
   priceConverter,
   unitConverter,
 } from '../lib/textFormatters';
-import { useAuth } from './useAuth';
+import { useAuthContext } from './useAuthContext';
 import { IngredientFormData } from '../components/HomeDashboard';
 
 type IngredientMethods = {
@@ -20,10 +20,10 @@ type IngredientMethods = {
   ) => Promise<DocumentReference<Ingredient> | undefined>;
 };
 
-const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
+const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
     async ({ name, price, measurement, quantity, unit, image }) => {
@@ -102,7 +102,7 @@ const useIngredient = (): [IngredientMethods, boolean, Error | undefined] => {
   return [{ submitIngredient, updateIngredient }, loading, error];
 };
 
-export default useIngredient;
+export default useIngredientHook;
 
 // Examples
 /* If you want to auto generate an ID, use addDoc() + collection()

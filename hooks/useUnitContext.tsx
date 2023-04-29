@@ -1,6 +1,6 @@
-import { createContext, FC, ReactNode, useContext, useEffect, useState } from 'react';
+import { createContext, FC, ReactNode, useContext, useState } from 'react';
 import { Unit, UnitCategory } from '../lib/firebase/interfaces';
-import { useAuth } from './useAuth';
+import { useAuthContext } from './useAuthContext';
 
 // Private context value types, set in Context Provider
 type UnitProps = {
@@ -18,11 +18,11 @@ const UnitContext = createContext<UnitProps>({
 type UnitContextType = {
   currentUnits: UnitCategory;
   setCurrentUnits: (type: UnitCategory) => void;
-  toggleUnit: () => void; // TODO: remove after testing unit/price functions work
+  toggleUnit: () => void;
 };
 
 // Public unit hook
-export const useUnit = (): UnitContextType => {
+export const useUnitContext = (): UnitContextType => {
   const { currentUnits, setCurrentUnits } = useContext(UnitContext);
 
   return {
@@ -37,7 +37,7 @@ export const useUnit = (): UnitContextType => {
 };
 
 export const UnitProvider: FC<{ children: ReactNode }> = ({ children }) => {
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
   const [currentUnits, setCurrentUnits] = useState<UnitCategory>({
     mass: authUser?.preferences?.units?.mass || Unit.kilogram,
     volume: authUser?.preferences?.units?.volume || Unit.litre,

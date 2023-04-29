@@ -13,7 +13,7 @@ import {
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient, WithDocId } from '../../lib/firebase/interfaces';
 import { IngredientFormData } from '../HomeDashboard';
-import { useUnit } from '../../hooks/useUnit';
+import { useUnitContext } from '../../hooks/useUnitContext';
 import {
   priceCalculator,
   currencyFormatter,
@@ -22,7 +22,7 @@ import {
   priceConverter,
   unitConverter,
 } from '../../lib/textFormatters';
-import useIngredient from '../../hooks/useIngredient';
+import useIngredientHook from '../../hooks/useIngredientHook';
 
 type CardProps = {
   ingredientInfo: WithDocId<Ingredient>;
@@ -33,9 +33,9 @@ type CardProps = {
 // Search result cards
 export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) => {
   // Showing price as unit preference
-  const { currentUnits } = useUnit();
+  const { currentUnits } = useUnitContext();
 
-  const [{ updateIngredient }, ingredientLoading, error] = useIngredient();
+  const [{ updateIngredient }, ingredientLoading, error] = useIngredientHook();
 
   const { handleSubmit, control, setValue, getValues, resetField } =
     useFormContext<IngredientFormData>();
@@ -168,9 +168,9 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
 // Search result cards
 export const NewIngredientCard: FC = () => {
   // Showing price as unit preference
-  const { currentUnits } = useUnit();
+  const { currentUnits } = useUnitContext();
 
-  const [{ submitIngredient }, ingredientLoading, error] = useIngredient();
+  const [{ submitIngredient }, ingredientLoading, error] = useIngredientHook();
 
   const { handleSubmit, control, reset } = useFormContext<IngredientFormData>();
 

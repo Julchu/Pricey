@@ -19,12 +19,12 @@ import {
 import NextLink from 'next/link';
 import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { useUnit } from '../../hooks/useUnit';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import { useUnitContext } from '../../hooks/useUnitContext';
 import { Role, Unit, UnitCategory } from '../../lib/firebase/interfaces';
 
 const Header: FC = () => {
-  const { authUser, authLoading } = useAuth();
+  const { authUser, authLoading } = useAuthContext();
 
   return (
     <Box justifyContent={'space-between'} display={{ base: 'flex', sm: 'block' }}>
@@ -84,7 +84,7 @@ const Header: FC = () => {
 };
 
 const DropdownMenu: FC = () => {
-  const { authUser, login, logout } = useAuth();
+  const { authUser, login, logout } = useAuthContext();
   const { asPath } = useRouter();
 
   const loginHandler = useCallback(async () => {
@@ -92,7 +92,7 @@ const DropdownMenu: FC = () => {
     else logout();
   }, [authUser, login, logout]);
 
-  const { currentUnits, setCurrentUnits } = useUnit();
+  const { currentUnits, setCurrentUnits } = useUnitContext();
 
   return (
     <MenuList boxShadow={'normal'}>

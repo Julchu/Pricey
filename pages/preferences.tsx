@@ -4,10 +4,10 @@ import { useRouter } from 'next/router';
 import { useEffect } from 'react';
 import Layout from '../components/Layout';
 import Preferences from '../components/Preferences';
-import { useAuth } from '../hooks/useAuth';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 const AboutPage: NextPage = () => {
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
   const router = useRouter();
 
   // if (!authUser) {

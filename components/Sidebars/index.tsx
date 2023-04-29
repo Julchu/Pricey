@@ -18,9 +18,9 @@ import {
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
 import { FC, useCallback } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { SidebarEnums, SidebarTypes, useSidebar } from '../../hooks/useSidebar';
-import { useUnit } from '../../hooks/useUnit';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import { SidebarEnums, SidebarTypes, useSidebarContext } from '../../hooks/useSidebarContext';
+import { useUnitContext } from '../../hooks/useUnitContext';
 
 /* { label: 'Pricey', path: '/' },
     { label: 'About Us', path: '/about/' },
@@ -28,7 +28,7 @@ import { useUnit } from '../../hooks/useUnit';
 
 const Sidebar: FC = () => {
   const { isSidebarOpen, /* openSidebar , */ closeSidebar, /* toggleSidebar , */ panelId } =
-    useSidebar();
+    useSidebarContext();
 
   const sidebarTypes: SidebarTypes = {
     userActions: <UserActionSidebar />,
@@ -44,9 +44,9 @@ const Sidebar: FC = () => {
 };
 
 const UserActionSidebar: FC = () => {
-  const { authUser, login, logout } = useAuth();
-  const { closeSidebar } = useSidebar();
-  const { toggleUnit, currentUnits } = useUnit();
+  const { authUser, login, logout } = useAuthContext();
+  const { closeSidebar } = useSidebarContext();
+  const { toggleUnit, currentUnits } = useUnitContext();
 
   const logoutHandler = useCallback(() => {
     logout();

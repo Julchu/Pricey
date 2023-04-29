@@ -5,8 +5,9 @@ import { db, Ingredient, Unit, WithDocId } from '../../lib/firebase/interfaces';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
 import { IngredientCard, NewIngredientCard } from '../Ingredients/ingredientCards';
 import IngredientForm from '../Ingredients/ingredientForm';
-import { useAuth } from '../../hooks/useAuth';
+import { useAuthContext } from '../../hooks/useAuthContext';
 import Fuse from 'fuse.js';
+import { useIngredientContext } from '../../hooks/useIngredientContext';
 
 export type IngredientFormData = {
   ingredientId?: string;
@@ -20,7 +21,9 @@ export type IngredientFormData = {
 };
 
 const IngredientList: FC = () => {
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
+  const { currentIngredients, addIngredient, arrayToIngredient, removeIngredient } =
+    useIngredientContext();
 
   // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
   /* Manual ingredient search
@@ -29,6 +32,7 @@ const IngredientList: FC = () => {
    */
   const [foundIngredient, setFoundIngredient] = useState<string>('');
   const [searchResults, setSearchResults] = useState<WithDocId<Ingredient>[]>([]);
+  const memoizedSearchResults = useMemo(() => searchResults, [searchResults]);
 
   // IngredientForm submission
   const methods = useForm<IngredientFormData>({
@@ -47,20 +51,23 @@ const IngredientList: FC = () => {
   // TODO: save ingredients to authUser/context state
   /* Original live-updating retrieval of specific document and its contents */
   useEffect(() => {
-    if (authUser?.uid) {
-      const q = query(db.ingredientCollection, where('userId', '==', authUser.uid), limit(30));
-
-      onSnapshot(q, querySnapshot => {
-        const ingredientInfoList: WithDocId<Ingredient>[] = [];
-        querySnapshot.forEach(doc => {
-          ingredientInfoList.push({ ...doc.data(), documentId: doc.id });
-        });
-        setSearchResults(ingredientInfoList);
+    if (!authUser?.uid) return setSearchResults([]);
+    const q = query(db.ingredientCollection, where('userId', '==', authUser.uid), limit(30));
+    const unsubscribe = onSnapshot(q, querySnapshot => {
+      const ingredientInfoList: WithDocId<Ingredient>[] = [];
+      querySnapshot.forEach(doc => {
+        ingredientInfoList.push({ ...doc.data(), documentId: doc.id });
       });
-    } else {
-      setSearchResults([]);
-    }
+      setSearchResults(ingredientInfoList);
+    });
+
+    return () => unsubscribe();
   }, [authUser?.uid]);
+
+  // Set ingredients context to be used across app
+  useEffect(() => {
+    arrayToIngredient(searchResults);
+  }, [arrayToIngredient, searchResults]);
 
   // Simplified fuzzy search with Fuse.js
   const filteredResults = useMemo(() => {
@@ -74,6 +81,7 @@ const IngredientList: FC = () => {
     const found = results.find(result => result.score && result.score < 0.00001)?.item || {
       documentId: '',
     };
+
     if (found.documentId) setFoundIngredient(found.documentId);
     else setFoundIngredient('');
 

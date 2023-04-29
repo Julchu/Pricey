@@ -11,7 +11,7 @@ import {
 import { useCallback, useState } from 'react';
 import { db, User, Role, WithDocId, Unit } from '../lib/firebase/interfaces';
 import { filterNullableObject } from '../lib/textFormatters';
-import { useAuth } from './useAuth';
+import { useAuthContext } from './useAuthContext';
 
 type AuthData = {
   uid: string;
@@ -27,10 +27,10 @@ interface UseUserMethods {
   updateUser: (userData: Partial<WithDocId<User>>) => Promise<WithDocId<User> | undefined | void>;
 }
 
-const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
+const useUserHook = (): [UseUserMethods, boolean, Error | undefined] => {
   const [error, setError] = useState<Error>();
   const [userLoading, setUserLoading] = useState<boolean>(false);
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
 
   const getUser = useCallback<UseUserMethods['getUser']>(async docId => {
     setUserLoading(true);
@@ -121,4 +121,4 @@ const useUser = (): [UseUserMethods, boolean, Error | undefined] => {
   ];
 };
 
-export default useUser;
+export default useUserHook;

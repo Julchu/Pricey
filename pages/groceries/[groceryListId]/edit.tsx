@@ -3,11 +3,11 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import EditList from '../../../components/GroceryLists/newList';
 import Layout from '../../../components/Layout';
-import { useAuth } from '../../../hooks/useAuth';
+import { useAuthContext } from '../../../hooks/useAuthContext';
 
 // Shows initial empty grocery list form
 const GroceryListPage: NextPage = () => {
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
   const router = useRouter();
   const { groceryListCreator, groceryListId } = router.query;
 

@@ -2,7 +2,7 @@ import { doc, DocumentReference, serverTimestamp, setDoc } from 'firebase/firest
 import { useCallback, useState } from 'react';
 import { GroceryListFormData } from '../components/GroceryLists';
 import { db, GroceryList, Unit } from '../lib/firebase/interfaces';
-import { useAuth } from './useAuth';
+import { useAuthContext } from './useAuthContext';
 
 type GroceryListMethods = {
   submitGroceryList: (
@@ -14,10 +14,10 @@ type GroceryListMethods = {
   ) => Promise<DocumentReference<GroceryList> | undefined>;
 };
 
-const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
+const useGroceryListHook = (): [GroceryListMethods, boolean, Error | undefined] => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
-  const { authUser } = useAuth();
+  const { authUser } = useAuthContext();
 
   const submitGroceryList = useCallback<GroceryListMethods['submitGroceryList']>(
     async ({ name, ingredients, viewable = false }) => {
@@ -96,4 +96,4 @@ const useGroceryList = (): [GroceryListMethods, boolean, Error | undefined] => {
   return [{ submitGroceryList, updateGroceryList }, loading, error];
 };
 
-export default useGroceryList;
+export default useGroceryListHook;

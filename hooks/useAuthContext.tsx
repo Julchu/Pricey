@@ -10,7 +10,7 @@ import {
 
 import { db, User, WithDocId } from '../lib/firebase/interfaces';
 import { useRouter } from 'next/router';
-import useUser from './useUser';
+import useUserHook from './useUserHook';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { useColorMode } from '@chakra-ui/react';
 
@@ -29,13 +29,13 @@ type AuthContextType = {
 };
 
 // Public auth hook
-export const useAuth = (): AuthContextType => useContext(AuthContext);
+export const useAuthContext = (): AuthContextType => useContext(AuthContext);
 
 // Initial values of Auth Context (AuthContextType)
 export const useProvideAuth = (): AuthContextType => {
   const { setColorMode } = useColorMode();
   const [authUser, setAuthUser] = useState<WithDocId<User> | undefined>(undefined);
-  const [{ retrieveUser }, _updatedUser, _createUserLoading] = useUser();
+  const [{ retrieveUser }, _updatedUser, _createUserLoading] = useUserHook();
   const [authLoading, setAuthLoading] = useState<boolean>(true);
   const router = useRouter();
   const auth = getAuth();
