@@ -17,6 +17,7 @@ import {
   AbsoluteCenter,
 } from '@chakra-ui/react';
 import NextLink from 'next/link';
+import { useRouter } from 'next/router';
 import { FC, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUnit } from '../../hooks/useUnit';
@@ -84,6 +85,7 @@ const Header: FC = () => {
 
 const DropdownMenu: FC = () => {
   const { authUser, login, logout } = useAuth();
+  const { asPath } = useRouter();
 
   const loginHandler = useCallback(async () => {
     if (!authUser) login();
@@ -92,7 +94,6 @@ const DropdownMenu: FC = () => {
 
   const { currentUnits, setCurrentUnits } = useUnit();
 
-  // TODO?: update user and/or authUser after unit toggles
   return (
     <MenuList boxShadow={'normal'}>
       {/* Mass switch */}
@@ -114,6 +115,7 @@ const DropdownMenu: FC = () => {
 
       <MenuDivider />
 
+      {/* Volume switch */}
       <MenuOptionGroup
         defaultValue={currentUnits.volume}
         title=""
@@ -135,10 +137,10 @@ const DropdownMenu: FC = () => {
       {authUser ? (
         <>
           <MenuGroup title="Groceries">
-            <MenuItem as={NextLink} href={'/'}>
+            <MenuItem as={NextLink} href={'/'} bg={asPath === '/' ? 'coral' : ''}>
               Ingredients
             </MenuItem>
-            <MenuItem as={NextLink} href={'/groceries'}>
+            <MenuItem as={NextLink} href={'/groceries'} bg={asPath === '/groceries' ? 'coral' : ''}>
               <Text onClick={() => console.log('list')}>My Lists</Text>
             </MenuItem>
           </MenuGroup>
@@ -148,11 +150,11 @@ const DropdownMenu: FC = () => {
 
       <MenuGroup title="Links">
         {authUser?.role === Role.admin ? (
-          <MenuItem as={NextLink} href={'/functions'}>
+          <MenuItem as={NextLink} href={'/functions'} bg={asPath === '/functions' ? 'coral' : ''}>
             Functions
           </MenuItem>
         ) : null}
-        <MenuItem as={NextLink} href={'/about'}>
+        <MenuItem as={NextLink} href={'/about'} bg={asPath === '/about' ? 'coral' : ''}>
           About
         </MenuItem>
       </MenuGroup>
@@ -161,7 +163,11 @@ const DropdownMenu: FC = () => {
 
       <MenuGroup title="Profile">
         {authUser ? (
-          <MenuItem as={NextLink} href={'/preferences'}>
+          <MenuItem
+            as={NextLink}
+            href={'/preferences'}
+            bg={asPath === '/preferences' ? 'coral' : ''}
+          >
             Preferences
           </MenuItem>
         ) : null}

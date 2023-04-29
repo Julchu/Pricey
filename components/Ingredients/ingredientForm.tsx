@@ -33,19 +33,6 @@ const IngredientForm: FC = () => {
         }
       />
 
-      {/* Price input */}
-      <Input
-        type={'number'}
-        {...register('price', {
-          valueAsNumber: true,
-          required: true,
-          min: 0,
-          validate: price => validateIsNumber(price),
-        })}
-        isInvalid={errors.price?.type === 'required' || errors.price?.type === 'validate'}
-        placeholder={'Price*'}
-      />
-
       {/* Measurement input */}
       <Input
         type={'number'}
@@ -90,6 +77,19 @@ const IngredientForm: FC = () => {
         })}
         isInvalid={errors.quantity?.type === 'validate'}
         placeholder={'Quantity'}
+      />
+
+      {/* Price input */}
+      <Input
+        type={'number'}
+        {...register('price', {
+          valueAsNumber: true,
+          required: true,
+          min: 0,
+          validate: price => validateIsNumber(price),
+        })}
+        isInvalid={errors.price?.type === 'required' || errors.price?.type === 'validate'}
+        placeholder={'Price*'}
       />
     </Grid>
   );

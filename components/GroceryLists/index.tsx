@@ -105,6 +105,8 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
       querySnapshot.forEach(doc => {
         queryListResults.push({ ...doc.data(), documentId: doc.id });
       });
+
+      // TODO: replace ingredients query with ingredients context state
       setGroceryLists(queryListResults);
     });
   }, [authUser?.documentId, groceryListCreator]);
@@ -173,7 +175,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
         <Flex p={{ base: '30px 0px', sm: '0px 30px' }} mt={'header'} flexDir={'column'}>
           {/* "Table" Header */}
           <Grid
-            templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
+            templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
             w="100%"
             p="12px 16px"
             columnGap={'20px'}
@@ -204,7 +206,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                     }}
                   >
                     <Grid
-                      templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
+                      templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
                       w="100%"
                       // p="12px 0px"
                       textAlign={'start'}
@@ -222,7 +224,9 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                         })}
                       </Flex>
 
+                      {/* Price */}
                       <Text textAlign={'end'}>$24</Text>
+
                       <GridItem textAlign={'center'}>
                         <AccordionIcon />
                       </GridItem>
@@ -237,7 +241,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                     w={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
                     zIndex={99}
                   >
-                    <Grid templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}>
+                    <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}>
                       <GridItem />
                       <GridItem>
                         {list.ingredients.map(({ name, amount, unit, quantity, price }, index) => {
@@ -263,6 +267,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
             })}
 
             {/* Start new list */}
+            {/* Accordion button row */}
             {authUser && !groceryListCreator ? (
               <AccordionItem>
                 <AccordionButton
@@ -278,7 +283,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                   }}
                 >
                   <Grid
-                    templateColumns={'1.5fr 5fr 0.5fr 0.3fr'}
+                    templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
                     w="100%"
                     p="12px 0px"
                     textAlign={'start'}
@@ -318,7 +323,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                 <AccordionPanel>
                   {fieldsIngredient.map((field, index) => (
                     <Grid
-                      templateColumns={'1.5fr 5.5fr 0.3fr'}
+                      templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
                       key={field.id}
                       p="12px 0px"
                       columnGap={'20px'}
@@ -326,12 +331,11 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                       <Input {...register(`ingredients.${index}.name`)} />
 
                       <Grid
-                        templateColumns={'1fr 1fr 1fr 1fr'}
+                        templateColumns={'1fr 1fr 1fr'}
                         w="100%"
                         textAlign={'start'}
                         columnGap={'20px'}
                       >
-                        <Input {...register(`ingredients.${index}.price`)} placeholder={'Price'} />
                         <Input
                           {...register(`ingredients.${index}.amount`)}
                           placeholder={'Amount'}
@@ -358,22 +362,30 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                         />
                       </Grid>
 
-                      <IconButton
-                        aria-label="Remove ingredient"
-                        icon={<DeleteIcon />}
-                        onClick={() => removeIngredient(index)}
-                      />
+                      <Input {...register(`ingredients.${index}.price`)} placeholder={'Price'} />
+
+                      <GridItem textAlign={'center'}>
+                        <IconButton
+                          aria-label="Remove ingredient"
+                          icon={<DeleteIcon />}
+                          onClick={() => removeIngredient(index)}
+                        />
+                      </GridItem>
                     </Grid>
                   ))}
 
-                  <HStack>
-                    <Spacer />
-                    <IconButton
-                      aria-label="Add ingredient"
-                      icon={<AddIcon />}
-                      onClick={() => appendIngredient({})}
-                    />
-                  </HStack>
+                  <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} p="12px 0px" columnGap={'20px'}>
+                    <GridItem />
+                    <GridItem />
+                    <GridItem />
+                    <GridItem textAlign={'center'}>
+                      <IconButton
+                        aria-label="Add ingredient"
+                        icon={<AddIcon />}
+                        onClick={() => appendIngredient({})}
+                      />
+                    </GridItem>
+                  </Grid>
                 </AccordionPanel>
               </AccordionItem>
             ) : null}

@@ -44,6 +44,7 @@ const IngredientList: FC = () => {
   const { watch } = methods;
   const searchIngredient = watch('name');
 
+  // TODO: save ingredients to authUser/context state
   /* Original live-updating retrieval of specific document and its contents */
   useEffect(() => {
     if (authUser?.uid) {
