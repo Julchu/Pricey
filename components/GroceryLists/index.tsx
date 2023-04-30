@@ -1,7 +1,6 @@
 import {
   Button,
   Box,
-  Center,
   Flex,
   Heading,
   Accordion,
@@ -15,20 +14,28 @@ import {
   Badge,
   Input,
   IconButton,
-  HStack,
   useMediaQuery,
   Select,
-  Spacer,
+  Menu,
+  MenuButton,
+  MenuList,
+  useMenu,
+  forwardRef,
+  BoxProps,
+  MenuGroup,
+  MenuItem,
 } from '@chakra-ui/react';
 
-import { FC, useCallback, useEffect, useMemo, useState } from 'react';
+import { FC, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuthContext } from '../../hooks/useAuthContext';
-import { db, GroceryList, Unit, WithDocId } from '../../lib/firebase/interfaces';
+import { db, GroceryList, Ingredient, Unit, WithDocId } from '../../lib/firebase/interfaces';
 import { onSnapshot, query, where } from 'firebase/firestore';
-import { useForm, FormProvider, useFieldArray } from 'react-hook-form';
+import { useForm, FormProvider, useFieldArray, useWatch, useFormContext } from 'react-hook-form';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import useGroceryListHook from '../../hooks/useGroceryListHook';
 import Fuse from 'fuse.js';
+import { useIngredientContext } from '../../hooks/useIngredientContext';
+import { useDebouncedState } from '../../hooks/useDebouncedState';
 
 export type GroceryListFormData = {
   groceryListId?: string;
@@ -46,6 +53,7 @@ export type GroceryListFormData = {
 const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator }) => {
   const { authUser } = useAuthContext();
   const [{ submitGroceryList }, loading] = useGroceryListHook();
+  const { ingredientIndexes, currentIngredients } = useIngredientContext();
   const [groceryLists, setGroceryLists] = useState<GroceryList[]>([]);
 
   const methods = useForm<GroceryListFormData>({
@@ -58,7 +66,6 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
 
   const {
     register,
-    setValue,
     control,
     watch,
     handleSubmit,
@@ -71,7 +78,6 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
     fields: fieldsIngredient,
     append: appendIngredient,
     remove: removeIngredient,
-    update: updateIngredient,
   } = useFieldArray({
     name: 'ingredients',
     control,
@@ -86,10 +92,6 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
       /* submitGroceryList */
     ],
   );
-
-  // useEffect(() => {
-  //   console.log(groceryLists);
-  // }, [groceryLists]);
 
   const [expandedIndex, setExpandedIndex] = useState<number[]>([]);
   const [isDesktopView] = useMediaQuery('(min-width: 30em)');
@@ -106,12 +108,11 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
         queryListResults.push({ ...doc.data(), documentId: doc.id });
       });
 
-      // TODO: replace ingredients query with ingredients context state
       setGroceryLists(queryListResults);
     });
   }, [authUser?.documentId, groceryListCreator]);
 
-  // Simplified fuzzy search with Fuse.js
+  // Search grocery lists
   const filteredResults = useMemo(() => {
     const fuse = new Fuse(groceryLists, {
       keys: ['name', 'ingredients.name'],
@@ -152,22 +153,11 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
               {...register('name', { required: true })}
             />
 
-            <Input
-              placeholder={'Grocery'}
-              onChange={e => updateIngredient(0, { name: e.target.value })}
-            />
-            <Input
-              placeholder={'Grocery'}
-              onChange={e => updateIngredient(1, { name: e.target.value })}
-            />
-            <Input
-              placeholder={'Grocery'}
-              onChange={e => updateIngredient(2, { name: e.target.value })}
-            />
-            <Input
-              placeholder={'Grocery'}
-              onChange={e => updateIngredient(3, { name: e.target.value })}
-            />
+            {/* Header grocery inputs */}
+            <DropdownIngredient index={0} />
+            <DropdownIngredient index={1} />
+            <DropdownIngredient index={2} />
+            <DropdownIngredient index={3} />
           </Grid>
         </Flex>
 
@@ -214,6 +204,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                     >
                       <Text>{list.name}</Text>
 
+                      {/* Ingredient badges */}
                       <Flex flexWrap={'wrap'} gap={'10px'}>
                         {list.ingredients.map((ingredient, index) => {
                           return (
@@ -241,21 +232,24 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                     w={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
                     zIndex={99}
                   >
-                    <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}>
-                      <GridItem />
-                      <GridItem>
-                        {list.ingredients.map(({ name, amount, unit, quantity, price }, index) => {
+                    <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'}>
+                      <GridItem gridColumnStart={2}>
+                        {list.ingredients.map(({ name, amount, unit, quantity }, index) => {
+                          // TODO: multiply existing price by quantity/amount
+                          const price = ingredientIndexes[name]
+                            ? currentIngredients[ingredientIndexes[name]].price
+                            : undefined;
                           return (
                             <Grid
                               templateColumns={'1fr 1fr 1fr 1fr 1fr'}
                               columnGap={'20px'}
                               key={`expandedIngredient_${index}`}
                             >
-                              {name ? <Button>{name}</Button> : <Box />}
-                              {amount ? <Button>{amount}</Button> : <Box />}
-                              {unit ? <Button>{unit}</Button> : <Box />}
-                              {quantity ? <Button>{quantity}</Button> : <Box />}
-                              {price ? <Button>{price}</Button> : <Box />}
+                              {name ? <Text>{name}</Text> : <Box />}
+                              {amount ? <Text>{amount}</Text> : <Box />}
+                              {unit ? <Text>{unit}</Text> : <Box />}
+                              {quantity ? <Text>{quantity}</Text> : <Box />}
+                              {price ? <Text>{price}</Text> : <Box />}
                             </Grid>
                           );
                         })}
@@ -311,8 +305,8 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                         </Box>
                       ))}
                     </Flex>
-                    <GridItem />
-                    <GridItem textAlign={'center'}>
+
+                    <GridItem textAlign={'center'} gridColumnStart={4}>
                       <AccordionIcon />
                     </GridItem>
                   </Grid>
@@ -320,6 +314,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
 
                 {/* 1.5 5 0.5 0.3 */}
                 {/* 1.5 5.5 0.3 */}
+                {/* Group of inputs for customizing ingredients */}
                 <AccordionPanel>
                   {fieldsIngredient.map((field, index) => (
                     <Grid
@@ -375,10 +370,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                   ))}
 
                   <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} p="12px 0px" columnGap={'20px'}>
-                    <GridItem />
-                    <GridItem />
-                    <GridItem />
-                    <GridItem textAlign={'center'}>
+                    <GridItem textAlign={'center'} gridColumnStart={4}>
                       <IconButton
                         aria-label="Add ingredient"
                         icon={<AddIcon />}
@@ -392,14 +384,156 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
           </Accordion>
 
           {groceryLists.length === 0 ? (
-            <Center my={'header'}>
-              <Heading>Create a new list</Heading>
-            </Center>
+            <Heading my={'header'} textAlign={'center'}>
+              Create a new list
+            </Heading>
           ) : null}
         </Flex>
       </FormProvider>
     </form>
   );
 };
+
+/* TODO: create custom dropdown menu for Ingredients */
+// TODO: convert to Combobox
+const DropdownIngredient: FC<{
+  index: number;
+}> = ({ index }) => {
+  const { control } = useFormContext<GroceryListFormData>();
+  const { update: updateIngredient } = useFieldArray({
+    name: 'ingredients',
+    control,
+  });
+
+  const [ingredients] = useWatch({
+    control,
+    name: [`ingredients.${index}`],
+  });
+
+  const onTyping = useCallback(
+    (ingredientName: string) => {
+      updateIngredient(index, { name: ingredientName });
+    },
+    [index, updateIngredient],
+  );
+
+  const onSelectIngredient = useCallback(
+    ({ name, price }: WithDocId<Ingredient>) => {
+      updateIngredient(index, { name, price });
+    },
+    [index, updateIngredient],
+  );
+
+  const { currentIngredients } = useIngredientContext();
+
+  const filteredResults = useMemo(() => {
+    const fuse = new Fuse(currentIngredients, {
+      keys: ['name'],
+      includeScore: true,
+      ignoreLocation: true,
+    });
+
+    const results = fuse.search(ingredients ? ingredients.name : '', { limit: 5 });
+
+    return ingredients && ingredients.name
+      ? results.map(result => {
+          return result.item;
+        })
+      : currentIngredients;
+  }, [currentIngredients, ingredients]);
+
+  // Used to manually trigger opening menu from custom events on input box, like typing, clicking when there's text
+  const { onOpen, isOpen } = useMenu();
+
+  // Used to override MenuItem autofocus by manually focusing Ingredient input box
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <Menu isOpen={isOpen} autoSelect={false} matchWidth initialFocusRef={inputRef}>
+      <MenuButton as={DropdownInput} onOpen={onOpen} onTyping={onTyping} inputRef={inputRef} />
+
+      <MenuList>
+        <MenuGroup>
+          {filteredResults.map((ingredient, index) => {
+            return (
+              <MenuItem
+                isFocusable={false}
+                closeOnSelect
+                key={`${ingredient.name}_${index}`}
+                value={ingredient.name}
+                onFocusCapture={() => {
+                  if (inputRef.current) inputRef.current.focus();
+                }}
+                onMouseOutCapture={() => {
+                  if (inputRef.current) inputRef.current.focus();
+                }}
+                onClickCapture={e => {
+                  if (inputRef.current) inputRef.current.focus();
+                  if (inputRef.current) {
+                    inputRef.current.value = e.currentTarget.value;
+                    onSelectIngredient(ingredient);
+                  }
+                }}
+              >
+                {ingredient.name}
+              </MenuItem>
+            );
+          })}
+        </MenuGroup>
+      </MenuList>
+    </Menu>
+  );
+};
+
+/**
+ * @param onOpen: triggers opening menu
+ * @param onTyping: passed down function for updating React Hook Form ingredient
+ * @param inputRef: ref for input as workaround to not focus MenuItems, but rather continue focus on input
+ */
+const DropdownInput: FC<{
+  onOpen: () => void;
+  onTyping: (value: string) => void;
+  inputRef: RefObject<HTMLInputElement>;
+}> = forwardRef<
+  BoxProps & {
+    onOpen: () => void;
+    onTyping: (value: string) => void;
+    inputRef: RefObject<HTMLInputElement>;
+  },
+  'div'
+>((props, ref) => {
+  const { onOpen, onTyping, inputRef } = props;
+
+  return (
+    // Box needs ref for Menu to be attached to this input
+    <Box ref={ref}>
+      <Input
+        ref={inputRef}
+        onFocusCapture={() => {
+          if (inputRef.current) inputRef.current.focus();
+        }}
+        onClickCapture={e => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+          if (e.currentTarget.value) onOpen();
+        }}
+        onMouseOutCapture={() => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+        }}
+        onChangeCapture={e => {
+          if (inputRef.current) {
+            inputRef.current.focus();
+          }
+          onOpen();
+          onTyping(e.target.value);
+        }}
+        placeholder={'Grocery'}
+      />
+    </Box>
+  );
+});
 
 export default GroceryLists;

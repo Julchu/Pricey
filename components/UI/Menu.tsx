@@ -16,9 +16,11 @@ const sizes = {
 
 const baseStyle = definePartsStyle({
   button: {},
-  list: {},
+  list: {
+    boxShadow: 'normal',
+  },
   item: {
-    textDecor: 'none !important',
+    _hover: { bg: 'coral' },
   },
   groupTitle: {},
   command: {},

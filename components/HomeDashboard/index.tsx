@@ -1,11 +1,9 @@
-import { limit, onSnapshot, query, where } from 'firebase/firestore';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useMemo, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { db, Ingredient, Unit, WithDocId } from '../../lib/firebase/interfaces';
+import { Unit } from '../../lib/firebase/interfaces';
 import { Flex, Grid, GridItem } from '@chakra-ui/react';
-import { IngredientCard, NewIngredientCard } from '../Ingredients/ingredientCards';
-import IngredientForm from '../Ingredients/ingredientForm';
-import { useAuthContext } from '../../hooks/useAuthContext';
+import { IngredientCard, NewIngredientCard } from './ingredientCards';
+import IngredientForm from './ingredientForm';
 import Fuse from 'fuse.js';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 
@@ -21,19 +19,7 @@ export type IngredientFormData = {
 };
 
 const IngredientList: FC = () => {
-  const { authUser } = useAuthContext();
-  const { currentIngredients, addIngredient, arrayToIngredient, removeIngredient } =
-    useIngredientContext();
-
-  // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
-  /* Manual ingredient search
-   * foundIngredient: used for desktop card card margins
-   * searchIngredient: user input into search box; not used for query
-   */
-  const [foundIngredient, setFoundIngredient] = useState<string>('');
-  const [searchResults, setSearchResults] = useState<WithDocId<Ingredient>[]>([]);
-  const memoizedSearchResults = useMemo(() => searchResults, [searchResults]);
-
+  const { currentIngredients } = useIngredientContext();
   // IngredientForm submission
   const methods = useForm<IngredientFormData>({
     defaultValues: {
@@ -45,33 +31,19 @@ const IngredientList: FC = () => {
     },
   });
 
+  // TODO: switch loading from boolean to string to reference ingredient being updated/saved and show Skeleton
+  /* Manual ingredient search
+   * foundIngredient: used for desktop card card margins
+   * searchIngredient: user input into search box; not used for query
+   */
+  const [foundIngredient, setFoundIngredient] = useState<string>('');
+
   const { watch } = methods;
   const searchIngredient = watch('name');
 
-  // TODO: save ingredients to authUser/context state
-  /* Original live-updating retrieval of specific document and its contents */
-  useEffect(() => {
-    if (!authUser?.uid) return setSearchResults([]);
-    const q = query(db.ingredientCollection, where('userId', '==', authUser.uid), limit(30));
-    const unsubscribe = onSnapshot(q, querySnapshot => {
-      const ingredientInfoList: WithDocId<Ingredient>[] = [];
-      querySnapshot.forEach(doc => {
-        ingredientInfoList.push({ ...doc.data(), documentId: doc.id });
-      });
-      setSearchResults(ingredientInfoList);
-    });
-
-    return () => unsubscribe();
-  }, [authUser?.uid]);
-
-  // Set ingredients context to be used across app
-  useEffect(() => {
-    arrayToIngredient(searchResults);
-  }, [arrayToIngredient, searchResults]);
-
   // Simplified fuzzy search with Fuse.js
   const filteredResults = useMemo(() => {
-    const fuse = new Fuse(searchResults, {
+    const fuse = new Fuse(currentIngredients, {
       keys: ['name'],
       includeScore: true,
       ignoreLocation: true,
@@ -89,8 +61,8 @@ const IngredientList: FC = () => {
       ? results.map(result => {
           return result.item;
         })
-      : searchResults;
-  }, [searchIngredient, searchResults]);
+      : currentIngredients;
+  }, [currentIngredients, searchIngredient]);
 
   return (
     <form>
@@ -99,8 +71,6 @@ const IngredientList: FC = () => {
         <Flex flexDir={{ base: 'column', sm: 'row' }}>
           <IngredientForm />
         </Flex>
-
-        {/* <Divider boxShadow={'focus'} /> */}
 
         <Grid
           // px: 0px required for mobile when no ingredients found

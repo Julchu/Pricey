@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Ingredient, WithDocId } from '../../lib/firebase/interfaces';
-import { IngredientFormData } from '../HomeDashboard';
+import { IngredientFormData } from '.';
 import { useUnitContext } from '../../hooks/useUnitContext';
 import {
   priceCalculator,

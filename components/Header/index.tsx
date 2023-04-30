@@ -24,8 +24,6 @@ import { useUnitContext } from '../../hooks/useUnitContext';
 import { Role, Unit, UnitCategory } from '../../lib/firebase/interfaces';
 
 const Header: FC = () => {
-  const { authUser, authLoading } = useAuthContext();
-
   return (
     <Box justifyContent={'space-between'} display={{ base: 'flex', sm: 'block' }}>
       <NextLink href={'/'}>
@@ -34,56 +32,54 @@ const Header: FC = () => {
         </Heading>
       </NextLink>
 
-      <Menu>
-        <MenuButton
-          as={Circle}
-          float={{ sm: 'right' }}
-          m={'20px 30px'}
-          size={'40px'}
-          transition="all 0.2s"
-          aria-label={'Open menu'}
-          cursor={'pointer'}
-          borderRadius={authUser || authLoading ? '50%' : '5px'}
-          boxShadow={'normal'}
-          _hover={{ boxShadow: 'hover' }}
-          _expanded={{ boxShadow: 'focus' }}
-          _focus={{ boxShadow: 'focus' }}
-          pos={'relative'}
-        >
-          {/* Double AbsoluteCenters for centering skeleton circle */}
-          <AbsoluteCenter>
-            {/* 48px is the default? size of Avatar */}
-            <SkeletonCircle isLoaded={!authLoading} size="48px">
-              <AbsoluteCenter>
-                {authUser ? (
-                  <Avatar
-                    alignSelf={'center'}
-                    justifySelf={'center'}
-                    m="auto"
-                    src={authUser?.photoURL}
-                    borderRadius={authUser ? '50%' : '5px'}
-                    boxShadow={'normal'}
-                  />
-                ) : (
-                  <HamburgerIcon
-                    color={'black'}
-                    alignSelf={'center'}
-                    justifySelf={'center'}
-                    m="auto"
-                  />
-                )}
-              </AbsoluteCenter>
-            </SkeletonCircle>
-          </AbsoluteCenter>
-        </MenuButton>
-
-        <DropdownMenu />
+      <Menu autoSelect={false} isLazy>
+        <HeaderButton />
+        <HeaderMenu />
       </Menu>
     </Box>
   );
 };
 
-const DropdownMenu: FC = () => {
+const HeaderButton: FC = () => {
+  const { authUser, authLoading } = useAuthContext();
+
+  return (
+    <MenuButton
+      as={Circle}
+      float={{ sm: 'right' }}
+      m={'20px 30px'}
+      size={'40px'}
+      transition="all 0.2s"
+      aria-label={'Open menu'}
+      cursor={'pointer'}
+      borderRadius={authUser || authLoading ? '50%' : '5px'}
+      pos={'relative'}
+    >
+      {/* Double AbsoluteCenters for centering skeleton circle */}
+      <AbsoluteCenter>
+        {/* 48px is the default? size of Avatar */}
+        <SkeletonCircle isLoaded={!authLoading} size="48px">
+          <AbsoluteCenter>
+            {authUser ? (
+              <Avatar
+                alignSelf={'center'}
+                justifySelf={'center'}
+                m="auto"
+                src={authUser?.photoURL}
+                borderRadius={authUser ? '50%' : '5px'}
+                boxShadow={'normal'}
+              />
+            ) : (
+              <HamburgerIcon color={'black'} alignSelf={'center'} justifySelf={'center'} m="auto" />
+            )}
+          </AbsoluteCenter>
+        </SkeletonCircle>
+      </AbsoluteCenter>
+    </MenuButton>
+  );
+};
+
+const HeaderMenu: FC = () => {
   const { authUser, login, logout } = useAuthContext();
   const { asPath } = useRouter();
 
@@ -95,7 +91,7 @@ const DropdownMenu: FC = () => {
   const { currentUnits, setCurrentUnits } = useUnitContext();
 
   return (
-    <MenuList boxShadow={'normal'}>
+    <MenuList>
       {/* Mass switch */}
       <MenuOptionGroup
         defaultValue={currentUnits.mass}
