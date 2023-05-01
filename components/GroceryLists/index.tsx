@@ -399,63 +399,37 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
 const IngredientComboBox: FC<{
   index: number;
 }> = ({ index }) => {
-  const { control, setValue } = useFormContext<GroceryListFormData>();
-  const { update: updateIngredient } = useFieldArray({
-    name: 'ingredients',
-    control,
-  });
-
-  const [currentIngredientWatch] = useWatch({
-    control,
-    name: [`ingredients.${index}`],
-  });
-
-  const onTyping = useCallback(
-    (ingredientName: string) => {
-      updateIngredient(index, { name: ingredientName });
-    },
-    [index, updateIngredient],
-  );
-
-  const onSelectIngredient = useCallback(
-    ({ name, price }: WithDocId<Ingredient>) => {
-      updateIngredient(index, { name, price });
-    },
-    [index, updateIngredient],
-  );
+  const { setValue } = useFormContext<GroceryListFormData>();
 
   const { currentIngredients } = useIngredientContext();
 
   const [filteredResults, setFilteredResults] = useState<WithDocId<Ingredient>[]>([]);
-  const { isOpen, selectedItem, getMenuProps, getInputProps, highlightedIndex, getItemProps } =
-    useCombobox({
-      items: filteredResults,
-      itemToString: (ingredient: WithDocId<Ingredient> | null) =>
-        ingredient ? ingredient.name : '',
-      onInputValueChange: ({ inputValue }) => {
-        if (inputValue) setValue(`ingredients.${index}.name`, inputValue);
-        const fuse = new Fuse(currentIngredients, {
-          keys: ['name'],
-          ignoreLocation: true,
-        });
+  const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps } = useCombobox({
+    items: filteredResults,
+    itemToString: (ingredient: WithDocId<Ingredient> | null) => (ingredient ? ingredient.name : ''),
+    onInputValueChange: ({ inputValue }) => {
+      if (inputValue) setValue(`ingredients.${index}.name`, inputValue);
+      const fuse = new Fuse(currentIngredients, {
+        keys: ['name'],
+        ignoreLocation: true,
+      });
 
-        const results = fuse.search(inputValue ? inputValue : '', {
-          limit: 5,
-        });
+      const results = fuse.search(inputValue ? inputValue : '', {
+        limit: 5,
+      });
 
-        setFilteredResults(
-          inputValue
-            ? results.map(result => {
-                return result.item;
-              })
-            : [],
-        );
-      },
-      onSelectedItemChange: ({ selectedItem }) => {
-        if (selectedItem) setValue(`ingredients.${index}`, { ...selectedItem });
-        console.log(selectedItem);
-      },
-    });
+      setFilteredResults(
+        inputValue
+          ? results.map(result => {
+              return result.item;
+            })
+          : [],
+      );
+    },
+    onSelectedItemChange: ({ selectedItem }) => {
+      if (selectedItem) setValue(`ingredients.${index}`, { ...selectedItem });
+    },
+  });
 
   return (
     <Flex flexDir={'column'} pos={'relative'}>
