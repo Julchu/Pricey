@@ -24,6 +24,9 @@ import {
   BoxProps,
   MenuGroup,
   MenuItem,
+  List,
+  ListItem,
+  Card,
 } from '@chakra-ui/react';
 
 import { FC, RefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -35,7 +38,7 @@ import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import useGroceryListHook from '../../hooks/useGroceryListHook';
 import Fuse from 'fuse.js';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
-import { useDebouncedState } from '../../hooks/useDebouncedState';
+import { useCombobox } from 'downshift';
 
 export type GroceryListFormData = {
   groceryListId?: string;
@@ -116,7 +119,6 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
   const filteredResults = useMemo(() => {
     const fuse = new Fuse(groceryLists, {
       keys: ['name', 'ingredients.name'],
-      includeScore: true,
       ignoreLocation: true,
     });
 
@@ -154,10 +156,10 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
             />
 
             {/* Header grocery inputs */}
-            <DropdownIngredient index={0} />
-            <DropdownIngredient index={1} />
-            <DropdownIngredient index={2} />
-            <DropdownIngredient index={3} />
+            <IngredientComboBox index={0} />
+            <IngredientComboBox index={1} />
+            <IngredientComboBox index={2} />
+            <IngredientComboBox index={3} />
           </Grid>
         </Flex>
 
@@ -186,7 +188,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
           <Accordion index={expandedIndex}>
             {filteredResults.map((list, index) => {
               return (
-                <AccordionItem key={`list_${index}`}>
+                <AccordionItem key={`list_${index}`} isFocusable={false}>
                   <AccordionButton
                     onClick={() => {
                       setExpandedIndex(previousArray => {
@@ -263,7 +265,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
             {/* Start new list */}
             {/* Accordion button row */}
             {authUser && !groceryListCreator ? (
-              <AccordionItem>
+              <AccordionItem isFocusable={false}>
                 <AccordionButton
                   py={0}
                   as={Box}
@@ -394,9 +396,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
   );
 };
 
-/* TODO: create custom dropdown menu for Ingredients */
-// TODO: convert to Combobox
-const DropdownIngredient: FC<{
+const IngredientComboBox: FC<{
   index: number;
 }> = ({ index }) => {
   const { control } = useFormContext<GroceryListFormData>();
@@ -426,95 +426,64 @@ const DropdownIngredient: FC<{
 
   const { currentIngredients } = useIngredientContext();
 
-  const filteredResults = useMemo(() => {
-    const fuse = new Fuse(currentIngredients, {
-      keys: ['name'],
-      includeScore: true,
-      ignoreLocation: true,
+  const [filteredResults, setFilteredResults] = useState<WithDocId<Ingredient>[]>([]);
+  const { isOpen, selectedItem, getMenuProps, getInputProps, highlightedIndex, getItemProps } =
+    useCombobox({
+      items: filteredResults,
+      itemToString: (ingredient: WithDocId<Ingredient> | null) =>
+        ingredient ? ingredient.name : '',
+      onInputValueChange: ({ inputValue }) => {
+        const fuse = new Fuse(currentIngredients, {
+          keys: ['name'],
+          ignoreLocation: true,
+        });
+
+        const results = fuse.search(inputValue ? inputValue : '', { limit: 5 });
+
+        setFilteredResults(
+          inputValue
+            ? results.map(result => {
+                return result.item;
+              })
+            : [],
+        );
+      },
     });
 
-    const results = fuse.search(ingredients ? ingredients.name : '', { limit: 5 });
-
-    return ingredients && ingredients.name
-      ? results.map(result => {
-          return result.item;
-        })
-      : currentIngredients;
-  }, [currentIngredients, ingredients]);
-
-  // Used to manually trigger opening menu from custom events on input box, like typing, clicking when there's text
-  const { onOpen, isOpen } = useMenu();
-
-  // Used to override MenuItem autofocus by manually focusing Ingredient input box
-  const inputRef = useRef<HTMLInputElement>(null);
-
   return (
-    <Menu isOpen={isOpen} matchWidth>
-      <MenuButton as={DropdownInput} onOpen={onOpen} onTyping={onTyping} inputRef={inputRef} />
+    <Flex flexDir={'column'} pos={'relative'}>
+      <Flex>
+        <Input {...getInputProps()} placeholder={'Grocery'} />
+      </Flex>
 
-      <MenuList>
-        <MenuGroup>
-          {filteredResults.map((ingredient, index) => {
-            return (
-              <MenuItem
-                closeOnSelect
-                key={`${ingredient.name}_${index}`}
-                value={ingredient.name}
-                onClickCapture={e => {
-                  if (inputRef.current) {
-                    inputRef.current.value = e.currentTarget.value;
-                    onSelectIngredient(ingredient);
-                  }
-                }}
-              >
-                {ingredient.name}
-              </MenuItem>
-            );
-          })}
-        </MenuGroup>
-      </MenuList>
-    </Menu>
+      <List
+        as={Card}
+        display={isOpen && filteredResults.length ? 'unset' : 'none'}
+        pos={'absolute'}
+        py={2}
+        mt={'50px'}
+        mx={0} // for mobile
+        overflowY="auto"
+        maxWidth={'100%'}
+        zIndex={98} // Remain under expanded accordions
+        {...getMenuProps()}
+      >
+        {filteredResults.map((item, index) => (
+          <ListItem
+            transition={'background-color 220ms, color 220ms'}
+            bg={index === highlightedIndex ? 'coral' : null}
+            px={'12px'}
+            py={'6px'}
+            cursor="pointer"
+            key={`${item}_${index}`}
+            {...getItemProps({ item, index })}
+          >
+            {item.name}
+          </ListItem>
+        ))}
+      </List>
+    </Flex>
   );
 };
-
-/**
- * @param onOpen: triggers opening menu
- * @param onTyping: passed down function for updating React Hook Form ingredient
- * @param inputRef: ref for input as workaround to not focus MenuItems, but rather continue focus on input
- */
-const DropdownInput: FC<{
-  onOpen: () => void;
-  onTyping: (value: string) => void;
-  inputRef: RefObject<HTMLInputElement>;
-}> = forwardRef<
-  BoxProps & {
-    onOpen: () => void;
-    onTyping: (value: string) => void;
-    inputRef: RefObject<HTMLInputElement>;
-  },
-  'div'
->((props, ref) => {
-  const { onOpen, onTyping, inputRef } = props;
-
-  return (
-    // Box needs ref for Menu to be attached to this input
-    <Box ref={ref} tabIndex={-1}>
-      <Input
-        ref={inputRef}
-        onClickCapture={e => {
-          if (e.currentTarget.value) onOpen();
-        }}
-        onChangeCapture={e => {
-          if (inputRef.current) {
-            inputRef.current.focus();
-          }
-          onOpen();
-          // onTyping(e.target.value);
-        }}
-        placeholder={'Grocery'}
-      />
-    </Box>
-  );
-});
 
 export default GroceryLists;

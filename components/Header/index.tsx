@@ -49,7 +49,7 @@ const HeaderButton: FC = () => {
       float={{ sm: 'right' }}
       m={'20px 30px'}
       size={'40px'}
-      transition="all 0.2s"
+      transition={'all 0.2s'}
       aria-label={'Open menu'}
       cursor={'pointer'}
       borderRadius={authUser || authLoading ? '50%' : '5px'}
@@ -141,7 +141,7 @@ const HeaderMenu: FC = () => {
               Ingredients
             </MenuItem>
             <MenuItem as={NextLink} href={'/groceries'} bg={asPath === '/groceries' ? 'coral' : ''}>
-              <Text onClick={() => console.log('list')}>My Lists</Text>
+              <Text>Grocery Lists</Text>
             </MenuItem>
           </MenuGroup>
           <MenuDivider />
