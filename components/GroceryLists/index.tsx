@@ -318,10 +318,10 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                 {/* 1.5 5.5 0.3 */}
                 {/* Group of inputs for customizing ingredients */}
                 <AccordionPanel>
-                  {fieldsIngredient.map((field, index) => (
+                  {ingredients.map(({ name, unit }, index) => (
                     <Grid
                       templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
-                      key={field.id}
+                      key={`${name}_${index}`}
                       p="12px 0px"
                       columnGap={'20px'}
                     >
@@ -340,7 +340,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
 
                         <Select
                           {...register(`ingredients.${index}.unit`)}
-                          color={ingredients[index].unit ? 'black' : 'grey'}
+                          color={unit ? 'black' : 'grey'}
                           isInvalid={errors.ingredients?.[index]?.unit?.type === 'required'}
                           placeholder={'Unit*'}
                         >
@@ -399,13 +399,13 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
 const IngredientComboBox: FC<{
   index: number;
 }> = ({ index }) => {
-  const { control } = useFormContext<GroceryListFormData>();
+  const { control, setValue } = useFormContext<GroceryListFormData>();
   const { update: updateIngredient } = useFieldArray({
     name: 'ingredients',
     control,
   });
 
-  const [ingredients] = useWatch({
+  const [currentIngredientWatch] = useWatch({
     control,
     name: [`ingredients.${index}`],
   });
@@ -433,12 +433,15 @@ const IngredientComboBox: FC<{
       itemToString: (ingredient: WithDocId<Ingredient> | null) =>
         ingredient ? ingredient.name : '',
       onInputValueChange: ({ inputValue }) => {
+        if (inputValue) setValue(`ingredients.${index}.name`, inputValue);
         const fuse = new Fuse(currentIngredients, {
           keys: ['name'],
           ignoreLocation: true,
         });
 
-        const results = fuse.search(inputValue ? inputValue : '', { limit: 5 });
+        const results = fuse.search(inputValue ? inputValue : '', {
+          limit: 5,
+        });
 
         setFilteredResults(
           inputValue
@@ -447,6 +450,10 @@ const IngredientComboBox: FC<{
               })
             : [],
         );
+      },
+      onSelectedItemChange: ({ selectedItem }) => {
+        if (selectedItem) setValue(`ingredients.${index}`, { ...selectedItem });
+        console.log(selectedItem);
       },
     });
 

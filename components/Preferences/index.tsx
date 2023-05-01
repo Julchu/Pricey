@@ -89,7 +89,7 @@ const Preferences: FC = () => {
           containerStyle: { letterSpacing: '2px' },
         });
 
-      router.push('/');
+      router.back();
     },
     [router, toast, updateUser],
   );
