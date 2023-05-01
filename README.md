@@ -58,14 +58,6 @@ cd Pricey
 yarn install
 yarn dev
 
-# Launching the Firebase/Firestore emulator: open the emulator at localhost:4000/firestore
-# Also exports/imports emulator data to ./emulatorData
-# projectId will be the one in your .env.development
-firebase --project="<projectId>" emulators:start --only auth,firestore,storage --export-on-exit ./emulatorData --import ./emulatorData
-
-# Sometimes emulator port is in use, this command will kill that port
-sudo kill -9 $(sudo lsof -t -i:8080)
-
 # TODO: Installing Firebase functions; can probably skip this for now
 cd functions
 yarn install
@@ -74,6 +66,21 @@ yarn install
 # Optional flag: --except functions
 yarn export && firebase --project <projectId> deploy
 
+```
+
+### Launching the Firebase/Firestore emulator: open the emulator at localhost:4000/firestore
+
+- Also exports/imports emulator data to `./emulatorData`
+- `projectId` will be the one in your .env.development
+
+```zsh
+firebase --project="<projectId>" emulators:start --only auth,firestore,storage --export-on-exit ./emulatorData --import ./emulatorData
+```
+
+### Sometimes emulator port is in use, this command will kill that port
+
+```zsh
+sudo kill -9 $(sudo lsof -t -i:8080)
 ```
 
 ### Prettier (format on save)

@@ -54,6 +54,10 @@ const HeaderButton: FC = () => {
       cursor={'pointer'}
       borderRadius={authUser || authLoading ? '50%' : '5px'}
       pos={'relative'}
+      boxShadow={'normal'}
+      _hover={{ boxShadow: 'hover' }}
+      _expanded={{ boxShadow: 'focus' }}
+      _focus={{ boxShadow: 'focus' }}
     >
       {/* Double AbsoluteCenters for centering skeleton circle */}
       <AbsoluteCenter>

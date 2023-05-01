@@ -449,7 +449,7 @@ const DropdownIngredient: FC<{
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
-    <Menu isOpen={isOpen} autoSelect={false} matchWidth initialFocusRef={inputRef}>
+    <Menu isOpen={isOpen} matchWidth>
       <MenuButton as={DropdownInput} onOpen={onOpen} onTyping={onTyping} inputRef={inputRef} />
 
       <MenuList>
@@ -457,18 +457,10 @@ const DropdownIngredient: FC<{
           {filteredResults.map((ingredient, index) => {
             return (
               <MenuItem
-                isFocusable={false}
                 closeOnSelect
                 key={`${ingredient.name}_${index}`}
                 value={ingredient.name}
-                onFocusCapture={() => {
-                  if (inputRef.current) inputRef.current.focus();
-                }}
-                onMouseOutCapture={() => {
-                  if (inputRef.current) inputRef.current.focus();
-                }}
                 onClickCapture={e => {
-                  if (inputRef.current) inputRef.current.focus();
                   if (inputRef.current) {
                     inputRef.current.value = e.currentTarget.value;
                     onSelectIngredient(ingredient);
@@ -506,29 +498,18 @@ const DropdownInput: FC<{
 
   return (
     // Box needs ref for Menu to be attached to this input
-    <Box ref={ref}>
+    <Box ref={ref} tabIndex={-1}>
       <Input
         ref={inputRef}
-        onFocusCapture={() => {
-          if (inputRef.current) inputRef.current.focus();
-        }}
         onClickCapture={e => {
-          if (inputRef.current) {
-            inputRef.current.focus();
-          }
           if (e.currentTarget.value) onOpen();
-        }}
-        onMouseOutCapture={() => {
-          if (inputRef.current) {
-            inputRef.current.focus();
-          }
         }}
         onChangeCapture={e => {
           if (inputRef.current) {
             inputRef.current.focus();
           }
           onOpen();
-          onTyping(e.target.value);
+          // onTyping(e.target.value);
         }}
         placeholder={'Grocery'}
       />
