@@ -1,6 +1,6 @@
 import { doc, DocumentReference, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
-import { db, Ingredient, Unit } from '../lib/firebase/interfaces';
+import { db, PersonalIngredient, Unit } from '../lib/firebase/interfaces';
 import {
   priceCalculator,
   filterNullableObject,
@@ -13,11 +13,11 @@ import { IngredientFormData } from '../components/HomeDashboard';
 type IngredientMethods = {
   submitIngredient: (
     ingredientData: IngredientFormData,
-  ) => Promise<DocumentReference<Ingredient> | undefined>;
+  ) => Promise<DocumentReference<PersonalIngredient> | undefined>;
 
   updateIngredient: (
     ingredientData: IngredientFormData,
-  ) => Promise<DocumentReference<Ingredient> | undefined>;
+  ) => Promise<DocumentReference<PersonalIngredient> | undefined>;
 };
 
 const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] => {
@@ -44,7 +44,7 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
       const ingredientDocRef = doc(db.ingredientCollection);
 
       // Ensuring all fields are passed by typechecking Ingredient
-      const newIngredient: Ingredient = {
+      const newIngredient: PersonalIngredient = {
         name: name.trim().toLocaleLowerCase('en-US'),
         price: parseFloat(convertedPricePerMeasurement),
         unit: convertedUnit,

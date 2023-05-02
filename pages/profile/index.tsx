@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import Layout from '../../components/Layout';
 import GroceryLists from '../../components/GroceryLists';
-import { AuthUnauthorized } from '../../components/AuthGuards';
+import { Unauthorized } from '../../components/AuthGuards';
 
 /* Paths:
  * pricey.app/profile (index): shows logged-in user's list of grocery lists (same as pages/groceries/index)
@@ -13,7 +13,6 @@ import { AuthUnauthorized } from '../../components/AuthGuards';
 const ProfilePage: NextPage = () => {
   const { authUser } = useAuthContext();
 
-  if (!authUser) return <AuthUnauthorized />;
   return (
     <>
       <Head>
@@ -22,9 +21,7 @@ const ProfilePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout>
-        <GroceryLists />
-      </Layout>
+      <Layout>{authUser ? <GroceryLists /> : <Unauthorized />}</Layout>
     </>
   );
 };

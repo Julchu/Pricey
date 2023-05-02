@@ -7,7 +7,7 @@ import {
 } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import Papa from 'papaparse';
-import { db, Ingredient } from '../lib/firebase/interfaces';
+import { db, PersonalIngredient } from '../lib/firebase/interfaces';
 import { firestore } from '../lib/firebase';
 
 type CsvMethods = {
@@ -15,8 +15,8 @@ type CsvMethods = {
   csvToFirestore: () => void;
 };
 
-const useCSVHook = (): [CsvMethods, Ingredient[], boolean, Error | undefined] => {
-  const [csvData, setCSVData] = useState<Ingredient[]>([]);
+const useCSVHook = (): [CsvMethods, PersonalIngredient[], boolean, Error | undefined] => {
+  const [csvData, setCSVData] = useState<PersonalIngredient[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
 
@@ -44,7 +44,7 @@ const useCSVHook = (): [CsvMethods, Ingredient[], boolean, Error | undefined] =>
           lastUpdated: serverTimestamp(),
         };
 
-        batch.set(ingredientDocRef, ingredientInfo as PartialWithFieldValue<Ingredient>);
+        batch.set(ingredientDocRef, ingredientInfo as PartialWithFieldValue<PersonalIngredient>);
 
         // Commit the batch
         await batch.commit();
@@ -66,7 +66,7 @@ const useCSVHook = (): [CsvMethods, Ingredient[], boolean, Error | undefined] =>
       worker: true,
       // Parsing the entire file at once
       complete: results => {
-        const newResults = results.data.reduce<Ingredient[]>((filteredData, nextValue) => {
+        const newResults = results.data.reduce<PersonalIngredient[]>((filteredData, nextValue) => {
           const { PLU, CATEGORY, COMMODITY, VARIETY, IMAGE, SIZE, ..._rest } = nextValue as Record<
             string,
             string

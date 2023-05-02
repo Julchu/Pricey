@@ -1,6 +1,6 @@
 import { collection, deleteDoc, doc, getDoc, getDocs } from 'firebase/firestore';
 import { firestore } from '.';
-import { db, Ingredient } from './interfaces';
+import { db, PersonalIngredient } from './interfaces';
 
 // Retrieves list of documents
 export const getDocuments = async (collectionName: string): Promise<void> => {
@@ -14,7 +14,7 @@ export const getDocuments = async (collectionName: string): Promise<void> => {
 export const getIngredientNames = async (
   collectionName: string,
   documentId: string,
-  callback: (arg0: Ingredient) => void,
+  callback: (arg0: PersonalIngredient) => void,
 ): Promise<void> => {
   const snap = await getDoc(
     // Retrieve single document with known id

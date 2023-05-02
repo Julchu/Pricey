@@ -1,6 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
-import { AuthUnauthorized } from '../components/AuthGuards';
+import { Unauthorized } from '../components/AuthGuards';
 import Functions from '../components/Functions';
 import Layout from '../components/Layout';
 import { useAuthContext } from '../hooks/useAuthContext';
@@ -17,7 +17,7 @@ const FunctionsPage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Layout>{authUser?.role === Role.admin ? <Functions /> : <AuthUnauthorized />}</Layout>
+      <Layout>{authUser?.role === Role.admin ? <Functions /> : <Unauthorized />}</Layout>
     </>
   );
 };

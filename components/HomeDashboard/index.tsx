@@ -81,7 +81,7 @@ const IngredientList: FC = () => {
           columnGap={{ base: '100%', sm: '30px' }}
           overflowX={{ base: 'scroll', sm: 'visible' }}
           overflowY={{ base: 'hidden', sm: 'visible' }}
-          scrollSnapType={['x mandatory', 'none']}
+          scrollSnapType={{ base: 'x mandatory', sm: 'none' }}
           templateColumns={{
             base: 'repeat(auto-fill, minmax(150px, 1fr))',
             sm: 'repeat(auto-fill, 250px)',

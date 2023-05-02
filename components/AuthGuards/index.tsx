@@ -1,4 +1,4 @@
-import { AbsoluteCenter, Heading, Highlight } from '@chakra-ui/react';
+import { AbsoluteCenter, Heading } from '@chakra-ui/react';
 import { FC } from 'react';
 
 export const AuthLoading: FC = () => {
@@ -9,7 +9,7 @@ export const AuthLoading: FC = () => {
   );
 };
 
-export const AuthUnauthorized: FC = () => {
+export const Unauthorized: FC = () => {
   return (
     <AbsoluteCenter>
       <Heading as={'h1'}>Unauthorized</Heading>

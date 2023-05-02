@@ -11,7 +11,7 @@ import {
   AbsoluteCenter,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { Ingredient, WithDocId } from '../../lib/firebase/interfaces';
+import { PersonalIngredient, WithDocId } from '../../lib/firebase/interfaces';
 import { IngredientFormData } from '.';
 import { useUnitContext } from '../../hooks/useUnitContext';
 import {
@@ -25,7 +25,7 @@ import {
 import useIngredientHook from '../../hooks/useIngredientHook';
 
 type CardProps = {
-  ingredientInfo: WithDocId<Ingredient>;
+  ingredientInfo: WithDocId<PersonalIngredient>;
   highlighted?: boolean;
 };
 
@@ -58,7 +58,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
 
   // Modify form data for update submission
   const onUpdateTransform = useCallback(
-    async (data: WithDocId<Ingredient>): Promise<void> => {
+    async (data: WithDocId<PersonalIngredient>): Promise<void> => {
       setValue('name', data.name);
       setValue('ingredientId', data.documentId);
     },

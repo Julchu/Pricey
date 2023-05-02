@@ -57,8 +57,8 @@ export enum Role {
 
 export interface Ingredient {
   name: string;
-  price: number;
-  unit: Unit;
+  price?: number;
+  unit?: Unit;
   image?: string;
   /** @param amount and @param quantity used for @interfaceGroceryList */
   amount?: number;
@@ -67,6 +67,11 @@ export interface Ingredient {
   season?: Season;
   createdAt?: Timestamp | FieldValue;
   lastUpdated?: Timestamp | FieldValue;
+}
+
+export interface PersonalIngredient extends Ingredient {
+  price: number;
+  unit: Unit;
 }
 
 export interface GroceryList {
@@ -140,12 +145,13 @@ const docPoint = <T>(collectionPath: string, ...extraPaths: string[]): DocumentR
 export const db = {
   // Collections
   groceryListCollection: collectionPoint<GroceryList>('groceryList'),
-  ingredientCollection: collectionPoint<Ingredient>('ingredients'),
+  ingredientCollection: collectionPoint<PersonalIngredient>('ingredients'),
   userCollection: collectionPoint<User>('users'),
 
   // Docs
   groceryListDoc: (...extraPaths: string[]) => docPoint<GroceryList>('groceryList', ...extraPaths),
-  ingredientDoc: (...extraPaths: string[]) => docPoint<Ingredient>('ingredients', ...extraPaths),
+  ingredientDoc: (...extraPaths: string[]) =>
+    docPoint<PersonalIngredient>('ingredients', ...extraPaths),
   userDoc: (...extraPaths: string[]) => docPoint<User>('users', ...extraPaths),
 };
 

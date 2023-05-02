@@ -1,5 +1,6 @@
 import { extendTheme } from '@chakra-ui/react';
 import { Montserrat } from 'next/font/google';
+import Accordion from './Accordion';
 import Button from './Button';
 import Card from './Card';
 import Input from './Input';
@@ -50,6 +51,7 @@ const theme = {
     Select,
     Card,
     Menu,
+    Accordion,
   },
   // Color mode (light/dark)
   config: {
