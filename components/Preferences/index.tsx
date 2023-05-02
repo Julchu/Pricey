@@ -20,8 +20,6 @@ import {
   CloseButton,
   UseToastOptions,
   Skeleton,
-  Hide,
-  Show,
 } from '@chakra-ui/react';
 import { getDocs, query, where } from 'firebase/firestore';
 import { useRouter } from 'next/router';
@@ -248,7 +246,7 @@ const RadioButton: FC<UseRadioProps> = props => {
   );
 };
 
-const CustomToast: FC<UseToastOptions & { onClose: () => void }> = ({
+const _CustomToast: FC<UseToastOptions & { onClose: () => void }> = ({
   title,
   description,
   onClose,

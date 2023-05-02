@@ -24,21 +24,14 @@ import {
 
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuthContext } from '../../hooks/useAuthContext';
-import {
-  db,
-  GroceryList,
-  Ingredient,
-  PersonalIngredient,
-  Unit,
-  WithDocId,
-} from '../../lib/firebase/interfaces';
+import { db, GroceryList, Unit, WithDocId } from '../../lib/firebase/interfaces';
 import { onSnapshot, query, where } from 'firebase/firestore';
-import { useForm, FormProvider, useFieldArray, useFormContext, useWatch } from 'react-hook-form';
+import { useForm, FormProvider, useFieldArray, useFormContext } from 'react-hook-form';
 import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import useGroceryListHook from '../../hooks/useGroceryListHook';
 import Fuse from 'fuse.js';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
-import { useCombobox, useSelect } from 'downshift';
+import { useCombobox } from 'downshift';
 import { validateIsNumber } from '../../lib/textFormatters';
 
 export type GroceryListFormData = {
