@@ -521,17 +521,17 @@ const IngredientComboBox: FC<{
         zIndex={98} // Remain under expanded accordions
         {...getMenuProps()}
       >
-        {filteredIngredients.map((ingredientName, index) => (
+        {filteredIngredients.map((item, index) => (
           <ListItem
             transition={'background-color 220ms, color 220ms'}
             bg={index === highlightedIndex ? 'coral' : null}
             px={'12px'}
             py={'6px'}
             cursor="pointer"
-            key={`${ingredientName}_${index}`}
-            {...getItemProps({ ingredientName, index })}
+            key={`${item}_${index}`}
+            {...getItemProps({ item, index })}
           >
-            {ingredientName}
+            {item}
           </ListItem>
         ))}
       </List>
