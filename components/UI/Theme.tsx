@@ -16,6 +16,7 @@ const montserrat = Montserrat({
 const theme = {
   colors: {
     blue: '#0000FF',
+    lightBlue: '#0070f3',
     coral: 'lightcoral',
   },
   fonts: {

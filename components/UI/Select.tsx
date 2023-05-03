@@ -14,6 +14,7 @@ const sizes = {
   // xl: definePartsStyle({ field: xl, addon: xl }),
 };
 
+// Same as Input
 const baseStyle = definePartsStyle({
   field: {
     letterSpacing: '2px',
@@ -24,12 +25,10 @@ const baseStyle = definePartsStyle({
     transition: 'box-shadow 0.2s ease-in-out',
     _hover: { boxShadow: 'hover' },
     _focus: { boxShadow: 'focus' },
+    fontWeight: 500,
     _invalid: {
       color: 'red',
       fontWeight: 600,
-      _placeholder: {
-        color: 'red',
-      },
     },
 
     // Dark mode alternatives

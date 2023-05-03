@@ -9,6 +9,8 @@ import {
   Stat,
   Tooltip,
   AbsoluteCenter,
+  Button,
+  Center,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { PersonalIngredient, WithDocId } from '../../lib/firebase/interfaces';
@@ -124,13 +126,23 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       {/* <Divider boxShadow={'focus'} borderColor={'lightgrey'} /> */}
 
       {/* Info */}
-      <CardBody
-        onClick={async () => {
-          await onUpdateTransform(ingredientInfo);
-          handleSubmit(onUpdateSubmit)();
-        }}
-      >
-        <Text display={'block'}>{highlighted ? 'Update' : <span>&nbsp;</span>}</Text>
+      <CardBody onClick={async () => {}}>
+        <Center>
+          <Button
+            onClick={async e => {
+              e.stopPropagation();
+              await onUpdateTransform(ingredientInfo);
+              handleSubmit(onUpdateSubmit)();
+            }}
+            display={'block'}
+            overflow={'hidden'}
+            bg={'white'}
+            _dark={{ bg: 'gray.800' }}
+            mb={'5px'}
+          >
+            Update
+          </Button>
+        </Center>
 
         <Tooltip isDisabled={!overflowing} hasArrow label={ingredientInfo?.name} placement={'top'}>
           <Text
@@ -233,7 +245,7 @@ export const NewIngredientCard: FC = () => {
   );
 
   return (
-    <Card>
+    <Card h="100%">
       {/* Image */}
       <CardHeader>
         <AbsoluteCenter>
@@ -245,17 +257,22 @@ export const NewIngredientCard: FC = () => {
       {/* Card line */}
       {/* <Divider boxShadow={'focus'} borderColor={'lightgrey'} /> */}
 
-      <CardBody
-        onClick={handleSubmit(onSubmit)}
-        h={'100%'}
-        w={'100%'}
-        padding={'15px 30px'}
-        cursor={'pointer'}
-        textAlign={'center'}
-      >
-        <Text display={'block'} overflow={'hidden'}>
-          Save
-        </Text>
+      <CardBody>
+        <Center>
+          <Button
+            onClick={e => {
+              e.stopPropagation();
+              handleSubmit(onSubmit);
+            }}
+            display={'block'}
+            overflow={'hidden'}
+            bg={'white'}
+            _dark={{ bg: 'gray.800' }}
+            mb={'5px'}
+          >
+            Save
+          </Button>
+        </Center>
 
         <Tooltip
           isDisabled={!overflowing}

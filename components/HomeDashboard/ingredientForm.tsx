@@ -25,7 +25,7 @@ const IngredientForm: FC = () => {
       {/* Ingredient name input */}
       <Input
         type={'text'}
-        gridColumn={{ base: '1/3', sm: '1/3' }}
+        gridColumn={'1/3'}
         {...register('name', { required: true })}
         isInvalid={errors.name?.type === 'required'}
         placeholder={

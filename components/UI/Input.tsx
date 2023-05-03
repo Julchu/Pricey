@@ -24,6 +24,7 @@ const baseStyle = definePartsStyle({
     transition: 'box-shadow 0.2s ease-in-out',
     _hover: { boxShadow: 'hover' },
     _focus: { boxShadow: 'focus' },
+    fontWeight: 500,
     _invalid: {
       color: 'red',
       fontWeight: 600,

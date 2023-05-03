@@ -12,6 +12,8 @@ type GroceryListMethods = {
   updateGroceryList: (
     groceryListData: GroceryListFormData,
   ) => Promise<DocumentReference<GroceryList> | undefined>;
+
+  deleteGroceryList: (groceryListId: string) => Promise<DocumentReference<GroceryList> | undefined>;
 };
 
 const useGroceryListHook = (): [GroceryListMethods, boolean, Error | undefined] => {
@@ -90,10 +92,42 @@ const useGroceryListHook = (): [GroceryListMethods, boolean, Error | undefined] 
 
       return groceryListDocRef;
     },
-    [authUser?.documentId],
+    [authUser],
   );
 
-  return [{ submitGroceryList, updateGroceryList }, loading, error];
+  const deleteGroceryList = useCallback<GroceryListMethods['deleteGroceryList']>(
+    async ({ groceryListId, name, ingredients, viewable }) => {
+      if (!authUser) return;
+      // const previewPrice = priceCalculator(price, measurement);
+      // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
+      //   mass: Unit.kilogram,
+      //   volume: Unit.litre,
+      // }).toFixed(2);
+
+      const groceryListDocRef = doc(db.groceryListCollection, groceryListId);
+
+      // const updatedIngredient = filterNullableObject({
+      //   ingredientId,
+      //   price: parseFloat(convertedPreviewPrice),
+      //   measurement,
+      //   quantity,
+      //   unit,
+      //   location,
+      //   image,
+      // });
+
+      try {
+        // await updateDoc(groceryListDocRef, updatedIngredient);
+      } catch (e) {
+        setError(e as Error);
+      }
+
+      return groceryListDocRef;
+    },
+    [authUser],
+  );
+
+  return [{ submitGroceryList, updateGroceryList, deleteGroceryList }, loading, error];
 };
 
 export default useGroceryListHook;

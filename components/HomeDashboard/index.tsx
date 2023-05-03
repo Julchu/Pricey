@@ -66,48 +66,50 @@ const IngredientList: FC = () => {
 
   return (
     <form>
-      {/* FormProvider from ReactHookForms */}
       <FormProvider {...methods}>
-        <Flex flexDir={{ base: 'column', sm: 'row' }}>
-          <IngredientForm />
-        </Flex>
+        <Flex h="calc(100svh - 80px)" flexDir={'column'} display={{ base: 'flex', sm: 'block' }}>
+          {/* FormProvider from ReactHookForms */}
+          <Flex flexDir={{ base: 'column', sm: 'row' }}>
+            <IngredientForm />
+          </Flex>
 
-        <Grid
-          // px: 0px required for mobile when no ingredients found
-          p={{ base: '30px 0px', sm: '0px 30px' }}
-          mt={'header'}
-          autoFlow={{ base: 'column', sm: 'row' }}
-          rowGap={'30px'}
-          columnGap={{ base: '100%', sm: '30px' }}
-          overflowX={{ base: 'scroll', sm: 'visible' }}
-          overflowY={{ base: 'hidden', sm: 'visible' }}
-          scrollSnapType={{ base: 'x mandatory', sm: 'none' }}
-          templateColumns={{
-            base: 'repeat(auto-fill, minmax(150px, 1fr))',
-            sm: 'repeat(auto-fill, 250px)',
-          }}
-          justifyContent={{ sm: 'space-between' }}
-        >
-          {!foundIngredient ? (
-            <GridItem>
-              <NewIngredientCard />
-            </GridItem>
-          ) : null}
-
-          {filteredResults?.map((item, index) => {
-            const highlighted = item.documentId === foundIngredient;
-
-            return (
-              <GridItem
-                ml={{ base: foundIngredient ? '30px' : '' }}
-                mr={{ base: index === filteredResults.length - 1 ? '30px' : '' }}
-                key={`${item.name}_${index}`}
-              >
-                <IngredientCard ingredientInfo={item} highlighted={highlighted} />
+          <Grid
+            flexGrow={{ base: 1, sm: 'unset' }}
+            // px: 0px required for mobile when no ingredients found
+            p={{ base: '30px 0px', sm: '0px 30px' }}
+            mt={'header'}
+            autoFlow={{ base: 'column', sm: 'row' }}
+            rowGap={'30px'}
+            columnGap={{ base: '100%', sm: '30px' }}
+            overflowX={{ base: 'scroll', sm: 'visible' }}
+            overflowY={{ base: 'hidden', sm: 'visible' }}
+            scrollSnapType={{ base: 'x mandatory', sm: 'none' }}
+            templateColumns={{
+              base: 'repeat(auto-fill, minmax(100%, 1fr))',
+              sm: 'repeat(auto-fill, 250px)',
+            }}
+          >
+            {!foundIngredient ? (
+              <GridItem h="100%">
+                <NewIngredientCard />
               </GridItem>
-            );
-          })}
-        </Grid>
+            ) : null}
+
+            {filteredResults?.map((item, index) => {
+              const highlighted = item.documentId === foundIngredient;
+
+              return (
+                <GridItem
+                  ml={{ base: foundIngredient ? '30px' : '' }}
+                  mr={{ base: index === filteredResults.length - 1 ? '30px' : '' }}
+                  key={`${item.name}_${index}`}
+                >
+                  <IngredientCard ingredientInfo={item} highlighted={highlighted} />
+                </GridItem>
+              );
+            })}
+          </Grid>
+        </Flex>
       </FormProvider>
     </form>
   );

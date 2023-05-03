@@ -1,7 +1,6 @@
 import type { NextPage } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { useEffect } from 'react';
 import Layout from '../components/Layout';
 import Preferences from '../components/Preferences';
 import { useAuthContext } from '../hooks/useAuthContext';
