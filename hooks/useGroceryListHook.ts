@@ -96,7 +96,7 @@ const useGroceryListHook = (): [GroceryListMethods, boolean, Error | undefined] 
   );
 
   const deleteGroceryList = useCallback<GroceryListMethods['deleteGroceryList']>(
-    async ({ groceryListId, name, ingredients, viewable }) => {
+    async groceryListId => {
       if (!authUser) return;
       // const previewPrice = priceCalculator(price, measurement);
       // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
