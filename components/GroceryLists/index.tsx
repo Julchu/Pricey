@@ -19,6 +19,7 @@ import {
   Hide,
   useColorModeValue,
   CloseButton,
+  Show,
 } from '@chakra-ui/react';
 
 import { FC, useCallback, useEffect, useMemo, useState } from 'react';
@@ -187,10 +188,11 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                               else return [index];
                             });
                           }}
+                          alignItems={'start'}
                         >
                           <Grid
                             templateColumns={{ base: '1fr', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
-                            templateRows={{ base: 'auto 1fr 1fr 1fr', sm: '1fr' }}
+                            templateRows={{ base: '100px 1fr 1fr 1fr', sm: '1fr' }}
                             w={'100%'}
                             h={{ base: '350px', sm: 'unset' }}
                             p={'12px 0px'}
@@ -199,7 +201,7 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                             rowGap={'20px'}
                           >
                             {/* Grocery list name */}
-                            <Text as={'b'} display={'block'} whiteSpace={'nowrap'} isTruncated>
+                            <Text as={'b'} display={'block'} alignSelf={'center'}>
                               {list.name}
                             </Text>
 
@@ -217,27 +219,33 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                             {/* Price */}
                             <Text textAlign={'end'}>$24</Text>
 
-                            <GridItem textAlign={'center'}>
+                            <GridItem
+                              textAlign={'center'}
+                              gridColumnStart={{ sm: 4 }}
+                              gridRowStart={{ base: '4', sm: 'unset' }}
+                            >
                               <AccordionIcon />
                             </GridItem>
                           </Grid>
                         </AccordionButton>
 
                         <AccordionPanel
-                          pos={{ base: expandedIndex.length ? 'absolute' : 'unset', sm: 'unset' }}
-                          top={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
-                          right={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
-                          h={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
-                          w={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
-                          bg={'bg'}
+                          pos={{ base: 'absolute', sm: 'unset' }}
+                          top={{ base: '0', sm: 'unset' }}
+                          right={{ base: '0', sm: 'unset' }}
+                          h={{ base: '100%', sm: 'unset' }}
+                          bg={bg}
                           zIndex={99}
+                          motionProps={{ animate: { rotate: '5' } }}
                         >
-                          <CloseButton
-                            ml={'auto'}
-                            onClick={() => {
-                              setExpandedIndex([]);
-                            }}
-                          />
+                          <Show below="sm">
+                            <CloseButton
+                              ml={'auto'}
+                              onClick={() => {
+                                setExpandedIndex([]);
+                              }}
+                            />
+                          </Show>
                           <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'}>
                             <GridItem gridColumnStart={2}>
                               {list.ingredients.map(({ name, amount, unit, quantity }, index) => {
@@ -282,7 +290,8 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                         h={{ base: '100%', sm: 'unset' }}
                         w={{ sm: '100%' }}
                         bg={isExpanded ? 'coral' : ''}
-                        py={0}
+                        // Base: 8px needed otherwise sets to 0 on mobile
+                        py={{ base: '8px', sm: '0px' }}
                         as={Box}
                         cursor={'pointer'}
                         onClick={() => {
@@ -292,10 +301,11 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                             else return [filteredLists.length];
                           });
                         }}
+                        alignItems={'start'}
                       >
                         <Grid
                           templateColumns={{ base: '1fr', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
-                          templateRows={{ base: 'auto 1fr 1fr 1fr', sm: '1fr' }}
+                          templateRows={{ base: '100px 1fr 1fr 1fr', sm: '1fr' }}
                           w={'100%'}
                           h={{ base: '350px', sm: 'unset' }}
                           p={'12px 0px'}
@@ -303,28 +313,30 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                           columnGap={'20px'}
                           rowGap={'20px'}
                         >
-                          <Button
-                            onClick={e => {
-                              // Prevent this button clicking from triggering accordion
-                              e.stopPropagation();
-                              handleSubmit(onSubmitHandler)();
-                            }}
-                            whiteSpace={'normal'}
-                            wordBreak={'break-word'}
-                            h={'fit-content'}
-                            bg={'white'}
-                            _dark={{ bg: 'gray.800' }}
-                            /**
-                             * @default minHeight: 10
-                             * @default paddingY: 2
-                             */
-                            minHeight={10}
-                            paddingY={2}
-                          >
-                            <Text>Save {newListName ? newListName : ' new list'}</Text>
-                          </Button>
+                          <GridItem alignSelf={'center'}>
+                            <Button
+                              onClick={e => {
+                                // Prevent this button clicking from triggering accordion
+                                e.stopPropagation();
+                                handleSubmit(onSubmitHandler)();
+                              }}
+                              whiteSpace={'normal'}
+                              wordBreak={'break-word'}
+                              h={'fit-content'}
+                              bg={'white'}
+                              _dark={{ bg: 'gray.800' }}
+                              /**
+                               * @default minHeight: 10
+                               * @default paddingY: 2
+                               */
+                              minHeight={10}
+                              paddingY={2}
+                            >
+                              <Text>Save {newListName ? newListName : ' new list'}</Text>
+                            </Button>
+                          </GridItem>
 
-                          <Flex flexWrap={'wrap'} gap={'10px'} alignItems={'center'}>
+                          <Flex flexWrap={'wrap'} gap={'10px'}>
                             {ingredients.map((field, index) => (
                               <Box key={`ingredient_${index}`}>
                                 <Badge>{field.name}</Badge>
@@ -354,6 +366,12 @@ const GroceryLists: FC<{ groceryListCreator?: string }> = ({ groceryListCreator 
                         bg={bg}
                         zIndex={99}
                       >
+                        <CloseButton
+                          ml={'auto'}
+                          onClick={() => {
+                            setExpandedIndex([]);
+                          }}
+                        />
                         {ingredients.map(({ name, unit }, index) => (
                           <Grid
                             templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}

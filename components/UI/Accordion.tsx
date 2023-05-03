@@ -20,7 +20,7 @@ const baseStyle = definePartsStyle({
   },
   container: {},
   button: {
-    _hover: { bg: 'coral' },
+    _hover: { bg: { base: 'none', sm: 'coral' } },
   },
   panel: {},
   icon: {},
@@ -42,18 +42,7 @@ const mobileCard = definePartsStyle({
 });
 
 const defaultVariant = definePartsStyle({
-  container: {
-    // flexGrow: { base: 1, sm: 'unset' },
-    // padding: { base: '30px 0px', sm: '0px 30px' },
-    // gridAutoFlow: { base: 'column', sm: 'row' },
-    // overflowX: { base: 'scroll', sm: 'visible' },
-    // overflowY: { base: 'hidden', sm: 'visible' },
-    // scrollSnapType: { base: 'x mandatory', sm: 'none' },
-    // gridTemplateColumns: {
-    //   base: 'repeat(auto-fill, minmax(100%, 1fr))',
-    //   sm: 'none',
-    // },
-  },
+  container: {},
 });
 
 const Accordion = defineMultiStyleConfig({

@@ -111,6 +111,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
 
   return (
     <Card
+      h="100%"
       boxShadow={highlighted ? 'under' : 'normal'}
       _hover={{ boxShadow: highlighted ? 'focus' : 'hover' }}
     >
