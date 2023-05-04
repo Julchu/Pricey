@@ -219,7 +219,7 @@ const NewListAccordion: FC<{
   newListName: string;
 }> = ({ isExpanded, filteredListsLength, newListName }) => {
   const [{ submitGroceryList }, loading] = useGroceryListHook();
-  const { expandedIndex, setExpandedIndex } = useGroceryListContext();
+  const { setExpandedIndex } = useGroceryListContext();
   const {
     register,
     control,
@@ -301,6 +301,7 @@ const NewListAccordion: FC<{
           </Flex>
 
           <GridItem
+            alignSelf={'center'}
             textAlign={'center'}
             gridColumnStart={{ sm: 4 }}
             gridRowStart={{ base: '4', sm: 'unset' }}
@@ -312,11 +313,11 @@ const NewListAccordion: FC<{
 
       {/* Group of inputs for customizing ingredients */}
       <AccordionPanel
-        pos={{ base: expandedIndex.length ? 'absolute' : 'unset', sm: 'unset' }}
-        top={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
-        right={{ base: expandedIndex.length ? '0' : 'unset', sm: 'unset' }}
-        h={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
-        w={{ base: expandedIndex.length ? '100%' : 'unset', sm: 'unset' }}
+        pos={{ base: 'absolute', sm: 'unset' }}
+        top={{ base: '0', sm: 'unset' }}
+        right={{ base: '0', sm: 'unset' }}
+        h={{ base: '100%', sm: 'unset' }}
+        w={{ base: '100%', sm: 'unset' }}
         bg={bg}
         zIndex={99}
       >
