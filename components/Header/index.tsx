@@ -137,10 +137,14 @@ const HeaderMenu: FC = () => {
       {authUser ? (
         <>
           <MenuGroup title="Groceries">
-            <MenuItem as={NextLink} href={'/'} bg={asPath === '/' ? 'coral' : ''}>
+            <MenuItem as={NextLink} href={'/'} bg={asPath === '/' ? 'lightcoral' : ''}>
               Ingredients
             </MenuItem>
-            <MenuItem as={NextLink} href={'/groceries'} bg={asPath === '/groceries' ? 'coral' : ''}>
+            <MenuItem
+              as={NextLink}
+              href={'/groceries'}
+              bg={asPath === '/groceries' ? 'lightcoral' : ''}
+            >
               <Text>Grocery Lists</Text>
             </MenuItem>
           </MenuGroup>
@@ -150,11 +154,15 @@ const HeaderMenu: FC = () => {
 
       <MenuGroup title="Links">
         {authUser?.role === Role.admin ? (
-          <MenuItem as={NextLink} href={'/functions'} bg={asPath === '/functions' ? 'coral' : ''}>
+          <MenuItem
+            as={NextLink}
+            href={'/functions'}
+            bg={asPath === '/functions' ? 'lightcoral' : ''}
+          >
             Functions
           </MenuItem>
         ) : null}
-        <MenuItem as={NextLink} href={'/about'} bg={asPath === '/about' ? 'coral' : ''}>
+        <MenuItem as={NextLink} href={'/about'} bg={asPath === '/about' ? 'lightcoral' : ''}>
           About
         </MenuItem>
       </MenuGroup>
@@ -166,7 +174,7 @@ const HeaderMenu: FC = () => {
           <MenuItem
             as={NextLink}
             href={'/preferences'}
-            bg={asPath === '/preferences' ? 'coral' : ''}
+            bg={asPath === '/preferences' ? 'lightcoral' : ''}
           >
             Preferences
           </MenuItem>

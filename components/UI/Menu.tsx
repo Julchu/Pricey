@@ -20,7 +20,7 @@ const baseStyle = definePartsStyle({
     boxShadow: 'normal',
   },
   item: {
-    _hover: { bg: 'coral' },
+    _hover: { bg: 'lightcoral' },
   },
   groupTitle: {},
   command: {},

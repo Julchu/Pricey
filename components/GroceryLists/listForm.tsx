@@ -1,12 +1,15 @@
-import { Card, Flex, Grid, Input, List, ListItem } from '@chakra-ui/react';
+import { Card, Flex, Grid, Input, List, ListItem, useMediaQuery } from '@chakra-ui/react';
 import { useCombobox } from 'downshift';
 import Fuse from 'fuse.js';
 import { FC, useState } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
+import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 
-const ListForm: FC = () => {
+const ListForm: FC<{
+  filteredListLength: number;
+}> = ({ filteredListLength }) => {
   const {
     register,
 
@@ -31,22 +34,25 @@ const ListForm: FC = () => {
       />
 
       {/* Header grocery inputs */}
-      <IngredientComboBox index={0} />
-      <IngredientComboBox index={1} />
-      <IngredientComboBox index={2} />
-      <IngredientComboBox index={3} />
+      <IngredientComboBox index={0} filteredListLength={filteredListLength} />
+      <IngredientComboBox index={1} filteredListLength={filteredListLength} />
+      <IngredientComboBox index={2} filteredListLength={filteredListLength} />
+      <IngredientComboBox index={3} filteredListLength={filteredListLength} />
     </Grid>
   );
 };
 
 const IngredientComboBox: FC<{
   index: number;
-}> = ({ index }) => {
+  filteredListLength: number;
+}> = ({ index, filteredListLength }) => {
   const { setValue } = useFormContext<GroceryListFormData>();
+  const { setExpandedIndex } = useGroceryListContext();
 
   // PersonalIngredient from context hook, and filtered array of PersonalIngredients
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
   const [filteredIngredients, setFilteredIngredients] = useState<string[]>([]);
+  const [isDesktopView] = useMediaQuery('(min-width: 30em)');
 
   const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps } = useCombobox({
     items: filteredIngredients,
@@ -65,6 +71,8 @@ const IngredientComboBox: FC<{
       }
 
       setValue(`ingredients.${index}`, updatedIngredient);
+
+      if (isDesktopView) setExpandedIndex([filteredListLength]);
 
       const fuse = new Fuse(Object.keys(ingredientIndexes), {
         keys: ['name'],
@@ -106,7 +114,7 @@ const IngredientComboBox: FC<{
         {filteredIngredients.map((item, index) => (
           <ListItem
             transition={'background-color 220ms, color 220ms'}
-            bg={index === highlightedIndex ? 'coral' : null}
+            bg={index === highlightedIndex ? 'lightcoral' : null}
             px={'12px'}
             py={'6px'}
             cursor="pointer"

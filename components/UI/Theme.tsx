@@ -17,7 +17,7 @@ const theme = {
   colors: {
     blue: '#0000FF',
     lightBlue: '#0070f3',
-    coral: 'lightcoral',
+    tableHeader: 'gray.600',
   },
   fonts: {
     heading: montserrat.style.fontFamily,

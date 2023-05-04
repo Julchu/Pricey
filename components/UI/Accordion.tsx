@@ -20,7 +20,7 @@ const baseStyle = definePartsStyle({
   },
   container: {},
   button: {
-    _hover: { bg: { base: 'none', sm: 'coral' } },
+    _hover: { bg: { base: 'none', sm: 'lightcoral' } },
   },
   panel: {},
   icon: {},

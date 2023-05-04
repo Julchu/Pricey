@@ -127,23 +127,15 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       {/* <Divider boxShadow={'focus'} borderColor={'lightgrey'} /> */}
 
       {/* Info */}
-      <CardBody onClick={async () => {}}>
-        <Center>
-          <Button
-            onClick={async e => {
-              e.stopPropagation();
-              await onUpdateTransform(ingredientInfo);
-              handleSubmit(onUpdateSubmit)();
-            }}
-            display={'block'}
-            overflow={'hidden'}
-            bg={'white'}
-            _dark={{ bg: 'gray.800' }}
-            mb={'5px'}
-          >
-            Update
-          </Button>
-        </Center>
+      <CardBody
+        onClick={async () => {
+          await onUpdateTransform(ingredientInfo);
+          handleSubmit(onUpdateSubmit)();
+        }}
+      >
+        <Text overflow={'hidden'} bg={'white'} _dark={{ bg: 'gray.800' }}>
+          {highlighted ? 'Update' : <span>&nbsp;</span>}
+        </Text>
 
         <Tooltip isDisabled={!overflowing} hasArrow label={ingredientInfo?.name} placement={'top'}>
           <Text
@@ -258,22 +250,10 @@ export const NewIngredientCard: FC = () => {
       {/* Card line */}
       {/* <Divider boxShadow={'focus'} borderColor={'lightgrey'} /> */}
 
-      <CardBody>
-        <Center>
-          <Button
-            onClick={e => {
-              e.stopPropagation();
-              handleSubmit(onSubmit);
-            }}
-            display={'block'}
-            overflow={'hidden'}
-            bg={'white'}
-            _dark={{ bg: 'gray.800' }}
-            mb={'5px'}
-          >
-            Save
-          </Button>
-        </Center>
+      <CardBody onClick={handleSubmit(onSubmit)}>
+        <Text as={'b'} overflow={'hidden'} bg={'white'} _dark={{ bg: 'gray.800' }}>
+          Save
+        </Text>
 
         <Tooltip
           isDisabled={!overflowing}
