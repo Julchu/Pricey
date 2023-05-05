@@ -10,7 +10,7 @@ export const filterNullableObject = (obj: Record<string, unknown>): Record<strin
 export const isMass = (unit: Unit): boolean => unit === Unit.kilogram || unit === Unit.pound;
 export const isVolume = (unit?: Unit): boolean => unit === Unit.litre || unit === Unit.quart;
 
-export const priceConverter = (price: number, fromUnit: Unit, toUnits: UnitCategory): number => {
+export const priceConverter = (price: number, fromUnit?: Unit, toUnits?: UnitCategory): number => {
   /* Prices are /lb by default; switch to kg if needed
    ** Example: $X per 1 lb, $X per 0.4536 kg, $X / 0.4536 per 1 kg = $X * 2.2046 per 1 kg
    *** $1 for 1 lb
@@ -46,13 +46,12 @@ export const unitConverter = (
   return Unit.item;
 };
 
-export const priceCalculator = (price: number, measurement: number, quantity?: number): number => {
-  return (
-    (price * 100) /
-    (measurement > 0 ? measurement : 1) /
-    (quantity && quantity > 0 ? quantity : 1) /
-    100
-  );
+export const priceCalculator = (
+  price: number,
+  measurement: number = 1, // default 1 for GroceryList ingredients that might not have measurements added
+  quantity: number = 1,
+): number => {
+  return (price * 100) / (measurement > 0 ? measurement : 1) / (quantity > 0 ? quantity : 1) / 100;
 };
 
 export const currencyFormatter = new Intl.NumberFormat(undefined, {

@@ -21,15 +21,16 @@ import {
   Heading,
   Text,
 } from '@chakra-ui/react';
-import { FC, useCallback } from 'react';
+import { FC, ReactElement, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import useGroceryListHook from '../../hooks/useGroceryListHook';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { GroceryList, Unit } from '../../lib/firebase/interfaces';
-import { validateIsNumber } from '../../lib/textFormatters';
+import { priceCalculator, priceConverter, validateIsNumber } from '../../lib/textFormatters';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
+import { useUnitContext } from '../../hooks/useUnitContext';
 
 const ListTable: FC<{
   filteredLists: GroceryList[];
@@ -85,6 +86,7 @@ const ListTable: FC<{
         {/* Accordion button row */}
         {authUser && !groceryListCreator ? (
           <AccordionItem
+            key={6}
             isFocusable={false}
             scrollSnapAlign={'center'}
             mr={{ base: '30px', sm: 'unset' }}
@@ -116,6 +118,7 @@ const CurrentListAccordion: FC<{
 }> = ({ isExpanded, index, list }) => {
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
   const { setExpandedIndex } = useGroceryListContext();
+  const { currentUnits } = useUnitContext();
   const bg = useColorModeValue('white', 'gray.800');
   return (
     <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'}>
@@ -185,29 +188,39 @@ const CurrentListAccordion: FC<{
             }}
           />
         </Show>
-        <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'}>
-          <GridItem gridColumnStart={2}>
-            {list.ingredients.map(({ name, amount, unit, quantity }, index) => {
-              // TODO: multiply existing price by quantity/amount
-              const price = ingredientIndexes[name]
-                ? currentIngredients[ingredientIndexes[name]].price
-                : undefined;
-              return (
-                <Grid
-                  templateColumns={'1fr 1fr 1fr 1fr 1fr'}
-                  columnGap={'20px'}
-                  key={`expandedIngredient_${index}`}
-                >
+        {list.ingredients.map(({ name, amount, unit, quantity }, index) => {
+          // TODO: multiply existing price by quantity/amount
+          const pricePerMeasurement = ingredientIndexes[name]
+            ? currentIngredients[ingredientIndexes[name]].price
+            : undefined;
+
+          const displayPrice = pricePerMeasurement
+            ? priceConverter(
+                priceCalculator(pricePerMeasurement, amount, quantity),
+                unit,
+                currentUnits,
+              )
+            : undefined;
+
+          return (
+            <Grid
+              templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
+              columnGap={'20px'}
+              my={'10px'}
+              key={`expandedIngredient_${index}`}
+            >
+              <GridItem gridColumnStart={'2'} gridColumnEnd={'4'}>
+                <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
                   {name ? <Text>{name}</Text> : <Box />}
                   {amount ? <Text>{amount}</Text> : <Box />}
                   {unit ? <Text>{unit}</Text> : <Box />}
                   {quantity ? <Text>{quantity}</Text> : <Box />}
-                  {price ? <Text>{price}</Text> : <Box />}
+                  {pricePerMeasurement ? <Text textAlign={'end'}>${displayPrice}</Text> : <Box />}
                 </Grid>
-              );
-            })}
-          </GridItem>
-        </Grid>
+              </GridItem>
+            </Grid>
+          );
+        })}
       </AccordionPanel>
     </Flex>
   );
@@ -242,6 +255,7 @@ const NewListAccordion: FC<{
     [submitGroceryList],
   );
   const bg = useColorModeValue('white', 'gray.800');
+
   return (
     <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'}>
       <AccordionButton
