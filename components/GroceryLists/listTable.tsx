@@ -128,7 +128,7 @@ const CurrentListAccordion: FC<{
   const { currentUnits } = useUnitContext();
   const bg = useColorModeValue('white', 'gray.800');
   return (
-    <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'} mr={'50px'}>
+    <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'} mr={'50px'} w="100%">
       <AccordionButton
         h={{ base: '100%', sm: 'unset' }}
         w={{ sm: '100%' }}
@@ -169,6 +169,7 @@ const CurrentListAccordion: FC<{
           <Text textAlign={'end'}>$24</Text>
 
           <GridItem
+            alignSelf={'center'}
             textAlign={'center'}
             gridColumnStart={{ sm: 4 }}
             gridRowStart={{ base: '4', sm: 'unset' }}
@@ -195,28 +196,27 @@ const CurrentListAccordion: FC<{
             }}
           />
         </Show>
-        {list.ingredients.map(({ name, amount, unit, quantity }, index) => {
-          // TODO: multiply existing price by quantity/amount
-          const pricePerMeasurement = ingredientIndexes[name]
-            ? currentIngredients[ingredientIndexes[name]].price
-            : undefined;
+        <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
+          {list.ingredients.map(({ name, amount, unit, quantity }, index) => {
+            // TODO: multiply existing price by quantity/amount
+            const pricePerMeasurement = ingredientIndexes[name]
+              ? currentIngredients[ingredientIndexes[name]].price
+              : undefined;
 
-          const displayPrice = pricePerMeasurement
-            ? priceConverter(
-                priceCalculator(pricePerMeasurement, amount, quantity),
-                unit,
-                currentUnits,
-              )
-            : undefined;
+            const displayPrice = pricePerMeasurement
+              ? priceConverter(
+                  priceCalculator(pricePerMeasurement, amount, quantity),
+                  unit,
+                  currentUnits,
+                )
+              : undefined;
 
-          return (
-            <Grid
-              templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
-              columnGap={'20px'}
-              my={'10px'}
-              key={`expandedIngredient_${index}`}
-            >
-              <GridItem gridColumnStart={'2'} gridColumnEnd={'4'}>
+            return (
+              <GridItem
+                gridColumnStart={'2'}
+                gridColumnEnd={'4'}
+                key={`expandedIngredient_${index}`}
+              >
                 <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
                   {name ? <Text>{name}</Text> : <Box />}
                   {amount ? <Text>{amount}</Text> : <Box />}
@@ -225,9 +225,9 @@ const CurrentListAccordion: FC<{
                   {pricePerMeasurement ? <Text textAlign={'end'}>${displayPrice}</Text> : <Box />}
                 </Grid>
               </GridItem>
-            </Grid>
-          );
-        })}
+            );
+          })}
+        </Grid>
       </AccordionPanel>
     </Flex>
   );
@@ -237,7 +237,7 @@ const NewListAccordion: FC<{
   isExpanded: boolean;
   filteredListsLength: number;
   newListName: string;
-}> = ({ isExpanded, filteredListsLength, newListName }) => {
+}> = ({ isExpanded, newListName }) => {
   const [{ submitGroceryList }, loading] = useGroceryListHook();
   const { setExpandedIndex } = useGroceryListContext();
   const {
@@ -245,6 +245,7 @@ const NewListAccordion: FC<{
     control,
     watch,
     handleSubmit,
+    resetField,
     formState: { errors },
   } = useFormContext<GroceryListFormData>();
 
@@ -257,9 +258,11 @@ const NewListAccordion: FC<{
   const onSubmitHandler = useCallback(
     async (groceryListData: GroceryListFormData) => {
       console.log(groceryListData);
-      await submitGroceryList(groceryListData);
+      // await submitGroceryList(groceryListData);
+      resetField('name');
+      resetField('ingredients');
     },
-    [submitGroceryList],
+    [resetField, submitGroceryList],
   );
   const bg = useColorModeValue('white', 'gray.800');
 

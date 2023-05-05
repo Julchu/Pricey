@@ -1,8 +1,8 @@
 import { Card, Flex, Grid, Input, List, ListItem, useMediaQuery } from '@chakra-ui/react';
 import { useCombobox } from 'downshift';
 import Fuse from 'fuse.js';
-import { FC, useState } from 'react';
-import { useFormContext } from 'react-hook-form';
+import { FC, RefObject, useEffect, useRef, useState } from 'react';
+import { useFormContext, useWatch } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
@@ -10,7 +10,6 @@ import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 const ListForm: FC = () => {
   const {
     register,
-
     formState: { errors },
   } = useFormContext<GroceryListFormData>();
 
@@ -42,59 +41,65 @@ const ListForm: FC = () => {
 
 const IngredientComboBox: FC<{
   index: number;
-  filteredListLength: number;
 }> = ({ index }) => {
-  const { setValue } = useFormContext<GroceryListFormData>();
+  const { setValue, register, control } = useFormContext<GroceryListFormData>();
   const { setExpandedIndex } = useGroceryListContext();
+  const ingredient = useWatch({ control, name: `ingredients.${index}` });
 
   // PersonalIngredient from context hook, and filtered array of PersonalIngredients
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
   const [filteredIngredients, setFilteredIngredients] = useState<string[]>([]);
   const [isDesktopView] = useMediaQuery('(min-width: 30em)');
 
-  const { isOpen, getMenuProps, getInputProps, highlightedIndex, getItemProps } = useCombobox({
-    items: filteredIngredients,
-    onInputValueChange: ({ inputValue }) => {
-      const updatedIngredient = {
-        name: inputValue ? inputValue : '',
-      };
+  const { isOpen, getMenuProps, reset, getInputProps, highlightedIndex, getItemProps } =
+    useCombobox({
+      items: filteredIngredients,
+      onInputValueChange: ({ inputValue }) => {
+        const updatedIngredient = {
+          name: inputValue ? inputValue : '',
+        };
 
-      if (inputValue && inputValue in ingredientIndexes) {
-        Object.assign(updatedIngredient, {
-          price: currentIngredients[ingredientIndexes[inputValue]].price,
-          amount: currentIngredients[ingredientIndexes[inputValue]].amount,
-          unit: currentIngredients[ingredientIndexes[inputValue]].unit,
-          quantity: currentIngredients[ingredientIndexes[inputValue]].quantity,
+        if (inputValue && inputValue in ingredientIndexes) {
+          Object.assign(updatedIngredient, {
+            price: currentIngredients[ingredientIndexes[inputValue]].price,
+            amount: currentIngredients[ingredientIndexes[inputValue]].amount,
+            unit: currentIngredients[ingredientIndexes[inputValue]].unit,
+            quantity: currentIngredients[ingredientIndexes[inputValue]].quantity,
+          });
+        }
+
+        setValue(`ingredients.${index}`, updatedIngredient);
+
+        if (isDesktopView) setExpandedIndex([0]);
+
+        const fuse = new Fuse(Object.keys(ingredientIndexes), {
+          keys: ['name'],
+          ignoreLocation: true,
         });
-      }
 
-      setValue(`ingredients.${index}`, updatedIngredient);
+        const results = fuse.search(inputValue ? inputValue : '', {
+          limit: 5,
+        });
 
-      if (isDesktopView) setExpandedIndex([0]);
-
-      const fuse = new Fuse(Object.keys(ingredientIndexes), {
-        keys: ['name'],
-        ignoreLocation: true,
-      });
-
-      const results = fuse.search(inputValue ? inputValue : '', {
-        limit: 5,
-      });
-
-      setFilteredIngredients(
-        inputValue
-          ? results.map(result => {
-              return result.item;
-            })
-          : [],
-      );
-    },
-  });
+        setFilteredIngredients(
+          inputValue
+            ? results.map(result => {
+                return result.item;
+              })
+            : [],
+        );
+      },
+    });
 
   return (
     <Flex flexDir={'column'} pos={'relative'}>
       <Flex>
-        <Input type={'text'} {...getInputProps()} placeholder={'Grocery'} />
+        <Input
+          type={'text'}
+          {...getInputProps()}
+          placeholder={'Grocery'}
+          value={ingredient ? ingredient.name : ''}
+        />
       </Flex>
 
       <List
