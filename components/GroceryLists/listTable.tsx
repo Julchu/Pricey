@@ -86,7 +86,7 @@ const ListTable: FC<{
             {({ isExpanded }) => (
               <NewListAccordion
                 isExpanded={isExpanded}
-                filteredListsLength={filteredLists.length}
+                groceryListsLength={groceryListsLength}
                 newListName={newListName}
               />
             )}
@@ -108,12 +108,6 @@ const ListTable: FC<{
           );
         })}
       </Accordion>
-
-      {authUser && !groceryListCreator && groceryListsLength === 0 ? (
-        <Heading my={'header'} textAlign={'center'}>
-          {'Create a new list'}
-        </Heading>
-      ) : null}
     </Flex>
   );
 };
@@ -128,7 +122,7 @@ const CurrentListAccordion: FC<{
   const { currentUnits } = useUnitContext();
   const bg = useColorModeValue('white', 'gray.800');
   return (
-    <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'} mr={'50px'} w="100%">
+    <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'}>
       <AccordionButton
         h={{ base: '100%', sm: 'unset' }}
         w={{ sm: '100%' }}
@@ -186,7 +180,6 @@ const CurrentListAccordion: FC<{
         h={{ base: '100%', sm: 'unset' }}
         bg={bg}
         zIndex={99}
-        motionProps={{ animate: { rotate: '5' } }}
       >
         <Show below="sm">
           <CloseButton
@@ -235,11 +228,12 @@ const CurrentListAccordion: FC<{
 
 const NewListAccordion: FC<{
   isExpanded: boolean;
-  filteredListsLength: number;
+  groceryListsLength: number;
   newListName: string;
-}> = ({ isExpanded, newListName }) => {
+}> = ({ isExpanded, groceryListsLength, newListName }) => {
+  const { authUser } = useAuthContext();
   const [{ submitGroceryList }, loading] = useGroceryListHook();
-  const { setExpandedIndex } = useGroceryListContext();
+  const { setExpandedIndex, groceryListCreator } = useGroceryListContext();
   const {
     register,
     control,
@@ -257,8 +251,7 @@ const NewListAccordion: FC<{
 
   const onSubmitHandler = useCallback(
     async (groceryListData: GroceryListFormData) => {
-      console.log(groceryListData);
-      // await submitGroceryList(groceryListData);
+      await submitGroceryList(groceryListData);
       resetField('name');
       resetField('ingredients');
     },
@@ -316,13 +309,17 @@ const NewListAccordion: FC<{
             </Button>
           </GridItem>
 
-          <Flex flexWrap={'wrap'} gap={'10px'} alignContent={{ sm: 'center' }}>
-            {ingredients.map((field, index) => (
-              <Box key={`ingredient_${index}`}>
-                <Badge>{field.name}</Badge>
-              </Box>
-            ))}
-          </Flex>
+          {authUser && !groceryListCreator && groceryListsLength === 0 ? (
+            <Heading textAlign={'center'}>{'Create a new list'}</Heading>
+          ) : (
+            <Flex flexWrap={'wrap'} gap={'10px'} alignContent={{ sm: 'center' }}>
+              {ingredients.map((field, index) => (
+                <Box key={`ingredient_${index}`}>
+                  <Badge>{field.name}</Badge>
+                </Box>
+              ))}
+            </Flex>
+          )}
 
           <GridItem
             alignSelf={'center'}
