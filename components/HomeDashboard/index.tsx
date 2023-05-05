@@ -50,7 +50,8 @@ const IngredientList: FC = () => {
     });
 
     const results = fuse.search(searchIngredient || '');
-    const found = results.find(result => result.score && result.score < 0.00001)?.item || {
+
+    const found = results.find(result => result.item.name === searchIngredient)?.item || {
       documentId: '',
     };
 
@@ -100,7 +101,6 @@ const IngredientList: FC = () => {
 
               return (
                 <GridItem
-                  ml={{ base: foundIngredient ? '30px' : '' }}
                   mr={{ base: index === filteredResults.length - 1 ? '30px' : '' }}
                   key={`${item.name}_${index}`}
                 >
