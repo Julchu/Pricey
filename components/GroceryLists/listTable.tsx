@@ -95,7 +95,12 @@ const ListTable: FC<{
 
         {filteredLists.map((list, index) => {
           return (
-            <AccordionItem key={`list_${index}`} isFocusable={false} scrollSnapAlign={'center'}>
+            <AccordionItem
+              key={`list_${index}`}
+              isFocusable={false}
+              scrollSnapAlign={'center'}
+              _last={{ mr: { base: '30px', sm: 'unset' } }}
+            >
               {({ isExpanded }) => (
                 <CurrentListAccordion isExpanded={isExpanded} index={index + 1} list={list} />
               )}
@@ -123,7 +128,7 @@ const CurrentListAccordion: FC<{
   const { currentUnits } = useUnitContext();
   const bg = useColorModeValue('white', 'gray.800');
   return (
-    <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'}>
+    <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'} mr={'50px'}>
       <AccordionButton
         h={{ base: '100%', sm: 'unset' }}
         w={{ sm: '100%' }}
