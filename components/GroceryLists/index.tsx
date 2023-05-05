@@ -74,7 +74,7 @@ const GroceryLists: FC = () => {
         <Flex h="calc(100svh - 80px)" flexDir={'column'} display={{ base: 'flex', sm: 'block' }}>
           {/* Header inputs */}
           <Flex flexDir={{ base: 'column', sm: 'row' }}>
-            <ListForm filteredListLength={filteredLists.length} />
+            <ListForm />
           </Flex>
 
           {/* "Table" */}

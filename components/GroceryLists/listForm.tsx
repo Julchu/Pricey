@@ -7,9 +7,7 @@ import { GroceryListFormData } from '.';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 
-const ListForm: FC<{
-  filteredListLength: number;
-}> = ({ filteredListLength }) => {
+const ListForm: FC = () => {
   const {
     register,
 
@@ -34,10 +32,10 @@ const ListForm: FC<{
       />
 
       {/* Header grocery inputs */}
-      <IngredientComboBox index={0} filteredListLength={filteredListLength} />
-      <IngredientComboBox index={1} filteredListLength={filteredListLength} />
-      <IngredientComboBox index={2} filteredListLength={filteredListLength} />
-      <IngredientComboBox index={3} filteredListLength={filteredListLength} />
+      <IngredientComboBox index={0} />
+      <IngredientComboBox index={1} />
+      <IngredientComboBox index={2} />
+      <IngredientComboBox index={3} />
     </Grid>
   );
 };
@@ -45,7 +43,7 @@ const ListForm: FC<{
 const IngredientComboBox: FC<{
   index: number;
   filteredListLength: number;
-}> = ({ index, filteredListLength }) => {
+}> = ({ index }) => {
   const { setValue } = useFormContext<GroceryListFormData>();
   const { setExpandedIndex } = useGroceryListContext();
 
@@ -72,7 +70,7 @@ const IngredientComboBox: FC<{
 
       setValue(`ingredients.${index}`, updatedIngredient);
 
-      if (isDesktopView) setExpandedIndex([filteredListLength]);
+      if (isDesktopView) setExpandedIndex([0]);
 
       const fuse = new Fuse(Object.keys(ingredientIndexes), {
         keys: ['name'],

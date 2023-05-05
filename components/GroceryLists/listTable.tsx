@@ -20,8 +20,10 @@ import {
   IconButton,
   Heading,
   Text,
+  InputGroup,
+  InputLeftElement,
 } from '@chakra-ui/react';
-import { FC, ReactElement, ReactNode, useCallback, useMemo, useState } from 'react';
+import { FC, useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
@@ -72,16 +74,6 @@ const ListTable: FC<{
         flexGrow={{ base: 1, sm: 'unset' }}
         p={{ base: '30px 0px', sm: '0px 30px' }}
       >
-        {filteredLists.map((list, index) => {
-          return (
-            <AccordionItem key={`list_${index}`} isFocusable={false} scrollSnapAlign={'center'}>
-              {({ isExpanded }) => (
-                <CurrentListAccordion isExpanded={isExpanded} index={index} list={list} />
-              )}
-            </AccordionItem>
-          );
-        })}
-
         {/* Start new list */}
         {/* Accordion button row */}
         {authUser && !groceryListCreator ? (
@@ -100,6 +92,16 @@ const ListTable: FC<{
             )}
           </AccordionItem>
         ) : null}
+
+        {filteredLists.map((list, index) => {
+          return (
+            <AccordionItem key={`list_${index}`} isFocusable={false} scrollSnapAlign={'center'}>
+              {({ isExpanded }) => (
+                <CurrentListAccordion isExpanded={isExpanded} index={index + 1} list={list} />
+              )}
+            </AccordionItem>
+          );
+        })}
       </Accordion>
 
       {authUser && !groceryListCreator && groceryListsLength === 0 ? (
@@ -267,7 +269,7 @@ const NewListAccordion: FC<{
         as={Box}
         cursor={'pointer'}
         onClick={() => {
-          setExpandedIndex(isExpanded ? [] : [filteredListsLength]);
+          setExpandedIndex(isExpanded ? [] : [0]);
         }}
         alignItems={'start'}
       >
@@ -398,17 +400,21 @@ const NewListAccordion: FC<{
               />
             </Grid>
 
-            <Input
-              type="number"
-              {...register(`ingredients.${index}.price`, {
-                valueAsNumber: true,
-                min: 0,
-                validate: price => {
-                  if (price) return validateIsNumber(price);
-                },
-              })}
-              placeholder={'Price'}
-            />
+            <InputGroup>
+              <InputLeftElement pointerEvents="none">$</InputLeftElement>
+              <Input
+                textAlign={'end'}
+                type="number"
+                {...register(`ingredients.${index}.price`, {
+                  valueAsNumber: true,
+                  min: 0,
+                  validate: price => {
+                    if (price) return validateIsNumber(price);
+                  },
+                })}
+                placeholder={'Price'}
+              />
+            </InputGroup>
 
             <GridItem textAlign={'center'}>
               <IconButton
