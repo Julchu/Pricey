@@ -70,7 +70,7 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(
     async ({ ingredientId, price, capacity, quantity, unit, location, image }) => {
-      const pricePerMeasurement = pricePerMeasurement(price, capacity, quantity);
+      const pricePerMeasurement = priceCalculator(price, capacity, quantity);
       const convertedPreviewPrice = priceConverter(pricePerMeasurement, unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,
@@ -81,7 +81,7 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
       const updatedIngredient = filterNullableObject({
         ingredientId,
         price: parseFloat(convertedPreviewPrice),
-        measurement,
+        capacity,
         quantity,
         unit,
         location,

@@ -391,7 +391,7 @@ const NewListAccordion: FC<{
           return (
             <Grid
               templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
-              key={`${name}_${index}`}
+              key={`newIngredient_${index}`}
               p={'12px 0px'}
               gap={'20px'}
             >
