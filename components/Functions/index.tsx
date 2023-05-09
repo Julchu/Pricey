@@ -48,7 +48,7 @@ const Functions: FC = () => {
             price: 1,
             quantity: 0,
             unit: '' as Unit,
-            measurement: 0,
+            capacity: 0,
           });
         }}
       >

@@ -46,12 +46,18 @@ export const unitConverter = (
   return Unit.item;
 };
 
+// Price per measurement per unit; takes care of float by multiplying by 100 to cents
 export const priceCalculator = (
   price: number,
-  measurement: number = 1, // default 1 for GroceryList ingredients that might not have measurements added
+  capacity: number = 1, // default 1 for GroceryList ingredients that might not have measurements added
   quantity: number = 1,
 ): number => {
-  return (price * 100) / (measurement > 0 ? measurement : 1) / (quantity > 0 ? quantity : 1) / 100;
+  return (price * 100) / (capacity > 0 ? capacity : 1) / (quantity > 0 ? quantity : 1) / 100;
+};
+
+// Total price based on price per measurement and capacity/quantity
+export const totalPrice = (price: number, capacity: number = 1, quantity: number = 1): number => {
+  return (price * 100 * capacity * quantity) / 100;
 };
 
 export const currencyFormatter = new Intl.NumberFormat(undefined, {

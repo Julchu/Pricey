@@ -60,8 +60,8 @@ export interface Ingredient {
   price?: number;
   unit?: Unit;
   image?: string;
-  /** @param amount and @param quantity used for @interfaceGroceryList */
-  amount?: number;
+  /** @param capacity and @param quantity used for @interfaceGroceryList */
+  capacity?: number;
   quantity?: number;
   userId: string;
   season?: Season;

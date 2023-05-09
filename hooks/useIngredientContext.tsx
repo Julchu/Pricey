@@ -27,8 +27,8 @@ type IngredientContextType = {
 
 export const useIngredientContext = (): IngredientContextType => {
   const { authUser } = useAuthContext();
-  const { ingredientIndexes, setIngredientIndexes } = useContext(IngredientContext);
-  const { currentIngredients, setCurrentIngredients } = useContext(IngredientContext);
+  const { ingredientIndexes, setIngredientIndexes, currentIngredients, setCurrentIngredients } =
+    useContext(IngredientContext);
 
   // State for user's dictionary of ingredients
   // TODO: limit to 30 and add pagination

@@ -12,8 +12,15 @@ import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 export type GroceryListFormData = {
   groceryListId?: string;
   name: string;
-  ingredients: { name: string; price?: number; amount?: number; unit?: Unit; quantity?: number }[];
+  ingredients: {
+    name: string;
+    price?: number;
+    capacity?: number;
+    unit?: Unit;
+    quantity?: number;
+  }[];
   viewable?: boolean;
+  price?: number;
 };
 
 /**

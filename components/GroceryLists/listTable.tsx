@@ -23,14 +23,20 @@ import {
   InputGroup,
   InputLeftElement,
 } from '@chakra-ui/react';
-import { FC, useCallback } from 'react';
+import { FC, useCallback, useMemo, useState } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import useGroceryListHook from '../../hooks/useGroceryListHook';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { GroceryList, Unit } from '../../lib/firebase/interfaces';
-import { priceCalculator, priceConverter, validateIsNumber } from '../../lib/textFormatters';
+import {
+  currencyFormatter,
+  priceCalculator,
+  priceConverter,
+  totalPrice,
+  validateIsNumber,
+} from '../../lib/textFormatters';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import { useUnitContext } from '../../hooks/useUnitContext';
 
@@ -119,8 +125,18 @@ const CurrentListAccordion: FC<{
 }> = ({ isExpanded, index, list }) => {
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
   const { setExpandedIndex } = useGroceryListContext();
-  const { currentUnits } = useUnitContext();
   const bg = useColorModeValue('white', 'gray.800');
+  const listPrice = list.ingredients.reduce<number>((price, { name, capacity, quantity }) => {
+    const pricePerCapacity: number | undefined = ingredientIndexes[name]
+      ? currentIngredients[ingredientIndexes[name]].price
+      : undefined;
+
+    const displayPrice: number | undefined = pricePerCapacity
+      ? totalPrice(pricePerCapacity, capacity, quantity)
+      : undefined;
+    return displayPrice ? price + displayPrice : price;
+  }, 0);
+
   return (
     <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'}>
       <AccordionButton
@@ -160,7 +176,7 @@ const CurrentListAccordion: FC<{
           </Flex>
 
           {/* Price */}
-          <Text textAlign={'end'}>$24</Text>
+          {listPrice ? <Text textAlign={'end'}>{currencyFormatter.format(listPrice)}</Text> : null}
 
           <GridItem
             alignSelf={'center'}
@@ -190,19 +206,15 @@ const CurrentListAccordion: FC<{
           />
         </Show>
         <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
-          {list.ingredients.map(({ name, amount, unit, quantity }, index) => {
-            // TODO: multiply existing price by quantity/amount
-            const pricePerMeasurement = ingredientIndexes[name]
+          {list.ingredients.map(({ name, capacity, unit, quantity }, index) => {
+            // TODO: multiply existing price by quantity/capacity
+            const pricePerCapacity = ingredientIndexes[name]
               ? currentIngredients[ingredientIndexes[name]].price
               : undefined;
 
-            const displayPrice = pricePerMeasurement
-              ? priceConverter(
-                  priceCalculator(pricePerMeasurement, amount, quantity),
-                  unit,
-                  currentUnits,
-                )
-              : undefined;
+            const displayPrice = pricePerCapacity
+              ? totalPrice(pricePerCapacity, capacity, quantity)
+              : null;
 
             return (
               <GridItem
@@ -212,10 +224,10 @@ const CurrentListAccordion: FC<{
               >
                 <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
                   {name ? <Text>{name}</Text> : <Box />}
-                  {amount ? <Text>{amount}</Text> : <Box />}
+                  {capacity ? <Text>{capacity}</Text> : <Box />}
                   {unit ? <Text>{unit}</Text> : <Box />}
                   {quantity ? <Text>{quantity}</Text> : <Box />}
-                  {pricePerMeasurement ? <Text textAlign={'end'}>${displayPrice}</Text> : <Box />}
+                  {displayPrice ? <Text>{currencyFormatter.format(displayPrice)}</Text> : null}
                 </Grid>
               </GridItem>
             );
@@ -234,6 +246,8 @@ const NewListAccordion: FC<{
   const { authUser } = useAuthContext();
   const [{ submitGroceryList }, loading] = useGroceryListHook();
   const { setExpandedIndex, groceryListCreator } = useGroceryListContext();
+  const { ingredientIndexes, currentIngredients } = useIngredientContext();
+  const { currentUnits } = useUnitContext();
   const {
     register,
     control,
@@ -244,6 +258,18 @@ const NewListAccordion: FC<{
   } = useFormContext<GroceryListFormData>();
 
   const ingredients = watch('ingredients');
+
+  const listPrice = ingredients.reduce<number>((price, { name, capacity, quantity }) => {
+    const pricePerCapacity: number | undefined = ingredientIndexes[name]
+      ? currentIngredients[ingredientIndexes[name]].price
+      : undefined;
+
+    const displayPrice: number | undefined = pricePerCapacity
+      ? totalPrice(pricePerCapacity, capacity, quantity)
+      : undefined;
+    return displayPrice ? price + displayPrice : price;
+  }, 0);
+
   const { append: appendIngredient, remove: removeIngredient } = useFieldArray({
     name: 'ingredients',
     control,
@@ -350,95 +376,115 @@ const NewListAccordion: FC<{
             }}
           />
         </Show>
-        {ingredients.map(({ name, unit }, index) => (
-          <Grid
-            templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
-            key={`${name}_${index}`}
-            p="12px 0px"
-            columnGap={'20px'}
-            rowGap={{ base: '20px', sm: 'unset' }}
-          >
-            <Input
-              {...register(`ingredients.${index}.name`, { required: true })}
-              isInvalid={errors.ingredients?.[index]?.name?.type === 'required'}
-              placeholder={'Grocery'}
-            />
+        {ingredients.map(({ name, capacity, quantity, unit }, index) => {
+          const pricePerCapacity = ingredientIndexes[name]
+            ? currentIngredients[ingredientIndexes[name]].price
+            : undefined;
 
-            <Grid templateColumns={'1fr 1fr 1fr'} textAlign={'start'} columnGap={'20px'}>
-              <Input
-                type="number"
-                {...register(`ingredients.${index}.amount`, {
-                  valueAsNumber: true,
-                  min: 0,
-                  validate: amount => {
-                    if (amount) return validateIsNumber(amount);
-                  },
-                })}
-                isInvalid={errors.ingredients?.[index]?.amount?.type === 'validate'}
-                placeholder={'Amount'}
-              />
-
-              <Select
-                {...register(`ingredients.${index}.unit`)}
-                color={unit ? 'black' : 'grey'}
-                placeholder={'Unit*'}
+          const displayPrice = pricePerCapacity
+            ? priceConverter(
+                priceCalculator(pricePerCapacity, capacity, quantity),
+                unit,
+                currentUnits,
+              )
+            : undefined;
+          return (
+            <Grid
+              templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
+              key={`${name}_${index}`}
+              p={'12px 0px'}
+              gap={'20px'}
+            >
+              <Grid
+                gridColumn={{ sm: 2 }}
+                templateColumns={{ base: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }}
+                textAlign={'start'}
+                gap={'20px'}
               >
-                {Object.values(Unit).map((unit, index) => {
-                  return (
-                    <option key={`${unit}_${index}`} value={unit}>
-                      {unit}
-                    </option>
-                  );
-                })}
-              </Select>
+                <Input
+                  {...register(`ingredients.${index}.name`, { required: true })}
+                  isInvalid={errors.ingredients?.[index]?.name?.type === 'required'}
+                  placeholder={'Grocery'}
+                />
+                <Input
+                  type="number"
+                  {...register(`ingredients.${index}.capacity`, {
+                    valueAsNumber: true,
+                    min: 0,
+                    validate: capacity => {
+                      if (capacity) return validateIsNumber(capacity);
+                    },
+                  })}
+                  isInvalid={errors.ingredients?.[index]?.capacity?.type === 'validate'}
+                  placeholder={'Capacity'}
+                />
 
-              <Input
-                type="number"
-                {...register(`ingredients.${index}.quantity`, {
-                  valueAsNumber: true,
-                  min: 0,
-                  validate: quantity => {
-                    if (quantity) return validateIsNumber(quantity);
-                  },
-                })}
-                placeholder={'Quantity'}
-              />
-            </Grid>
+                <Select
+                  {...register(`ingredients.${index}.unit`)}
+                  color={unit ? 'black' : 'grey'}
+                  placeholder={'Unit'}
+                >
+                  {Object.values(Unit).map((unit, index) => {
+                    return (
+                      <option key={`${unit}_${index}`} value={unit}>
+                        {unit}
+                      </option>
+                    );
+                  })}
+                </Select>
 
-            <InputGroup>
-              <InputLeftElement pointerEvents="none">$</InputLeftElement>
-              <Input
+                <Input
+                  type="number"
+                  {...register(`ingredients.${index}.quantity`, {
+                    valueAsNumber: true,
+                    min: 0,
+                    validate: quantity => {
+                      if (quantity) return validateIsNumber(quantity);
+                    },
+                  })}
+                  placeholder={'Quantity'}
+                />
+              </Grid>
+
+              <GridItem
+                textAlign={{ sm: 'end' }}
+                alignSelf={'center'}
+                gridRow={{ base: '2', sm: 1 }}
+                gridColumn={{ base: '1', sm: 3 }}
+              >
+                {displayPrice ? <Text>{currencyFormatter.format(displayPrice)}</Text> : null}
+              </GridItem>
+
+              <GridItem
                 textAlign={'end'}
-                type="number"
-                {...register(`ingredients.${index}.price`, {
-                  valueAsNumber: true,
-                  min: 0,
-                  validate: price => {
-                    if (price) return validateIsNumber(price);
-                  },
-                })}
-                placeholder={'Price'}
-              />
-            </InputGroup>
+                gridRow={{ base: '2', sm: 1 }}
+                gridColumn={{ base: '1', sm: 4 }}
+              >
+                <IconButton
+                  aria-label="Remove ingredient"
+                  icon={<DeleteIcon />}
+                  onClick={() => removeIngredient(index)}
+                />
+              </GridItem>
+            </Grid>
+          );
+        })}
 
-            <GridItem textAlign={'center'}>
-              <IconButton
-                aria-label="Remove ingredient"
-                icon={<DeleteIcon />}
-                onClick={() => removeIngredient(index)}
-              />
-            </GridItem>
-          </Grid>
-        ))}
-
-        <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} p="12px 0px" columnGap={'20px'}>
+        <Grid
+          templateColumns={'1.5fr 4.5fr 1fr 0.3fr'}
+          p="12px 0px"
+          columnGap={'20px'}
+          display={{ base: 'block', sm: 'grid' }}
+        >
           {!ingredients.length ? (
             <Heading textAlign={'center'} gridColumn={'2/3'}>
               Add some ingredients
             </Heading>
           ) : null}
 
-          <GridItem textAlign={'center'} gridColumnStart={4}>
+          {listPrice ? <Text>{currencyFormatter.format(listPrice)}</Text> : null}
+
+          <GridItem textAlign={'end'} gridColumnStart={4}>
             <IconButton
               aria-label="Add ingredient"
               icon={<AddIcon />}

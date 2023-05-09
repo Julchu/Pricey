@@ -26,16 +26,16 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
   const { authUser } = useAuthContext();
 
   const submitIngredient = useCallback<IngredientMethods['submitIngredient']>(
-    async ({ name, price, measurement, quantity, unit, image }) => {
+    async ({ name, price, capacity, quantity, unit, image }) => {
       if (!authUser) return;
       setLoading(true);
 
       /* Save price per measurement per quantity
        * When displaying data, can measure based on current measurement and quantity to compare prices
        */
-      const pricePerMeasurement = priceCalculator(price, measurement, quantity);
+      const pricePerCapacity = priceCalculator(price, capacity, quantity);
       const convertedUnit = unitConverter(unit);
-      const convertedPricePerMeasurement = priceConverter(pricePerMeasurement, unit, {
+      const convertedPricePerMeasurement = priceConverter(pricePerCapacity, unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,
       }).toFixed(2);
@@ -69,8 +69,8 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
   );
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(
-    async ({ ingredientId, price, measurement, quantity, unit, location, image }) => {
-      const pricePerMeasurement = priceCalculator(price, measurement, quantity);
+    async ({ ingredientId, price, capacity, quantity, unit, location, image }) => {
+      const pricePerMeasurement = pricePerMeasurement(price, capacity, quantity);
       const convertedPreviewPrice = priceConverter(pricePerMeasurement, unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,

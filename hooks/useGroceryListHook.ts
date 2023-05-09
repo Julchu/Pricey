@@ -29,20 +29,12 @@ const useGroceryListHook = (): [GroceryListMethods, boolean, Error | undefined] 
       // Creating doc with auto-generated id
       const groceryListDocRef = doc(db.groceryListCollection);
 
-      // TODO: convert ingredients to Ingredient
-
-      /* 
-      { name: string; price?: number; amount?: number; unit?: Unit; quantity?:
-         */
-
       // Ensuring all fields are passed by typechecking Ingredient
       const newList: GroceryList = {
         name: name.trim(),
-        ingredients: ingredients.map(
-          ({ name: ingredientName, price = 1, amount, unit = Unit.item }) => {
-            return { name: ingredientName, price, amount, unit, userId: authUser.documentId };
-          },
-        ),
+        ingredients: ingredients.map(({ name: ingredientName, capacity, unit = Unit.item }) => {
+          return { name: ingredientName, capacity, unit, userId: authUser.documentId };
+        }),
         viewable,
         userId: authUser.documentId,
         createdAt: serverTimestamp(),

@@ -44,7 +44,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
 
   const [newPrice, newMeasurement, newUnit, newQuantity] = useWatch({
     control,
-    name: ['price', 'measurement', 'unit', 'quantity'],
+    name: ['price', 'capacity', 'unit', 'quantity'],
   });
 
   // Check if text is overflowing
@@ -74,7 +74,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
         name: data.name,
         price: getValues('price'),
         quantity: getValues('quantity'),
-        measurement: getValues('measurement'),
+        capacity: getValues('capacity'),
         unit: getValues('unit'),
       };
 
@@ -83,7 +83,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       resetField('price');
       resetField('quantity');
       resetField('unit');
-      resetField('measurement');
+      resetField('capacity');
     },
     [getValues, resetField, updateIngredient],
   );
@@ -181,7 +181,7 @@ export const NewIngredientCard: FC = () => {
 
   const [newName, newPrice, newQuantity, newUnit, newMeasurement] = useWatch({
     control,
-    name: ['name', 'price', 'quantity', 'unit', 'measurement'],
+    name: ['name', 'price', 'quantity', 'unit', 'capacity'],
   });
 
   // Check if text is overflowing
@@ -205,8 +205,8 @@ export const NewIngredientCard: FC = () => {
   );
 
   /* Preview new ingredient information: memoizing reduces rerenders/function calls
-   * pricePerMeasurement: converted price per dropdown unit amount per item
-   * pricePerItem: converted price per item, ignoring measurement unit amount
+   * pricePerMeasurement: converted price per dropdown unit capacity per item
+   * pricePerItem: converted price per item, ignoring measurement unit capacity
    * convertedUnit: converted dropdown unit to user's appropriate (mass, volume) current unit
    */
   /* Price example: $6.97 for box of 12 x 0.355L cans of Coke

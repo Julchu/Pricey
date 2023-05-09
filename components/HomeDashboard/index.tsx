@@ -13,7 +13,7 @@ export type IngredientFormData = {
   price: number;
   quantity: number;
   unit: Unit;
-  measurement: number;
+  capacity: number;
   location?: string;
   image?: string;
 };
@@ -25,7 +25,7 @@ const IngredientList: FC = () => {
     defaultValues: {
       name: '',
       price: undefined,
-      measurement: undefined,
+      capacity: undefined,
       unit: undefined,
       quantity: undefined,
     },

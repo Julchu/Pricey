@@ -61,7 +61,7 @@ const IngredientComboBox: FC<{
       if (inputValue && inputValue in ingredientIndexes) {
         Object.assign(updatedIngredient, {
           price: currentIngredients[ingredientIndexes[inputValue]].price,
-          amount: currentIngredients[ingredientIndexes[inputValue]].amount,
+          capacity: currentIngredients[ingredientIndexes[inputValue]].capacity,
           unit: currentIngredients[ingredientIndexes[inputValue]].unit,
           quantity: currentIngredients[ingredientIndexes[inputValue]].quantity,
         });

@@ -1,4 +1,4 @@
-import { Grid, Input, Select } from '@chakra-ui/react';
+import { Grid, Input, InputGroup, InputLeftElement, Select } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { Unit } from '../../lib/firebase/interfaces';
@@ -36,15 +36,13 @@ const IngredientForm: FC = () => {
       {/* Measurement input */}
       <Input
         type={'number'}
-        {...register('measurement', {
+        {...register('capacity', {
           valueAsNumber: true,
           required: true,
           min: 0,
-          validate: measurement => validateIsNumber(measurement),
+          validate: capacity => validateIsNumber(capacity),
         })}
-        isInvalid={
-          errors.measurement?.type === 'required' || errors.measurement?.type === 'validate'
-        }
+        isInvalid={errors.capacity?.type === 'required' || errors.capacity?.type === 'validate'}
         placeholder={'Capacity*'}
       />
 
@@ -80,17 +78,20 @@ const IngredientForm: FC = () => {
       />
 
       {/* Price input */}
-      <Input
-        type={'number'}
-        {...register('price', {
-          valueAsNumber: true,
-          required: true,
-          min: 0,
-          validate: price => validateIsNumber(price),
-        })}
-        isInvalid={errors.price?.type === 'required' || errors.price?.type === 'validate'}
-        placeholder={'Price*'}
-      />
+      <InputGroup>
+        <InputLeftElement pointerEvents={'none'}>$</InputLeftElement>
+        <Input
+          type={'number'}
+          {...register('price', {
+            valueAsNumber: true,
+            required: true,
+            min: 0,
+            validate: price => validateIsNumber(price),
+          })}
+          isInvalid={errors.price?.type === 'required' || errors.price?.type === 'validate'}
+          placeholder={'Price*'}
+        />
+      </InputGroup>
     </Grid>
   );
 };
