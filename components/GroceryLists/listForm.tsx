@@ -31,20 +31,20 @@ const ListForm: FC = () => {
       />
 
       {/* Header grocery inputs */}
-      <IngredientComboBox index={0} />
-      <IngredientComboBox index={1} />
-      <IngredientComboBox index={2} />
-      <IngredientComboBox index={3} />
+      <IngredientComboBox ingredientFieldIndex={0} />
+      <IngredientComboBox ingredientFieldIndex={1} />
+      <IngredientComboBox ingredientFieldIndex={2} />
+      <IngredientComboBox ingredientFieldIndex={3} />
     </Grid>
   );
 };
 
-const IngredientComboBox: FC<{
-  index: number;
-}> = ({ index }) => {
+export const IngredientComboBox: FC<{
+  ingredientFieldIndex: number;
+}> = ({ ingredientFieldIndex }) => {
   const { setValue, control } = useFormContext<GroceryListFormData>();
   const { setExpandedIndex } = useGroceryListContext();
-  const ingredient = useWatch({ control, name: `ingredients.${index}` });
+  const ingredient = useWatch({ control, name: `ingredients.${ingredientFieldIndex}` });
 
   // PersonalIngredient from context hook, and filtered array of PersonalIngredients
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
@@ -67,7 +67,7 @@ const IngredientComboBox: FC<{
         });
       }
 
-      setValue(`ingredients.${index}`, updatedIngredient);
+      setValue(`ingredients.${ingredientFieldIndex}`, updatedIngredient);
 
       if (isDesktopView) setExpandedIndex([0]);
 

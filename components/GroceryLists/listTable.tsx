@@ -406,6 +406,7 @@ const NewListAccordion: FC<{
                   isInvalid={errors.ingredients?.[index]?.name?.type === 'required'}
                   placeholder={'Grocery'}
                 />
+
                 <Input
                   type="number"
                   {...register(`ingredients.${index}.capacity`, {
