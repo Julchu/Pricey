@@ -98,6 +98,7 @@ export const IngredientComboBox: FC<{
           {...getInputProps()}
           placeholder={'Grocery'}
           value={ingredient ? ingredient.name : ''}
+          autoFocus
         />
       </Flex>
 
@@ -110,8 +111,9 @@ export const IngredientComboBox: FC<{
         mx={0} // for mobile
         overflowY="auto"
         maxWidth={'100%'}
-        zIndex={98} // Remain under expanded accordions
+        zIndex={99} // Remain above expanded accordions
         {...getMenuProps()}
+        bg="red"
       >
         {filteredIngredients.map((item, index) => (
           <ListItem
@@ -120,7 +122,7 @@ export const IngredientComboBox: FC<{
             px={'12px'}
             py={'6px'}
             cursor="pointer"
-            key={`${item}_${index}`}
+            key={`ingredientDropdown_${index}`}
             {...getItemProps({ item, index })}
           >
             {item}
