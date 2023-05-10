@@ -91,16 +91,13 @@ export const IngredientComboBox: FC<{
   });
 
   return (
-    <Flex flexDir={'column'} pos={'relative'}>
-      <Flex>
-        <Input
-          type={'text'}
-          {...getInputProps()}
-          placeholder={'Grocery'}
-          value={ingredient ? ingredient.name : ''}
-          autoFocus
-        />
-      </Flex>
+    <Flex flexDir={'column'}>
+      <Input
+        type={'text'}
+        {...getInputProps()}
+        placeholder={'Grocery'}
+        value={ingredient ? ingredient.name : ''}
+      />
 
       <List
         as={Card}
@@ -111,9 +108,8 @@ export const IngredientComboBox: FC<{
         mx={0} // for mobile
         overflowY="auto"
         maxWidth={'100%'}
-        zIndex={99} // Remain above expanded accordions
+        zIndex={99}
         {...getMenuProps()}
-        bg="red"
       >
         {filteredIngredients.map((item, index) => (
           <ListItem

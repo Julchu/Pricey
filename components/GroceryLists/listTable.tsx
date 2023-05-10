@@ -50,7 +50,6 @@ const ListTable: FC<{
         {/* Accordion button row */}
         {authUser && !groceryListCreator ? (
           <AccordionItem
-            key={6}
             isFocusable={false}
             scrollSnapAlign={'center'}
             mr={{ base: '30px', sm: 'unset' }}

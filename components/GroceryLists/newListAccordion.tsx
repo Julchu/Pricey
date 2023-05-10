@@ -18,7 +18,7 @@ import {
   Box,
   Text,
 } from '@chakra-ui/react';
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback } from 'react';
 import { useFormContext, useFieldArray } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
@@ -299,7 +299,15 @@ const NewListAccordion: FC<{
             <IconButton
               aria-label="Add ingredient"
               icon={<AddIcon />}
-              onClick={() => appendIngredient({ name: '' })}
+              onClick={() =>
+                appendIngredient(
+                  { name: '' },
+                  {
+                    // Currently manually disables all autoFocus, since input is shared
+                    focusName: `ingredients.${fieldIngredients.length}.name`,
+                  },
+                )
+              }
             />
           </GridItem>
         </Grid>
