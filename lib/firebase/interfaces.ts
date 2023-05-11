@@ -23,13 +23,16 @@ export enum Unit {
   // Volume
   litre = 'L',
   quart = 'qt',
+  cup = 'cup',
+  tablespoon = 'tbsp',
+  teaspoon = 'tsp',
 
   item = 'item',
 }
 
 export type MassType = Unit.kilogram | Unit.pound;
 
-export type VolumeType = Unit.litre | Unit.quart;
+export type VolumeType = Unit.litre | Unit.quart | Unit.cup | Unit.tablespoon | Unit.teaspoon;
 
 export type UnitCategory = {
   mass: MassType;
