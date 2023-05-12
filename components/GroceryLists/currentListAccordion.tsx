@@ -121,7 +121,7 @@ const CurrentListAccordion: FC<{
         h={{ base: '100%', sm: 'unset' }}
         bg={bg}
       >
-        <Show below="sm">
+        <Show below={'sm'}>
           <CloseButton
             ml={'auto'}
             onClick={() => {
@@ -129,25 +129,52 @@ const CurrentListAccordion: FC<{
             }}
           />
         </Show>
-        <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
-          {listPrice.listIngredients.map(({ name, capacity, unit, quantity, price }, index) => {
-            return (
-              <GridItem
-                gridColumnStart={'2'}
-                gridColumnEnd={'4'}
-                key={`expandedIngredient_${index}`}
-              >
+
+        <Show above={'sm'}>
+          {/* "Table" header for existing ingredient info */}
+          <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
+            <GridItem gridColumnStart={'2'} gridColumnEnd={'4'}>
+              <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
+                <Text as={'b'}>Ingredient name</Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Measurement
+                </Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Unit
+                </Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Quantity
+                </Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Estimated price
+                </Text>
+              </Grid>
+            </GridItem>
+          </Grid>
+        </Show>
+
+        {/* Ingredient info list "table" */}
+        {listPrice.listIngredients.map(({ name, capacity, unit, quantity, price }, index) => {
+          return (
+            <Grid
+              key={`expandedIngredient_${index}`}
+              templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
+              p={'12px 0px'}
+              gap={'20px'}
+              my={'10px'}
+            >
+              <GridItem gridColumnStart={{ sm: '2' }} gridColumnEnd={{ sm: '4' }}>
                 <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
-                  {name ? <Text>{name}</Text> : <Box />}
-                  {capacity ? <Text>{capacity}</Text> : <Box />}
-                  {unit ? <Text>{unit}</Text> : <Box />}
-                  {quantity ? <Text>{quantity}</Text> : <Box />}
-                  {price ? <Text>{currencyFormatter.format(price)}</Text> : null}
+                  <Text>{name ? name : '-'}</Text>
+                  <Text textAlign={'end'}>{capacity ? capacity : '-'}</Text>
+                  <Text textAlign={'end'}>{unit ? unit : '-'}</Text>
+                  <Text textAlign={'end'}>{quantity ? quantity : '-'}</Text>
+                  <Text textAlign={'end'}>{price ? currencyFormatter.format(price) : '-'}</Text>
                 </Grid>
               </GridItem>
-            );
-          })}
-        </Grid>
+            </Grid>
+          );
+        })}
       </AccordionPanel>
     </Flex>
   );

@@ -188,6 +188,30 @@ const NewListAccordion: FC<{
             }}
           />
         </Show>
+
+        <Show above={'sm'}>
+          {/* "Table" header for existing ingredient info */}
+          <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
+            <GridItem gridColumnStart={'2'} gridColumnEnd={'4'}>
+              <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
+                <Text as={'b'}>Ingredient name</Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Measurement
+                </Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Unit
+                </Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Quantity
+                </Text>
+                <Text as={'b'} textAlign={'end'}>
+                  Estimated price
+                </Text>
+              </Grid>
+            </GridItem>
+          </Grid>
+        </Show>
+
         {listPrice.listIngredients.map(({ unit, price }, index) => {
           return (
             <Grid
@@ -196,53 +220,54 @@ const NewListAccordion: FC<{
               p={'12px 0px'}
               gap={'20px'}
             >
-              <Grid
-                gridColumn={{ sm: 2 }}
-                templateColumns={{ base: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }}
-                textAlign={'start'}
-                gap={'20px'}
-              >
-                <IngredientComboBox ingredientFieldIndex={index} />
-
-                <Input
-                  type="number"
-                  {...register(`ingredients.${index}.capacity`, {
-                    valueAsNumber: true,
-                    min: 0,
-                    validate: capacity => {
-                      if (capacity) return validateIsNumber(capacity);
-                    },
-                  })}
-                  isInvalid={errors.ingredients?.[index]?.capacity?.type === 'validate'}
-                  placeholder={'Capacity'}
-                />
-
-                <Select
-                  {...register(`ingredients.${index}.unit`)}
-                  color={unit ? 'black' : 'grey'}
-                  placeholder={'Unit'}
+              <GridItem gridColumn={{ sm: 2 }}>
+                <Grid
+                  templateColumns={{ base: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }}
+                  textAlign={'start'}
+                  gap={'20px'}
                 >
-                  {Object.values(Unit).map((unit, index) => {
-                    return (
-                      <option key={`${unit}_${index}`} value={unit}>
-                        {unit}
-                      </option>
-                    );
-                  })}
-                </Select>
+                  <IngredientComboBox ingredientFieldIndex={index} />
 
-                <Input
-                  type="number"
-                  {...register(`ingredients.${index}.quantity`, {
-                    valueAsNumber: true,
-                    min: 0,
-                    validate: quantity => {
-                      if (quantity) return validateIsNumber(quantity);
-                    },
-                  })}
-                  placeholder={'Quantity'}
-                />
-              </Grid>
+                  <Input
+                    type="number"
+                    {...register(`ingredients.${index}.capacity`, {
+                      valueAsNumber: true,
+                      min: 0,
+                      validate: capacity => {
+                        if (capacity) return validateIsNumber(capacity);
+                      },
+                    })}
+                    isInvalid={errors.ingredients?.[index]?.capacity?.type === 'validate'}
+                    placeholder={'Capacity'}
+                  />
+
+                  <Select
+                    {...register(`ingredients.${index}.unit`)}
+                    color={unit ? 'black' : 'grey'}
+                    placeholder={'Unit'}
+                  >
+                    {Object.values(Unit).map((unit, index) => {
+                      return (
+                        <option key={`${unit}_${index}`} value={unit}>
+                          {unit}
+                        </option>
+                      );
+                    })}
+                  </Select>
+
+                  <Input
+                    type="number"
+                    {...register(`ingredients.${index}.quantity`, {
+                      valueAsNumber: true,
+                      min: 0,
+                      validate: quantity => {
+                        if (quantity) return validateIsNumber(quantity);
+                      },
+                    })}
+                    placeholder={'Quantity'}
+                  />
+                </Grid>
+              </GridItem>
 
               <GridItem
                 textAlign={{ sm: 'end' }}
