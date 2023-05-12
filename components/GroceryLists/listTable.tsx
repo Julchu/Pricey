@@ -1,4 +1,4 @@
-import { Flex, Hide, Grid, Accordion, AccordionItem, Text } from '@chakra-ui/react';
+import { Accordion, AccordionItem, Flex, Grid, Hide, Text } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { GroceryList } from '../../lib/firebase/interfaces';
@@ -67,7 +67,7 @@ const ListTable: FC<{
         {filteredLists.map((list, index) => {
           return (
             <AccordionItem
-              key={`list_${index}`}
+              key={`accordionList_${index}`}
               isFocusable={false}
               scrollSnapAlign={'center'}
               _last={{ mr: { base: '30px', sm: 'unset' } }}

@@ -1,23 +1,21 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Text,
-  Image,
-  Card,
-  CardHeader,
-  CardBody,
-  StatArrow,
-  Stat,
-  Tooltip,
   AbsoluteCenter,
-  Button,
-  Center,
+  Card,
+  CardBody,
+  CardHeader,
+  Image,
+  Stat,
+  StatArrow,
+  Text,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useFormContext, useWatch } from 'react-hook-form';
 import { PersonalIngredient, WithDocId } from '../../lib/firebase/interfaces';
 import { IngredientFormData } from '.';
 import { useUnitContext } from '../../hooks/useUnitContext';
 import {
-  priceCalculator,
+  calcIndividualPrice,
   currencyFormatter,
   getPercentChange,
   percentageFormatter,
@@ -90,7 +88,11 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
 
   const newPricePerMeasurement = useMemo(
     () =>
-      priceConverter(priceCalculator(newPrice, newMeasurement, newQuantity), newUnit, currentUnits),
+      priceConverter(
+        calcIndividualPrice(newPrice, newMeasurement, newQuantity),
+        newUnit,
+        currentUnits,
+      ),
     [currentUnits, newMeasurement, newPrice, newQuantity, newUnit],
   );
 
@@ -223,12 +225,16 @@ export const NewIngredientCard: FC = () => {
    */
   const pricePerMeasurement = useMemo(
     () =>
-      priceConverter(priceCalculator(newPrice, newMeasurement, newQuantity), newUnit, currentUnits),
+      priceConverter(
+        calcIndividualPrice(newPrice, newMeasurement, newQuantity),
+        newUnit,
+        currentUnits,
+      ),
     [currentUnits, newMeasurement, newPrice, newQuantity, newUnit],
   );
 
   const pricePerItem = useMemo(
-    () => priceConverter(priceCalculator(newPrice, newQuantity), newUnit, currentUnits),
+    () => priceConverter(calcIndividualPrice(newPrice, newQuantity), newUnit, currentUnits),
     [currentUnits, newPrice, newQuantity, newUnit],
   );
 

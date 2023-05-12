@@ -1,22 +1,22 @@
 import {
-  useColorModeValue,
-  Flex,
   AccordionButton,
-  Grid,
-  Badge,
-  GridItem,
   AccordionIcon,
   AccordionPanel,
-  Show,
-  CloseButton,
+  Badge,
   Box,
+  CloseButton,
+  Flex,
+  Grid,
+  GridItem,
+  Show,
   Text,
+  useColorModeValue,
 } from '@chakra-ui/react';
-import { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
-import { GroceryList } from '../../lib/firebase/interfaces';
-import { totalPrice, currencyFormatter } from '../../lib/textFormatters';
+import { GroceryList, Unit } from '../../lib/firebase/interfaces';
+import { calcTotalPrice, currencyFormatter } from '../../lib/textFormatters';
 
 const CurrentListAccordion: FC<{
   isExpanded: boolean;
@@ -26,16 +26,39 @@ const CurrentListAccordion: FC<{
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
   const { setExpandedIndex } = useGroceryListContext();
   const bg = useColorModeValue('white', 'gray.800');
-  const listPrice = list.ingredients.reduce<number>((price, { name, capacity, quantity }) => {
-    const pricePerCapacity: number | undefined = ingredientIndexes[name]
-      ? currentIngredients[ingredientIndexes[name]].price
-      : undefined;
 
-    const displayPrice: number | undefined = pricePerCapacity
-      ? totalPrice(pricePerCapacity, capacity, quantity)
-      : undefined;
-    return displayPrice ? price + displayPrice : price;
-  }, 0);
+  /** Created memoized object with
+   * @property prices: { ingredient name, capacity, unit, quantity } and price: converted price * capacity * quantity // ingredient info
+   * @property totalPrice: combined total price of all ingredients
+   * */
+  const listPrice = useMemo(() => {
+    return list.ingredients.reduce<{
+      listIngredients: ({
+        name: string;
+        capacity: number | undefined;
+        unit: Unit | undefined;
+        quantity: number | undefined;
+      } & { price: number | undefined })[];
+      totalPrice: number;
+    }>(
+      (acc, { name, capacity, unit, quantity }) => {
+        const pricePerCapacity: number | undefined = ingredientIndexes[name]
+          ? currentIngredients[ingredientIndexes[name]].price
+          : undefined;
+
+        const displayPrice: number | undefined = pricePerCapacity
+          ? calcTotalPrice(pricePerCapacity, capacity, quantity)
+          : undefined;
+
+        acc.listIngredients.push({ name, capacity, unit, quantity, price: displayPrice });
+
+        return displayPrice
+          ? { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice + displayPrice }
+          : { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice };
+      },
+      { listIngredients: [], totalPrice: 0 },
+    );
+  }, [currentIngredients, ingredientIndexes, list.ingredients]);
 
   return (
     <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'}>
@@ -76,7 +99,9 @@ const CurrentListAccordion: FC<{
           </Flex>
 
           {/* Price */}
-          {listPrice ? <Text textAlign={'end'}>{currencyFormatter.format(listPrice)}</Text> : null}
+          {listPrice.totalPrice ? (
+            <Text textAlign={'end'}>{currencyFormatter.format(listPrice.totalPrice)}</Text>
+          ) : null}
 
           <GridItem
             alignSelf={'center'}
@@ -105,16 +130,7 @@ const CurrentListAccordion: FC<{
           />
         </Show>
         <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
-          {list.ingredients.map(({ name, capacity, unit, quantity }, index) => {
-            // TODO: multiply existing price by quantity/capacity
-            const pricePerCapacity = ingredientIndexes[name]
-              ? currentIngredients[ingredientIndexes[name]].price
-              : undefined;
-
-            const displayPrice = pricePerCapacity
-              ? totalPrice(pricePerCapacity, capacity, quantity)
-              : null;
-
+          {listPrice.listIngredients.map(({ name, capacity, unit, quantity, price }, index) => {
             return (
               <GridItem
                 gridColumnStart={'2'}
@@ -126,7 +142,7 @@ const CurrentListAccordion: FC<{
                   {capacity ? <Text>{capacity}</Text> : <Box />}
                   {unit ? <Text>{unit}</Text> : <Box />}
                   {quantity ? <Text>{quantity}</Text> : <Box />}
-                  {displayPrice ? <Text>{currencyFormatter.format(displayPrice)}</Text> : null}
+                  {price ? <Text>{currencyFormatter.format(price)}</Text> : null}
                 </Grid>
               </GridItem>
             );

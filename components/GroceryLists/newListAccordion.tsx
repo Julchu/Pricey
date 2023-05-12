@@ -1,39 +1,32 @@
-import { DeleteIcon, AddIcon } from '@chakra-ui/icons';
+import { AddIcon, DeleteIcon } from '@chakra-ui/icons';
 import {
-  useColorModeValue,
-  Flex,
   AccordionButton,
-  Grid,
-  GridItem,
-  Button,
-  Heading,
-  Badge,
   AccordionIcon,
   AccordionPanel,
-  Show,
+  Badge,
+  Box,
+  Button,
   CloseButton,
+  Flex,
+  Grid,
+  GridItem,
+  Heading,
+  IconButton,
   Input,
   Select,
-  IconButton,
-  Box,
+  Show,
   Text,
+  useColorModeValue,
 } from '@chakra-ui/react';
-import { FC, useCallback } from 'react';
-import { useFormContext, useFieldArray } from 'react-hook-form';
+import { FC, useCallback, useMemo } from 'react';
+import { useFieldArray, useFormContext } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import useGroceryListHook from '../../hooks/useGroceryListHook';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
-import { useUnitContext } from '../../hooks/useUnitContext';
 import { Unit } from '../../lib/firebase/interfaces';
-import {
-  totalPrice,
-  priceConverter,
-  priceCalculator,
-  validateIsNumber,
-  currencyFormatter,
-} from '../../lib/textFormatters';
+import { calcTotalPrice, currencyFormatter, validateIsNumber } from '../../lib/textFormatters';
 import { IngredientComboBox } from './listForm';
 
 const NewListAccordion: FC<{
@@ -45,7 +38,6 @@ const NewListAccordion: FC<{
   const [{ submitGroceryList }, loading] = useGroceryListHook();
   const { setExpandedIndex, groceryListCreator } = useGroceryListContext();
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
-  const { currentUnits } = useUnitContext();
   const {
     register,
     control,
@@ -58,16 +50,34 @@ const NewListAccordion: FC<{
 
   const ingredients = watch('ingredients');
 
-  const listPrice = ingredients.reduce<number>((price, { name, capacity, quantity }) => {
-    const pricePerCapacity: number | undefined = ingredientIndexes[name]
-      ? currentIngredients[ingredientIndexes[name]].price
-      : undefined;
+  const listPrice = useMemo(() => {
+    return ingredients.reduce<{
+      listIngredients: ({
+        name: string;
+        capacity: number | undefined;
+        unit: Unit | undefined;
+        quantity: number | undefined;
+      } & { price: number | undefined })[];
+      totalPrice: number;
+    }>(
+      (acc, { name, capacity, unit, quantity }) => {
+        const pricePerCapacity = ingredientIndexes[name]
+          ? currentIngredients[ingredientIndexes[name]].price
+          : undefined;
 
-    const displayPrice: number | undefined = pricePerCapacity
-      ? totalPrice(pricePerCapacity, capacity, quantity)
-      : undefined;
-    return displayPrice ? price + displayPrice : price;
-  }, 0);
+        const displayPrice = pricePerCapacity
+          ? calcTotalPrice(pricePerCapacity, capacity, quantity)
+          : undefined;
+
+        acc.listIngredients.push({ name, capacity, unit, quantity, price: displayPrice });
+
+        return displayPrice
+          ? { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice + displayPrice }
+          : { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice };
+      },
+      { listIngredients: [], totalPrice: 0 },
+    );
+  }, [currentIngredients, ingredientIndexes, ingredients]);
 
   const {
     fields: fieldIngredients,
@@ -178,18 +188,7 @@ const NewListAccordion: FC<{
             }}
           />
         </Show>
-        {ingredients.map(({ name, capacity, quantity, unit }, index) => {
-          const pricePerCapacity = ingredientIndexes[name]
-            ? currentIngredients[ingredientIndexes[name]].price
-            : undefined;
-
-          const displayPrice = pricePerCapacity
-            ? priceConverter(
-                priceCalculator(pricePerCapacity, capacity, quantity),
-                unit,
-                currentUnits,
-              )
-            : undefined;
+        {listPrice.listIngredients.map(({ unit, price }, index) => {
           return (
             <Grid
               templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
@@ -251,7 +250,7 @@ const NewListAccordion: FC<{
                 gridRow={{ base: '2', sm: '1' }}
                 gridColumn={{ base: '1', sm: '3' }}
               >
-                {displayPrice ? <Text>{currencyFormatter.format(displayPrice)}</Text> : null}
+                {price ? <Text>{currencyFormatter.format(price)}</Text> : null}
               </GridItem>
 
               <GridItem
@@ -280,14 +279,14 @@ const NewListAccordion: FC<{
             </Heading>
           ) : null}
 
-          {listPrice ? (
+          {listPrice.totalPrice ? (
             <GridItem
               textAlign={{ sm: 'end' }}
               alignSelf={'center'}
               gridRow={{ base: '2', sm: '1' }}
               gridColumn={{ base: '1', sm: '3' }}
             >
-              <Text>{currencyFormatter.format(listPrice)}</Text>
+              <Text>{currencyFormatter.format(listPrice.totalPrice)}</Text>
             </GridItem>
           ) : null}
 

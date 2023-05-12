@@ -2,7 +2,7 @@ import { doc, DocumentReference, serverTimestamp, setDoc, updateDoc } from 'fire
 import { useCallback, useState } from 'react';
 import { db, PersonalIngredient, Unit } from '../lib/firebase/interfaces';
 import {
-  priceCalculator,
+  calcIndividualPrice,
   filterNullableObject,
   priceConverter,
   unitConverter,
@@ -33,7 +33,7 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
       /* Save price per measurement per quantity
        * When displaying data, can measure based on current measurement and quantity to compare prices
        */
-      const pricePerCapacity = priceCalculator(price, capacity, quantity);
+      const pricePerCapacity = calcIndividualPrice(price, capacity, quantity);
       const convertedUnit = unitConverter(unit);
       const convertedPricePerMeasurement = priceConverter(pricePerCapacity, unit, {
         mass: Unit.kilogram,
@@ -70,7 +70,7 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
 
   const updateIngredient = useCallback<IngredientMethods['updateIngredient']>(
     async ({ ingredientId, price, capacity, quantity, unit, location, image }) => {
-      const pricePerMeasurement = priceCalculator(price, capacity, quantity);
+      const pricePerMeasurement = calcIndividualPrice(price, capacity, quantity);
       const convertedPreviewPrice = priceConverter(pricePerMeasurement, unit, {
         mass: Unit.kilogram,
         volume: Unit.litre,

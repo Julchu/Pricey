@@ -47,7 +47,7 @@ export const unitConverter = (
 };
 
 // Price per measurement per unit; takes care of float by multiplying by 100 to cents
-export const priceCalculator = (
+export const calcIndividualPrice = (
   price: number,
   capacity: number = 1, // default 1 for GroceryList ingredients that might not have measurements added
   quantity: number = 1,
@@ -56,7 +56,14 @@ export const priceCalculator = (
 };
 
 // Total price based on price per measurement and capacity/quantity
-export const totalPrice = (price: number, capacity: number = 1, quantity: number = 1): number => {
+export const calcTotalPrice = (
+  price: number,
+  capacity: number = 1,
+  quantity: number = 1,
+): number => {
+  console.log('price', price);
+  console.log('capacity', capacity);
+  console.log('quantity:', quantity);
   return (price * 100 * capacity * quantity) / 100;
 };
 
