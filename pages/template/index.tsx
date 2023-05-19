@@ -2,7 +2,7 @@
 import Layout from '../../components/Layout';
 import Template from '../../components/Template';
 
-/* NextJS will take the folder's name as the route (URL), and display the inner index.tsx
+/* NextJS will take the folder's name as the route (URL), and display the inner CropAlgorithm.tsx
  * Ex: localhost:3000/template
  */
 const TemplatePage: () => null | JSX.Element = () => {

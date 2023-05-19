@@ -2,7 +2,8 @@
 
 Tracking personal price thresholds and lowest price of items we purchase on a recurring basis.
 
-Convert prices per unit when grocery stores purposefully hide them or markup and discount them while hiding their actual prices per unit
+Convert prices per unit when grocery stores purposefully hide them or markup and discount them while hiding their actual
+prices per unit
 
 # TODO:
 
@@ -12,9 +13,11 @@ Convert prices per unit when grocery stores purposefully hide them or markup and
 
 ### NodeJS, `npm`, `yarn`
 
-- You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that you can run commands to download packages used to create React projects.
+- You'll need to download [NodeJS](https://nodejs.org/en/) and install to `npm` (Node Package Manager) to PATH so that
+  you can run commands to download packages used to create React projects.
 
-- The main package you'll need is a separate package manager called `yarn`, which functions similarly (like a super layer) to `npm`
+- The main package you'll need is a separate package manager called `yarn`, which functions similarly (like a super
+  layer) to `npm`
 
 ### Why `yarn`
 
@@ -40,7 +43,8 @@ yarn global add firebase-tools
 
 ### Environment files
 
-- You'll need a copy of `.env.example` as your development environment, as well as a production environment when deploying to live
+- You'll need a copy of `.env.example` as your development environment, as well as a production environment when
+  deploying to live
 
 ```zsh
 # Copy and setup your environment
@@ -87,7 +91,7 @@ sudo kill -9 $(sudo lsof -t -i:8080)
 
 - In VSCode, install the extention Prettier
 - Go to your VSCode JSON settings:
-  - Command Palette -> Preferences: Open Settings (JSON)
+    - Command Palette -> Preferences: Open Settings (JSON)
 - Add the following code to the JSON object
 - Whenever you save a file, it'll run automatic formatting based on rules defined in `/.prettierrc.json`
 
@@ -124,7 +128,8 @@ yarn lint
 yarn type-check
 ```
 
-- With Husky and Lint-Staged, project will automatically run these basic checks when trying to commit changes or deploy the project, and will block the commit/deployment on errors (not warnings)
+- With Husky and Lint-Staged, project will automatically run these basic checks when trying to commit changes or deploy
+  the project, and will block the commit/deployment on errors (not warnings)
 
 # Notes
 
@@ -153,53 +158,59 @@ Imagine a Discord text-channel as a website: it can be split into multiple piece
 - Main chat box w/ text input
 - Right side bar to view available users
 
-Each area can be a component, that can be a group of smaller components, which can be a group of smaller individual components/HTML elements
+Each area can be a component, that can be a group of smaller components, which can be a group of smaller individual
+components/HTML elements
 
-Sometimes data must be able to appear in multiple components, or be manipulated within specific components and appear in other components.
+Sometimes data must be able to appear in multiple components, or be manipulated within specific components and appear in
+other components.
 
-Data can be passed downwards to children pretty easily through `props`, tho cycling them back up and/or across is not as easy.
+Data can be passed downwards to children pretty easily through `props`, tho cycling them back up and/or across is not as
+easy.
 
-If you understand `getters` and `setters`, we can also pass down `setter` functions that'll manipulate the top-level `state` data that is also being passed down to other neighbouring child components
+If you understand `getters` and `setters`, we can also pass down `setter` functions that'll manipulate the
+top-level `state` data that is also being passed down to other neighbouring child components
 
 ## NextJS Layout
 
 ### /components
 
 - For React components, structured as
-  - DirectoryName
-    - index.tsx
-    - styles.tsx
+    - DirectoryName
+        - CropAlgorithm.tsx
+        - styles.tsx
 - Template files:
-  - /components/Template: index/styles.tsx
-  - /pages/template: index.tsx
+    - /components/Template: index/styles.tsx
+    - /pages/template: CropAlgorithm.tsx
 
 ### /pages:
 
 - Files in this directory are treated as API routes instead of React pages
-  - RouteName
-    - index.tsx: localhost:3000/RouteName
-    - SubRouteName
-      - index.tsx: localhost:3000/RouteName/SubRouteName
-      - [templateIndex].tsx: localhost:3000/RouteName/SubRouteName/templateIndex
-- index.tsx files are the displayed components, so `/pages/index.tsx` will be the base `localhost:3000/` file
+    - RouteName
+        - CropAlgorithm.tsx: localhost:3000/RouteName
+        - SubRouteName
+            - CropAlgorithm.tsx: localhost:3000/RouteName/SubRouteName
+            - [templateIndex].tsx: localhost:3000/RouteName/SubRouteName/templateIndex
+- CropAlgorithm.tsx files are the displayed components, so `/pages/CropAlgorithm.tsx` will be the base `localhost:3000/`
+  file
 
 ### /package.json
 
 - Project information, node module dependencies, etc...
 - Scripts: commands and aliases to run commands
-  - Ex: type-check runs the TS compiler script `tsc` when you call it with `yarn type-check`
+    - Ex: type-check runs the TS compiler script `tsc` when you call it with `yarn type-check`
 - Dependencies: `yarn add <packageName>`
-  - Required for end user/host to install when building app
-  - Ex: NextJS/React, Emotion (styling)
+    - Required for end user/host to install when building app
+    - Ex: NextJS/React, Emotion (styling)
 - Dev Dependencies: `yarn add <packageName> -D`
-  - Required for devs to install when building app
-  - Ex: linters, formatters
+    - Required for devs to install when building app
+    - Ex: linters, formatters
 
 ## Basic Emotion styled components
 
 Emotion allows you to style components in a function/object format, similar to how we build normal React components
 
-Our base styled components will go into `/UI`, and each specific component's styles can either build unique styled components, or inherit from one in `/UI`
+Our base styled components will go into `/UI`, and each specific component's styles can either build unique styled
+components, or inherit from one in `/UI`
 
 - Ex: `/components/UI/buttons.tsx`
 
@@ -213,11 +224,14 @@ Every non-numeric value is a string in single quotes
 
 ## Chakra UI: advanced version of Emotion styled components
 
-Chakra UI is built on Emotion, but with various nuances, attempting to solve inconsistent theming from building every component from scratch (like I did in V1 of this app)
+Chakra UI is built on Emotion, but with various nuances, attempting to solve inconsistent theming from building every
+component from scratch (like I did in V1 of this app)
 
-Chakra UI offers basic components with the idea for us to elaborately customize them into different varients to call in our app
+Chakra UI offers basic components with the idea for us to elaborately customize them into different varients to call in
+our app
 
-Rather than lose track of every single kind of button we built per page in Emotion, we'll just use Chakra UI Buttons with a specific variant
+Rather than lose track of every single kind of button we built per page in Emotion, we'll just use Chakra UI Buttons
+with a specific variant
 
 ## CSS Notes
 
@@ -227,7 +241,8 @@ Rather than lose track of every single kind of button we built per page in Emoti
 
 `position: 'fixed'`: positions content relative to browser
 
-- Ex: `bottom: '0px'`, will position content at bottom of browser regardless of any content, on top of the content displayed
+- Ex: `bottom: '0px'`, will position content at bottom of browser regardless of any content, on top of the content
+  displayed
 
 ## Firestore
 
@@ -248,7 +263,8 @@ if (existingUser.docs.length) {
 
 Types or Interfaces?
 
-- Interface for public API's definition when authoring a library or 3rd party ambient type definitions, as this allows a consumer to extend them via declaration merging if some definitions are missing.
+- Interface for public API's definition when authoring a library or 3rd party ambient type definitions, as this allows a
+  consumer to extend them via declaration merging if some definitions are missing.
 
 - Type for your React Component Props and State, for consistency and because it is more constrained.
 

@@ -30,6 +30,9 @@ export const priceConverter = (price: number, fromUnit?: Unit, toUnits?: UnitCat
   else if (fromUnit === Unit.kilogram && toUnits?.mass === Unit.pound) return price / 2.2046;
   else if (fromUnit === Unit.litre && toUnits?.volume === Unit.quart) return price * 1.05669;
   else if (fromUnit === Unit.quart && toUnits?.volume === Unit.litre) return price / 1.05669;
+  else if (fromUnit === Unit.tablespoon && toUnits?.volume === Unit.cup) return price * 16;
+  else if (fromUnit === Unit.cup && toUnits?.volume === Unit.tablespoon) return price / 16;
+
   return price;
 };
 

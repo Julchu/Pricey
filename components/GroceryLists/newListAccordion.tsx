@@ -189,28 +189,30 @@ const NewListAccordion: FC<{
           />
         </Show>
 
-        <Show above={'sm'}>
-          {/* "Table" header for existing ingredient info */}
-          <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
-            <GridItem gridColumnStart={'2'} gridColumnEnd={'4'}>
-              <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
-                <Text as={'b'}>Ingredient name</Text>
-                <Text as={'b'} textAlign={'end'}>
-                  Measurement
-                </Text>
-                <Text as={'b'} textAlign={'end'}>
-                  Unit
-                </Text>
-                <Text as={'b'} textAlign={'end'}>
-                  Quantity
-                </Text>
-                <Text as={'b'} textAlign={'end'}>
-                  Estimated price
-                </Text>
-              </Grid>
-            </GridItem>
-          </Grid>
-        </Show>
+        {ingredients.length ? (
+          <Show above={'sm'}>
+            {/* "Table" header for existing ingredient info */}
+            <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
+              <GridItem gridColumnStart={'2'} gridColumnEnd={'4'}>
+                <Grid templateColumns={'1fr 1fr 1fr 1fr 1fr'} columnGap={'20px'}>
+                  <Text as={'b'}>Ingredient name</Text>
+                  <Text as={'b'} textAlign={'end'}>
+                    Measurement
+                  </Text>
+                  <Text as={'b'} textAlign={'end'}>
+                    Unit
+                  </Text>
+                  <Text as={'b'} textAlign={'end'}>
+                    Quantity
+                  </Text>
+                  <Text as={'b'} textAlign={'end'}>
+                    Estimated price
+                  </Text>
+                </Grid>
+              </GridItem>
+            </Grid>
+          </Show>
+        ) : null}
 
         {listPrice.listIngredients.map(({ unit, price }, index) => {
           return (

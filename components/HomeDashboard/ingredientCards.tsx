@@ -132,7 +132,7 @@ export const IngredientCard: FC<CardProps> = ({ ingredientInfo, highlighted }) =
       <CardBody
         onClick={async () => {
           await onUpdateTransform(ingredientInfo);
-          handleSubmit(onUpdateSubmit)();
+          await handleSubmit(onUpdateSubmit)();
         }}
       >
         <Text overflow={'hidden'} bg={'white'} _dark={{ bg: 'gray.800' }}>

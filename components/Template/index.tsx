@@ -1,5 +1,5 @@
-import { Box, Text } from '@chakra-ui/react';
-import { FC, ReactNode, useState } from 'react';
+import {Box, Text} from '@chakra-ui/react';
+import {FC, ReactNode, useState} from 'react';
 // import { Button } from '../UI/Buttons';
 
 /* Props in the form of a TypeScript { object }
@@ -123,7 +123,7 @@ const RenderProps4: FC<{
   return <Box bg="royalblue">{children({ text, setText })}</Box>;
 };
 
-/* Combine RenderProp3 and RenderProp4 return types: 
+/* Combine RenderProp3 and RenderProp4 return types:
   Can return ReactNode or function with object props ({ text, setText }) that returns ReactNode
  */
 const RenderProps5: FC<{
@@ -147,19 +147,23 @@ const Counter = ({
   children: JSX.Element;
 }): JSX.Element => (
   <>
-    <button onClick={() => setCount(count - 1)}>-</button> {count}{' '}
-    <button onClick={() => setCount(count + 1)}>+</button> {children}{' '}
+    <button onClick={() => setCount(count - 1)}>-</button>
+    {count}
+    <button onClick={() => setCount(count + 1)}>+</button>
+    {children}
   </>
 );
 
 const Result = ({ total }: { total: number }): JSX.Element => <h1>The total is {total}</h1>;
 
-const Counter2 = ({ render }: { render: (count: number) => void }): JSX.Element => {
+const Counter2 = ({ render }: { render: (count: number) => JSX.Element }): JSX.Element => {
   const [count, setCount] = useState(0);
   return (
     <>
-      <button onClick={() => setCount(count - 1)}>-</button> {count}
-      <button onClick={() => setCount(count + 1)}>+</button> {render(count)}
+      <button onClick={() => setCount(count - 1)}>-</button>
+      {count}
+      <button onClick={() => setCount(count + 1)}>+</button>
+      {render(count)}
     </>
   );
 };
@@ -169,4 +173,5 @@ const Result2 = ({ total }: { total: number }): JSX.Element => <h1>The total is 
 /* You can export as default, so that other files can import Template from '/component/Template'
  * Or you can export const Template and other components within file, so that other files can import { Template } from '/component/Template'
  */
+
 export default Template;
