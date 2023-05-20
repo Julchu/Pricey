@@ -59,15 +59,8 @@ export const calcIndividualPrice = (
 };
 
 // Total price based on price per measurement and capacity/quantity
-export const calcTotalPrice = (
-  price: number,
-  capacity: number = 1,
-  quantity: number = 1,
-): number => {
-  console.log('price', price);
-  console.log('capacity', capacity);
-  console.log('quantity:', quantity);
-  return (price * 100 * capacity * quantity) / 100;
+export const calcTotalPrice = (price: number, capacity?: number, quantity?: number): number => {
+  return (price * 100 * (capacity ? capacity : 1) * (quantity ? quantity : 1)) / 100;
 };
 
 export const currencyFormatter = new Intl.NumberFormat(undefined, {

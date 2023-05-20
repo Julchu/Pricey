@@ -18,7 +18,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { FC, useCallback, useMemo } from 'react';
+import { FC, useCallback } from 'react';
 import { useFieldArray, useFormContext } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
@@ -50,34 +50,33 @@ const NewListAccordion: FC<{
 
   const ingredients = watch('ingredients');
 
-  const listPrice = useMemo(() => {
-    return ingredients.reduce<{
-      listIngredients: ({
-        name: string;
-        capacity: number | undefined;
-        unit: Unit | undefined;
-        quantity: number | undefined;
-      } & { price: number | undefined })[];
-      totalPrice: number;
-    }>(
-      (acc, { name, capacity, unit, quantity }) => {
-        const pricePerCapacity = ingredientIndexes[name]
+  const listPrice = ingredients.reduce<{
+    listIngredients: ({
+      name: string;
+      capacity: number | undefined;
+      unit: Unit | undefined;
+      quantity: number | undefined;
+    } & { price: number | undefined })[];
+    totalPrice: number;
+  }>(
+    (acc, { name, capacity, unit, quantity }) => {
+      const pricePerCapacity =
+        ingredientIndexes[name] >= 0
           ? currentIngredients[ingredientIndexes[name]].price
           : undefined;
 
-        const displayPrice = pricePerCapacity
-          ? calcTotalPrice(pricePerCapacity, capacity, quantity)
-          : undefined;
+      const displayPrice = pricePerCapacity
+        ? calcTotalPrice(pricePerCapacity, capacity, quantity)
+        : undefined;
 
-        acc.listIngredients.push({ name, capacity, unit, quantity, price: displayPrice });
+      acc.listIngredients.push({ name, capacity, unit, quantity, price: displayPrice });
 
-        return displayPrice
-          ? { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice + displayPrice }
-          : { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice };
-      },
-      { listIngredients: [], totalPrice: 0 },
-    );
-  }, [currentIngredients, ingredientIndexes, ingredients]);
+      return displayPrice
+        ? { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice + displayPrice }
+        : { listIngredients: acc.listIngredients, totalPrice: acc.totalPrice };
+    },
+    { listIngredients: [], totalPrice: 0 },
+  );
 
   const {
     fields: fieldIngredients,

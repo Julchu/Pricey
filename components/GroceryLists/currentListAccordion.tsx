@@ -42,11 +42,12 @@ const CurrentListAccordion: FC<{
       totalPrice: number;
     }>(
       (acc, { name, capacity, unit, quantity }) => {
-        const pricePerCapacity: number | undefined = ingredientIndexes[name]
-          ? currentIngredients[ingredientIndexes[name]].price
-          : undefined;
+        const pricePerCapacity =
+          ingredientIndexes[name] >= 0
+            ? currentIngredients[ingredientIndexes[name]].price
+            : undefined;
 
-        const displayPrice: number | undefined = pricePerCapacity
+        const displayPrice = pricePerCapacity
           ? calcTotalPrice(pricePerCapacity, capacity, quantity)
           : undefined;
 

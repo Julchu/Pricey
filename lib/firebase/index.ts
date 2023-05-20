@@ -1,10 +1,10 @@
 // Import the functions you need from the SDKs you need
 import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 // import { getAnalytics } from 'firebase/analytics';
-import { connectFirestoreEmulator, initializeFirestore } from 'firebase/firestore';
+import { initializeFirestore } from 'firebase/firestore';
 // import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import getConfig from 'next/config';
-import { getAuth, connectAuthEmulator } from '@firebase/auth';
+import { getAuth } from '@firebase/auth';
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -56,8 +56,8 @@ try {
     /* Note: `next build` doesn't account for environment variables (doesn't use .env.production)
      * Need to comment out emulator connections when pushing to production
      */
-    connectFirestoreEmulator(firestore, '10.88.111.5', 8080);
-    connectAuthEmulator(authentication, 'http://10.88.111.5:9099', { disableWarnings: true });
+    // connectFirestoreEmulator(firestore, '10.88.111.5', 8080);
+    // connectAuthEmulator(authentication, 'http://10.88.111.5:9099', { disableWarnings: true });
 
     // connectFirestoreEmulator(firestore, 'localhost', 8080);
     // connectAuthEmulator(authentication, 'http://localhost:9099', { disableWarnings: true });

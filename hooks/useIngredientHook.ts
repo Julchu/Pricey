@@ -81,8 +81,6 @@ const useIngredientHook = (): [IngredientMethods, boolean, Error | undefined] =>
       const updatedIngredient = filterNullableObject({
         ingredientId,
         price: parseFloat(convertedPreviewPrice),
-        capacity,
-        quantity,
         unit,
         location,
         image,
