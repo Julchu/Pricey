@@ -91,7 +91,7 @@ export const IngredientComboBox: FC<{
   });
 
   return (
-    <Flex flexDir={'column'}>
+    <Flex flexDir={'column'} position={{ base: 'relative', sm: 'unset' }}>
       <Input
         type={'text'}
         {...getInputProps()}
