@@ -16,7 +16,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { FC, useCallback, useEffect, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { GroceryList, Unit, WithDocId } from '../../lib/firebase/interfaces';
@@ -39,29 +39,26 @@ const CurrentListAccordion: FC<{
   const [isEditing, setIsEditing] = useState<boolean>(false);
 
   const methods = useForm<GroceryListFormData>({
-    defaultValues: { ...list, groceryListId: list.documentId },
+    defaultValues: { ...list, groceryListId: list.documentId } || {
+      name: '',
+      ingredients: [],
+      viewable: false,
+    },
   });
 
   const {
     register,
-    reset,
     control,
     watch,
     handleSubmit,
     formState: { errors },
   } = methods;
 
+  const ingredients = watch('ingredients');
   const { append: appendIngredient, remove: removeIngredient } = useFieldArray({
     name: 'ingredients',
     control,
   });
-
-  useEffect(() => {
-    if (!isExpanded) {
-      reset();
-      setIsEditing(false);
-    }
-  }, [isExpanded, reset]);
 
   const onUpdateHandler = useCallback(
     async (groceryListData: GroceryListFormData) => {
@@ -138,7 +135,7 @@ const CurrentListAccordion: FC<{
 
             {/* Ingredient badges */}
             <Flex flexWrap={'wrap'} gap={'10px'} alignContent={{ sm: 'center' }}>
-              {list.ingredients.map((ingredient, index) => {
+              {ingredients.map((ingredient, index) => {
                 return (
                   <Box key={`ingredient_${index}`}>
                     <Badge>{ingredient.name}</Badge>
@@ -209,7 +206,7 @@ const CurrentListAccordion: FC<{
            * else: show static grocery list with prices
            */}
           {isEditing
-            ? listPrice.listIngredients.map((_, index) => {
+            ? ingredients.map((_, index) => {
                 return (
                   <IngredientForm
                     key={`editCurrentIngredient_${index}`}
@@ -247,7 +244,7 @@ const CurrentListAccordion: FC<{
             p="12px 0px"
             gap={'20px'}
           >
-            {!list.ingredients.length ? (
+            {!listPrice.listIngredients.length ? (
               <Heading textAlign={'center'} gridColumn={{ sm: '2/3' }}>
                 Add some ingredients
               </Heading>
