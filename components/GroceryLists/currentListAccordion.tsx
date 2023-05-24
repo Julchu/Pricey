@@ -56,8 +56,8 @@ const CurrentListAccordion: FC<{
   } = methods;
 
   useEffect(() => {
-    reset();
-  }, [reset]);
+    reset({ ...list, groceryListId: list.documentId });
+  }, [isEditing, list, reset]);
 
   const ingredients = watch('ingredients');
   const { append: appendIngredient, remove: removeIngredient } = useFieldArray({
@@ -75,6 +75,7 @@ const CurrentListAccordion: FC<{
   const onDeleteHandler = useCallback(
     async (groceryListData: GroceryListFormData) => {
       if (groceryListData.groceryListId) await deleteGroceryList(groceryListData.groceryListId);
+      setIsEditing(false);
     },
     [deleteGroceryList],
   );
@@ -146,13 +147,21 @@ const CurrentListAccordion: FC<{
 
             {/* Ingredient badges */}
             <Flex flexWrap={'wrap'} gap={'10px'} alignContent={{ sm: 'center' }}>
-              {ingredients.map((ingredient, index) => {
-                return (
-                  <Box key={`ingredient_${index}`}>
-                    <Badge>{ingredient.name}</Badge>
-                  </Box>
-                );
-              })}
+              {isEditing
+                ? ingredients.map((ingredient, index) => {
+                    return (
+                      <Box key={`ingredient_${index}`}>
+                        <Badge>{ingredient.name}</Badge>
+                      </Box>
+                    );
+                  })
+                : listPrice.listIngredients.map((ingredient, index) => {
+                    return (
+                      <Box key={`ingredient_${index}`}>
+                        <Badge>{ingredient.name}</Badge>
+                      </Box>
+                    );
+                  })}
             </Flex>
 
             {/* Price */}
