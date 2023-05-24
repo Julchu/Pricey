@@ -176,7 +176,7 @@ const CurrentListAccordion: FC<{
             />
           </Show>
 
-          {list.ingredients.length ? (
+          {ingredients.length ? (
             <Show above={'sm'}>
               {/* "Table" header for existing ingredient info */}
               <Grid templateColumns={'1.5fr 4.5fr 1fr 0.3fr'} columnGap={'20px'} my={'10px'}>
@@ -244,7 +244,7 @@ const CurrentListAccordion: FC<{
             p="12px 0px"
             gap={'20px'}
           >
-            {!listPrice.listIngredients.length ? (
+            {!ingredients.length ? (
               <Heading textAlign={'center'} gridColumn={{ sm: '2/3' }}>
                 Add some ingredients
               </Heading>
