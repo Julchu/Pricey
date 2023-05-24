@@ -54,8 +54,9 @@ const NewListAccordion: FC<{
       await submitGroceryList(groceryListData);
       resetField('name');
       resetField('ingredients');
+      setExpandedIndex([]);
     },
-    [resetField, submitGroceryList],
+    [resetField, setExpandedIndex, submitGroceryList],
   );
 
   const listPrice = ingredients.reduce<{

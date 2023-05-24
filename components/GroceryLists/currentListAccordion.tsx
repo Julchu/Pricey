@@ -41,7 +41,7 @@ const CurrentListAccordion: FC<{
   const methods = useForm<GroceryListFormData>({
     defaultValues: { ...list, groceryListId: list.documentId } || {
       name: '',
-      ingredients: [],
+      ingredients: [{ name: '', capacity: undefined, quantity: undefined, unit: undefined }],
       viewable: false,
     },
   });
@@ -76,15 +76,16 @@ const CurrentListAccordion: FC<{
     async (groceryListData: GroceryListFormData) => {
       if (groceryListData.groceryListId) await deleteGroceryList(groceryListData.groceryListId);
       setIsEditing(false);
+      setExpandedIndex([]);
     },
-    [deleteGroceryList],
+    [deleteGroceryList, setExpandedIndex],
   );
 
   /**
    * @property prices: { ingredient name, capacity, unit, quantity } and price: converted price * capacity * quantity // ingredient info
    * @property totalPrice: combined total price of all ingredients
    * */
-  const listPrice = list.ingredients.reduce<{
+  const listPrice = ingredients.reduce<{
     listIngredients: ({
       name: string;
       capacity: number | undefined;
@@ -147,21 +148,13 @@ const CurrentListAccordion: FC<{
 
             {/* Ingredient badges */}
             <Flex flexWrap={'wrap'} gap={'10px'} alignContent={{ sm: 'center' }}>
-              {isEditing
-                ? ingredients.map((ingredient, index) => {
-                    return (
-                      <Box key={`ingredient_${index}`}>
-                        <Badge>{ingredient.name}</Badge>
-                      </Box>
-                    );
-                  })
-                : listPrice.listIngredients.map((ingredient, index) => {
-                    return (
-                      <Box key={`ingredient_${index}`}>
-                        <Badge>{ingredient.name}</Badge>
-                      </Box>
-                    );
-                  })}
+              {listPrice.listIngredients.map((ingredient, index) => {
+                return (
+                  <Box key={`ingredient_${index}`}>
+                    <Badge>{ingredient.name}</Badge>
+                  </Box>
+                );
+              })}
             </Flex>
 
             {/* Price */}
