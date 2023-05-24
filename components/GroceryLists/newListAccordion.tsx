@@ -221,7 +221,7 @@ const NewListAccordion: FC<{
           gap={'20px'}
         >
           {!ingredients.length ? (
-            <Heading textAlign={'center'} gridColumn={{ sm: '2/3' }}>
+            <Heading textAlign={'center'} gridRow={'1'} gridColumn={{ base: '1', sm: '2/3' }}>
               Add some ingredients
             </Heading>
           ) : null}

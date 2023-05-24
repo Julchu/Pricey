@@ -1,4 +1,11 @@
-import { doc, DocumentReference, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import {
+  deleteDoc,
+  doc,
+  DocumentReference,
+  serverTimestamp,
+  setDoc,
+  updateDoc,
+} from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { GroceryListFormData } from '../components/GroceryLists';
 import { db, GroceryList, Unit } from '../lib/firebase/interfaces';
@@ -81,26 +88,12 @@ const useGroceryListHook = (): [GroceryListMethods, boolean, Error | undefined] 
   const deleteGroceryList = useCallback<GroceryListMethods['deleteGroceryList']>(
     async groceryListId => {
       if (!authUser) return;
-      // const previewPrice = priceCalculator(price, measurement);
-      // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
-      //   mass: Unit.kilogram,
-      //   volume: Unit.litre,
-      // }).toFixed(2);
 
+      // TODO: fix updating list (shows wrong list deleted until refresh)
       const groceryListDocRef = doc(db.groceryListCollection, groceryListId);
 
-      // const updatedIngredient = filterNullableObject({
-      //   ingredientId,
-      //   price: parseFloat(convertedPreviewPrice),
-      //   measurement,
-      //   quantity,
-      //   unit,
-      //   location,
-      //   image,
-      // });
-
       try {
-        // await updateDoc(groceryListDocRef, updatedIngredient);
+        await deleteDoc(groceryListDocRef);
       } catch (e) {
         setError(e as Error);
       }

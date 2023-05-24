@@ -16,7 +16,7 @@ import {
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { FC, useCallback, useState } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { GroceryList, Unit, WithDocId } from '../../lib/firebase/interfaces';
@@ -33,7 +33,7 @@ const CurrentListAccordion: FC<{
   list: WithDocId<GroceryList>;
 }> = ({ isExpanded, index, list }) => {
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
-  const [{ updateGroceryList }, loading] = useGroceryListHook();
+  const [{ updateGroceryList, deleteGroceryList }, loading] = useGroceryListHook();
   const { setExpandedIndex } = useGroceryListContext();
   const bg = useColorModeValue('white', 'gray.800');
   const [isEditing, setIsEditing] = useState<boolean>(false);
@@ -49,10 +49,15 @@ const CurrentListAccordion: FC<{
   const {
     register,
     control,
+    reset,
     watch,
     handleSubmit,
     formState: { errors },
   } = methods;
+
+  useEffect(() => {
+    reset();
+  }, [reset]);
 
   const ingredients = watch('ingredients');
   const { append: appendIngredient, remove: removeIngredient } = useFieldArray({
@@ -65,6 +70,13 @@ const CurrentListAccordion: FC<{
       await updateGroceryList(groceryListData);
     },
     [updateGroceryList],
+  );
+
+  const onDeleteHandler = useCallback(
+    async (groceryListData: GroceryListFormData) => {
+      if (groceryListData.groceryListId) await deleteGroceryList(groceryListData.groceryListId);
+    },
+    [deleteGroceryList],
   );
 
   /**
@@ -106,7 +118,6 @@ const CurrentListAccordion: FC<{
           as={Box}
           cursor={'pointer'}
           h={{ base: '100%', sm: 'unset' }}
-          w={{ sm: '100%' }}
           bg={isExpanded ? 'lightcoral' : ''}
           onClick={() => {
             // Checking if current AccordionItem is the current one
@@ -165,6 +176,7 @@ const CurrentListAccordion: FC<{
           top={{ base: '0', sm: 'unset' }}
           right={{ base: '0', sm: 'unset' }}
           h={{ base: '100%', sm: 'unset' }}
+          w={'100%'}
           bg={bg}
         >
           <Show below={'sm'}>
@@ -245,12 +257,16 @@ const CurrentListAccordion: FC<{
             gap={'20px'}
           >
             {!ingredients.length ? (
-              <Heading textAlign={'center'} gridColumn={{ sm: '2/3' }}>
+              <Heading
+                textAlign={'center'}
+                gridRow={{ base: '1' }}
+                gridColumn={{ base: '2/3', sm: '2/3' }}
+              >
                 Add some ingredients
               </Heading>
             ) : null}
 
-            {/* Edit list button*/}
+            {/* Add ingredient button */}
             {isEditing ? (
               <GridItem
                 textAlign={'end'}
@@ -273,21 +289,40 @@ const CurrentListAccordion: FC<{
               </GridItem>
             ) : null}
 
-            {/* Edit list button*/}
+            {/* Delete list button */}
+            {isEditing ? (
+              <GridItem
+                textAlign={{ base: 'start', sm: 'end' }}
+                gridRow={{ base: '2', sm: '2' }}
+                gridColumn={{ base: '1', sm: '3' }}
+              >
+                <IconButton
+                  aria-label="Delete list"
+                  icon={<DeleteIcon />}
+                  onClick={() => {
+                    handleSubmit(onDeleteHandler)();
+                  }}
+                />
+              </GridItem>
+            ) : null}
+
+            {/* Edit list button */}
             <GridItem
               textAlign={'end'}
               gridRow={{ base: '2', sm: '2' }}
               gridColumn={{ base: '1', sm: '4' }}
             >
               {isEditing ? (
-                <IconButton
-                  aria-label="Edit grocery list"
-                  icon={<CheckIcon />}
-                  onClick={() => {
-                    handleSubmit(onUpdateHandler)();
-                    setIsEditing(false);
-                  }}
-                />
+                <>
+                  <IconButton
+                    aria-label="Edit grocery list"
+                    icon={<CheckIcon />}
+                    onClick={() => {
+                      handleSubmit(onUpdateHandler)();
+                      setIsEditing(false);
+                    }}
+                  />
+                </>
               ) : (
                 <IconButton
                   aria-label="Edit grocery list"
