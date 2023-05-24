@@ -19,8 +19,8 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { FC, useCallback } from 'react';
-import { useFieldArray, UseFieldArrayRemove, useFormContext } from 'react-hook-form';
-import { GroceryListFormData } from '.';
+import { useFieldArray, UseFieldArrayRemove, useFormContext, useWatch } from 'react-hook-form';
+import { GroceryListFormData, GroceryListFormIngredient } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import useGroceryListHook from '../../hooks/useGroceryListHook';
@@ -44,11 +44,7 @@ const NewListAccordion: FC<{
 
   const ingredients = watch('ingredients');
 
-  const {
-    fields: fieldIngredients,
-    append: appendIngredient,
-    remove: removeIngredient,
-  } = useFieldArray({
+  const { append: appendIngredient, remove: removeIngredient } = useFieldArray({
     name: 'ingredients',
     control,
   });
@@ -62,7 +58,7 @@ const NewListAccordion: FC<{
     [resetField, submitGroceryList],
   );
 
-  const listPrice = fieldIngredients.reduce<{
+  const listPrice = ingredients.reduce<{
     listIngredients: ({
       name: string;
       capacity: number | undefined;
@@ -241,11 +237,7 @@ const NewListAccordion: FC<{
             </GridItem>
           ) : null}
 
-          <GridItem
-            textAlign={'end'}
-            gridRow={{ base: '2', sm: '1' }}
-            gridColumn={{ base: '1', sm: '4' }}
-          >
+          <GridItem textAlign={'end'} gridRow={1} gridColumn={{ base: '1', sm: '4' }}>
             <IconButton
               aria-label="Add ingredient"
               icon={<AddIcon />}
@@ -254,7 +246,7 @@ const NewListAccordion: FC<{
                   { name: '' },
                   {
                     // Currently manually disables all autoFocus, since input is shared
-                    focusName: `ingredients.${fieldIngredients.length - 1}.name`,
+                    focusName: `ingredients.${ingredients.length - 1}.name`,
                   },
                 );
               }}
@@ -274,8 +266,18 @@ const IngredientForm: FC<{
 }> = ({ unit, price, index, removeIngredient }) => {
   const {
     register,
+    control,
+    setValue,
     formState: { errors },
   } = useFormContext<GroceryListFormData>();
+
+  const ingredient = useWatch({ control, name: `ingredients.${index}` });
+  const valueSetter = useCallback(
+    (ingredientIndex: number, upgradedIngredient: GroceryListFormIngredient) => {
+      setValue(`ingredients.${ingredientIndex}`, upgradedIngredient);
+    },
+    [setValue],
+  );
 
   return (
     <Grid
@@ -290,7 +292,11 @@ const IngredientForm: FC<{
           textAlign={'start'}
           gap={'20px'}
         >
-          <IngredientComboBox ingredientFieldIndex={index} />
+          <IngredientComboBox
+            ingredientName={ingredient && ingredient.name ? ingredient.name : ''}
+            ingredientIndex={index}
+            valueSetter={valueSetter}
+          />
 
           <Input
             type="number"

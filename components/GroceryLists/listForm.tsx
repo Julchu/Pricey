@@ -1,17 +1,36 @@
 import { Card, Flex, Grid, Input, List, ListItem, useMediaQuery } from '@chakra-ui/react';
 import { useCombobox } from 'downshift';
 import Fuse from 'fuse.js';
-import { FC, useState } from 'react';
+import { FC, useCallback, useState } from 'react';
 import { useFormContext, useWatch } from 'react-hook-form';
-import { GroceryListFormData } from '.';
+import { GroceryListFormData, GroceryListFormIngredient } from '.';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 
 const ListForm: FC = () => {
   const {
     register,
+    setValue,
+    control,
     formState: { errors },
   } = useFormContext<GroceryListFormData>();
+
+  const ingredientNames = useWatch({
+    control,
+    name: [
+      `ingredients.${0}.name`,
+      `ingredients.${1}.name`,
+      `ingredients.${2}.name`,
+      `ingredients.${3}.name`,
+    ],
+  });
+
+  const valueSetter = useCallback(
+    (ingredientIndex: number, upgradedIngredient: GroceryListFormIngredient) => {
+      setValue(`ingredients.${ingredientIndex}`, upgradedIngredient);
+    },
+    [setValue],
+  );
 
   return (
     <Grid
@@ -31,20 +50,28 @@ const ListForm: FC = () => {
       />
 
       {/* Header grocery inputs */}
-      <IngredientComboBox ingredientFieldIndex={0} />
-      <IngredientComboBox ingredientFieldIndex={1} />
-      <IngredientComboBox ingredientFieldIndex={2} />
-      <IngredientComboBox ingredientFieldIndex={3} />
+      {[0, 1, 2, 3].map(index => {
+        return (
+          <IngredientComboBox
+            key={`headerComboBox_${index}`}
+            ingredientName={ingredientNames[index]}
+            ingredientIndex={index}
+            valueSetter={valueSetter}
+            header
+          />
+        );
+      })}
     </Grid>
   );
 };
 
 export const IngredientComboBox: FC<{
-  ingredientFieldIndex: number;
-}> = ({ ingredientFieldIndex }) => {
-  const { setValue, control } = useFormContext<GroceryListFormData>();
+  ingredientName: string;
+  ingredientIndex: number;
+  header?: boolean;
+  valueSetter?: (ingredientIndex: number, updatedIngredient: GroceryListFormIngredient) => void;
+}> = ({ ingredientName, ingredientIndex, header, valueSetter }) => {
   const { setExpandedIndex } = useGroceryListContext();
-  const ingredient = useWatch({ control, name: `ingredients.${ingredientFieldIndex}` });
 
   // PersonalIngredient from context hook, and filtered array of PersonalIngredients
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
@@ -67,9 +94,9 @@ export const IngredientComboBox: FC<{
         });
       }
 
-      setValue(`ingredients.${ingredientFieldIndex}`, updatedIngredient);
+      if (valueSetter) valueSetter(ingredientIndex, updatedIngredient);
 
-      if (isDesktopView) setExpandedIndex([0]);
+      if (header && isDesktopView) setExpandedIndex([0]);
 
       const fuse = new Fuse(Object.keys(ingredientIndexes), {
         keys: ['name'],
@@ -96,7 +123,7 @@ export const IngredientComboBox: FC<{
         type={'text'}
         {...getInputProps()}
         placeholder={'Grocery'}
-        value={ingredient ? ingredient.name : ''}
+        value={ingredientName ? ingredientName : ''}
       />
 
       <List

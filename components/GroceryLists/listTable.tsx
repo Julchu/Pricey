@@ -1,13 +1,13 @@
 import { Accordion, AccordionItem, Flex, Grid, Hide, Text } from '@chakra-ui/react';
 import { FC } from 'react';
 import { useAuthContext } from '../../hooks/useAuthContext';
-import { GroceryList } from '../../lib/firebase/interfaces';
+import { GroceryList, WithDocId } from '../../lib/firebase/interfaces';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import CurrentListAccordion from './currentListAccordion';
 import NewListAccordion from './newListAccordion';
 
 const ListTable: FC<{
-  filteredLists: GroceryList[];
+  filteredLists: WithDocId<GroceryList>[];
   newListName: string;
   groceryListsLength: number;
 }> = ({ filteredLists, newListName, groceryListsLength }) => {

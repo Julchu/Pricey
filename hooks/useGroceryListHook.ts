@@ -1,8 +1,9 @@
-import { doc, DocumentReference, serverTimestamp, setDoc } from 'firebase/firestore';
+import { doc, DocumentReference, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
 import { useCallback, useState } from 'react';
 import { GroceryListFormData } from '../components/GroceryLists';
 import { db, GroceryList, Unit } from '../lib/firebase/interfaces';
 import { useAuthContext } from './useAuthContext';
+import { filterNullableObject } from '../lib/textFormatters';
 
 type GroceryListMethods = {
   submitGroceryList: (
@@ -58,26 +59,16 @@ const useGroceryListHook = (): [GroceryListMethods, boolean, Error | undefined] 
   const updateGroceryList = useCallback<GroceryListMethods['updateGroceryList']>(
     async ({ groceryListId, name, ingredients, viewable }) => {
       if (!authUser) return;
-      // const previewPrice = priceCalculator(price, measurement);
-      // const convertedPreviewPrice = priceConverter(priceCalculator(previewPrice, quantity), unit, {
-      //   mass: Unit.kilogram,
-      //   volume: Unit.litre,
-      // }).toFixed(2);
-
       const groceryListDocRef = doc(db.groceryListCollection, groceryListId);
 
-      // const updatedIngredient = filterNullableObject({
-      //   ingredientId,
-      //   price: parseFloat(convertedPreviewPrice),
-      //   measurement,
-      //   quantity,
-      //   unit,
-      //   location,
-      //   image,
-      // });
+      const upgradedList = filterNullableObject({
+        name,
+        ingredients,
+        viewable,
+      });
 
       try {
-        // await updateDoc(groceryListDocRef, updatedIngredient);
+        await updateDoc(groceryListDocRef, upgradedList);
       } catch (e) {
         setError(e as Error);
       }

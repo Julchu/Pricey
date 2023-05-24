@@ -1,5 +1,5 @@
 import { Flex } from '@chakra-ui/react';
-import { FC, useEffect, useMemo, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { db, GroceryList, Unit, WithDocId } from '../../lib/firebase/interfaces';
 import { FormProvider, useForm } from 'react-hook-form';
 import ListForm from './listForm';
@@ -9,16 +9,17 @@ import Fuse from 'fuse.js';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 
+export type GroceryListFormIngredient = {
+  name: string;
+  capacity?: number;
+  unit?: Unit;
+  quantity?: number;
+};
+
 export type GroceryListFormData = {
   groceryListId?: string;
   name: string;
-  ingredients: {
-    name: string;
-    price?: number;
-    capacity?: number;
-    unit?: Unit;
-    quantity?: number;
-  }[];
+  ingredients: GroceryListFormIngredient[];
   viewable?: boolean;
 };
 
@@ -31,7 +32,7 @@ export type GroceryListFormData = {
 const GroceryLists: FC = () => {
   const { authUser } = useAuthContext();
   const { groceryListCreator } = useGroceryListContext();
-  const [groceryLists, setGroceryLists] = useState<GroceryList[]>([]);
+  const [groceryLists, setGroceryLists] = useState<WithDocId<GroceryList>[]>([]);
   const methods = useForm<GroceryListFormData>({
     defaultValues: {
       name: '',
@@ -59,20 +60,18 @@ const GroceryLists: FC = () => {
   }, [authUser?.documentId, groceryListCreator, setGroceryLists]);
 
   // Search grocery lists
-  const filteredLists = useMemo(() => {
-    const fuse = new Fuse(groceryLists, {
-      keys: ['name', 'ingredients.name'],
-      ignoreLocation: true,
-    });
+  const fuse = new Fuse(groceryLists, {
+    keys: ['name', 'ingredients.name'],
+    ignoreLocation: true,
+  });
 
-    const results = fuse.search(newListName || '');
+  const results = fuse.search(newListName || '');
 
-    return newListName
-      ? results.map(result => {
-          return result.item;
-        })
-      : groceryLists;
-  }, [newListName, groceryLists]);
+  const filteredLists = newListName
+    ? results.map(result => {
+        return result.item;
+      })
+    : groceryLists;
 
   return (
     <form>
