@@ -19,7 +19,7 @@ import {
   useColorModeValue,
 } from '@chakra-ui/react';
 import { FC, useCallback } from 'react';
-import { useFieldArray, useFormContext } from 'react-hook-form';
+import { useFieldArray, UseFieldArrayRemove, useFormContext } from 'react-hook-form';
 import { GroceryListFormData } from '.';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
@@ -38,19 +38,31 @@ const NewListAccordion: FC<{
   const [{ submitGroceryList }, loading] = useGroceryListHook();
   const { setExpandedIndex, groceryListCreator } = useGroceryListContext();
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
-  const {
-    register,
-    control,
-    watch,
-    handleSubmit,
-    resetField,
+  const bg = useColorModeValue('white', 'gray.800');
 
-    formState: { errors },
-  } = useFormContext<GroceryListFormData>();
+  const { control, watch, handleSubmit, resetField } = useFormContext<GroceryListFormData>();
 
   const ingredients = watch('ingredients');
 
-  const listPrice = ingredients.reduce<{
+  const {
+    fields: fieldIngredients,
+    append: appendIngredient,
+    remove: removeIngredient,
+  } = useFieldArray({
+    name: 'ingredients',
+    control,
+  });
+
+  const onSubmitHandler = useCallback(
+    async (groceryListData: GroceryListFormData) => {
+      await submitGroceryList(groceryListData);
+      resetField('name');
+      resetField('ingredients');
+    },
+    [resetField, submitGroceryList],
+  );
+
+  const listPrice = fieldIngredients.reduce<{
     listIngredients: ({
       name: string;
       capacity: number | undefined;
@@ -77,25 +89,6 @@ const NewListAccordion: FC<{
     },
     { listIngredients: [], totalPrice: 0 },
   );
-
-  const {
-    fields: fieldIngredients,
-    append: appendIngredient,
-    remove: removeIngredient,
-  } = useFieldArray({
-    name: 'ingredients',
-    control,
-  });
-
-  const onSubmitHandler = useCallback(
-    async (groceryListData: GroceryListFormData) => {
-      await submitGroceryList(groceryListData);
-      resetField('name');
-      resetField('ingredients');
-    },
-    [resetField, submitGroceryList],
-  );
-  const bg = useColorModeValue('white', 'gray.800');
 
   return (
     <Flex h={{ base: '100%', sm: 'unset' }} flexDir={'column'}>
@@ -213,84 +206,16 @@ const NewListAccordion: FC<{
           </Show>
         ) : null}
 
+        {/* Ingredient form */}
         {listPrice.listIngredients.map(({ unit, price }, index) => {
           return (
-            <Grid
-              templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
+            <IngredientForm
               key={`newIngredient_${index}`}
-              p={'12px 0px'}
-              gap={'20px'}
-            >
-              <GridItem gridColumn={{ sm: 2 }}>
-                <Grid
-                  templateColumns={{ base: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }}
-                  textAlign={'start'}
-                  gap={'20px'}
-                >
-                  <IngredientComboBox ingredientFieldIndex={index} />
-
-                  <Input
-                    type="number"
-                    {...register(`ingredients.${index}.capacity`, {
-                      valueAsNumber: true,
-                      min: 0,
-                      validate: capacity => {
-                        if (capacity) return validateIsNumber(capacity);
-                      },
-                    })}
-                    isInvalid={errors.ingredients?.[index]?.capacity?.type === 'validate'}
-                    placeholder={'Capacity'}
-                  />
-
-                  <Select
-                    {...register(`ingredients.${index}.unit`)}
-                    color={unit ? 'black' : 'grey'}
-                    placeholder={'Unit'}
-                  >
-                    {Object.values(Unit).map((unit, index) => {
-                      return (
-                        <option key={`${unit}_${index}`} value={unit}>
-                          {unit}
-                        </option>
-                      );
-                    })}
-                  </Select>
-
-                  <Input
-                    type="number"
-                    {...register(`ingredients.${index}.quantity`, {
-                      valueAsNumber: true,
-                      min: 0,
-                      validate: quantity => {
-                        if (quantity) return validateIsNumber(quantity);
-                      },
-                    })}
-                    placeholder={'Quantity'}
-                  />
-                </Grid>
-              </GridItem>
-
-              <GridItem
-                textAlign={{ sm: 'end' }}
-                alignSelf={'center'}
-                gridRow={{ base: '2', sm: '1' }}
-                gridColumn={{ base: '1', sm: '3' }}
-              >
-                {price ? <Text>{currencyFormatter.format(price)}</Text> : null}
-              </GridItem>
-
-              <GridItem
-                textAlign={'end'}
-                gridRow={{ base: '2', sm: '1' }}
-                gridColumn={{ base: '1', sm: '4' }}
-              >
-                <IconButton
-                  aria-label="Remove ingredient"
-                  icon={<DeleteIcon />}
-                  onClick={() => removeIngredient(index)}
-                />
-              </GridItem>
-            </Grid>
+              unit={unit}
+              price={price}
+              index={index}
+              removeIngredient={removeIngredient}
+            />
           );
         })}
 
@@ -324,20 +249,111 @@ const NewListAccordion: FC<{
             <IconButton
               aria-label="Add ingredient"
               icon={<AddIcon />}
-              onClick={() =>
+              onClick={() => {
                 appendIngredient(
                   { name: '' },
                   {
                     // Currently manually disables all autoFocus, since input is shared
-                    focusName: `ingredients.${fieldIngredients.length}.name`,
+                    focusName: `ingredients.${fieldIngredients.length - 1}.name`,
                   },
-                )
-              }
+                );
+              }}
             />
           </GridItem>
         </Grid>
       </AccordionPanel>
     </Flex>
+  );
+};
+
+const IngredientForm: FC<{
+  unit: Unit | undefined;
+  price: number | undefined;
+  index: number;
+  removeIngredient: UseFieldArrayRemove;
+}> = ({ unit, price, index, removeIngredient }) => {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext<GroceryListFormData>();
+
+  return (
+    <Grid
+      templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
+      key={`newIngredient_${index}`}
+      p={'12px 0px'}
+      gap={'20px'}
+    >
+      <GridItem gridColumn={{ sm: 2 }}>
+        <Grid
+          templateColumns={{ base: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }}
+          textAlign={'start'}
+          gap={'20px'}
+        >
+          <IngredientComboBox ingredientFieldIndex={index} />
+
+          <Input
+            type="number"
+            {...register(`ingredients.${index}.capacity`, {
+              valueAsNumber: true,
+              min: 0,
+              validate: capacity => {
+                if (capacity) return validateIsNumber(capacity);
+              },
+            })}
+            isInvalid={errors.ingredients?.[index]?.capacity?.type === 'validate'}
+            placeholder={'Capacity'}
+          />
+
+          <Select
+            {...register(`ingredients.${index}.unit`)}
+            color={unit ? 'black' : 'grey'}
+            placeholder={'Unit'}
+          >
+            {Object.values(Unit).map((unit, index) => {
+              return (
+                <option key={`${unit}_${index}`} value={unit}>
+                  {unit}
+                </option>
+              );
+            })}
+          </Select>
+
+          <Input
+            type="number"
+            {...register(`ingredients.${index}.quantity`, {
+              valueAsNumber: true,
+              min: 0,
+              validate: quantity => {
+                if (quantity) return validateIsNumber(quantity);
+              },
+            })}
+            placeholder={'Quantity'}
+          />
+        </Grid>
+      </GridItem>
+
+      <GridItem
+        textAlign={{ sm: 'end' }}
+        alignSelf={'center'}
+        gridRow={{ base: '2', sm: '1' }}
+        gridColumn={{ base: '1', sm: '3' }}
+      >
+        {price ? <Text>{currencyFormatter.format(price)}</Text> : null}
+      </GridItem>
+
+      <GridItem
+        textAlign={'end'}
+        gridRow={{ base: '2', sm: '1' }}
+        gridColumn={{ base: '1', sm: '4' }}
+      >
+        <IconButton
+          aria-label="Remove ingredient"
+          icon={<DeleteIcon />}
+          onClick={() => removeIngredient(index)}
+        />
+      </GridItem>
+    </Grid>
   );
 };
 

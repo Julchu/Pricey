@@ -1,10 +1,10 @@
 import { Flex } from '@chakra-ui/react';
 import { FC, useEffect, useMemo, useState } from 'react';
 import { db, GroceryList, Unit, WithDocId } from '../../lib/firebase/interfaces';
-import { useForm, FormProvider } from 'react-hook-form';
+import { FormProvider, useForm } from 'react-hook-form';
 import ListForm from './listForm';
 import ListTable from './listTable';
-import { query, where, onSnapshot } from 'firebase/firestore';
+import { onSnapshot, query, where } from 'firebase/firestore';
 import Fuse from 'fuse.js';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
@@ -20,7 +20,6 @@ export type GroceryListFormData = {
     quantity?: number;
   }[];
   viewable?: boolean;
-  price?: number;
 };
 
 /**

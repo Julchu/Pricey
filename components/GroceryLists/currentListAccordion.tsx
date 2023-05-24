@@ -8,15 +8,23 @@ import {
   Flex,
   Grid,
   GridItem,
+  IconButton,
+  Input,
+  Select,
   Show,
   Text,
   useColorModeValue,
 } from '@chakra-ui/react';
-import { FC, useMemo } from 'react';
+import { FC, useCallback, useEffect, useMemo, useState } from 'react';
 import { useGroceryListContext } from '../../hooks/useGroceryListContext';
 import { useIngredientContext } from '../../hooks/useIngredientContext';
 import { GroceryList, Unit } from '../../lib/firebase/interfaces';
-import { calcTotalPrice, currencyFormatter } from '../../lib/textFormatters';
+import { calcTotalPrice, currencyFormatter, validateIsNumber } from '../../lib/textFormatters';
+import { CheckIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons';
+import { useFieldArray, useForm } from 'react-hook-form';
+import { GroceryListFormData } from './index';
+import { IngredientComboBox } from './listForm';
+import useGroceryListHook from '../../hooks/useGroceryListHook';
 
 const CurrentListAccordion: FC<{
   isExpanded: boolean;
@@ -24,8 +32,32 @@ const CurrentListAccordion: FC<{
   list: GroceryList;
 }> = ({ isExpanded, index, list }) => {
   const { ingredientIndexes, currentIngredients } = useIngredientContext();
+  const [{ updateGroceryList }, loading] = useGroceryListHook();
   const { setExpandedIndex } = useGroceryListContext();
   const bg = useColorModeValue('white', 'gray.800');
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+
+  const {
+    register,
+    reset,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GroceryListFormData>({ defaultValues: list });
+
+  useEffect(() => {
+    if (!isExpanded) {
+      reset();
+      setIsEditing(false);
+    }
+  }, [isExpanded]);
+
+  const onUpdateHandler = useCallback(
+    async (groceryListData: GroceryListFormData) => {
+      await updateGroceryList(groceryListData);
+    },
+    [updateGroceryList],
+  );
 
   /** Created memoized object with
    * @property prices: { ingredient name, capacity, unit, quantity } and price: converted price * capacity * quantity // ingredient info
@@ -84,12 +116,16 @@ const CurrentListAccordion: FC<{
           rowGap={'20px'}
         >
           {/* Grocery list name */}
-          <Text as={'b'} display={'block'} alignSelf={'center'}>
-            {list.name}
-          </Text>
+          {isEditing ? (
+            <Input onClick={e => e.stopPropagation()} {...register('name', { required: true })} />
+          ) : (
+            <Text as={'b'} display={'block'} alignSelf={'center'}>
+              {list.name}
+            </Text>
+          )}
 
           {/* Ingredient badges */}
-          <Flex flexWrap={'wrap'} gap={'10px'}>
+          <Flex flexWrap={'wrap'} gap={'10px'} alignContent={{ sm: 'center' }}>
             {list.ingredients.map((ingredient, index) => {
               return (
                 <Box key={`ingredient_${index}`}>
@@ -176,8 +212,131 @@ const CurrentListAccordion: FC<{
             </Grid>
           );
         })}
+
+        <Grid
+          templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
+          p="12px 0px"
+          gap={'20px'}
+        >
+          {/* Edit list button*/}
+          <GridItem
+            textAlign={'end'}
+            gridRow={{ base: '2', sm: '1' }}
+            gridColumn={{ base: '1', sm: '4' }}
+          >
+            {isEditing ? (
+              <IconButton
+                aria-label="Edit grocery list"
+                icon={<CheckIcon />}
+                onClick={() => setIsEditing(false)}
+              />
+            ) : (
+              <IconButton
+                aria-label="Edit grocery list"
+                icon={<EditIcon />}
+                onClick={() => setIsEditing(true)}
+              />
+            )}
+          </GridItem>
+        </Grid>
       </AccordionPanel>
     </Flex>
+  );
+};
+
+const IngredientForm: FC<{
+  unit: Unit;
+  price: number;
+  index: number;
+}> = ({ unit, price, index }) => {
+  const {
+    register,
+    control,
+    formState: { errors },
+  } = useForm<GroceryListFormData>({ defaultValues: {} });
+
+  const { remove: removeIngredient } = useFieldArray({
+    name: 'ingredients',
+    control,
+  });
+
+  return (
+    <Grid
+      templateColumns={{ base: '100%', sm: '1.5fr 4.5fr 1fr 0.3fr' }}
+      key={`newIngredient_${index}`}
+      p={'12px 0px'}
+      gap={'20px'}
+    >
+      <GridItem gridColumn={{ sm: 2 }}>
+        <Grid
+          templateColumns={{ base: '1fr 1fr', sm: '1fr 1fr 1fr 1fr' }}
+          textAlign={'start'}
+          gap={'20px'}
+        >
+          <IngredientComboBox ingredientFieldIndex={index} />
+
+          <Input
+            type="number"
+            {...register(`ingredients.${index}.capacity`, {
+              valueAsNumber: true,
+              min: 0,
+              validate: capacity => {
+                if (capacity) return validateIsNumber(capacity);
+              },
+            })}
+            isInvalid={errors.ingredients?.[index]?.capacity?.type === 'validate'}
+            placeholder={'Capacity'}
+          />
+
+          <Select
+            {...register(`ingredients.${index}.unit`)}
+            color={unit ? 'black' : 'grey'}
+            placeholder={'Unit'}
+          >
+            {Object.values(Unit).map((unit, index) => {
+              return (
+                <option key={`${unit}_${index}`} value={unit}>
+                  {unit}
+                </option>
+              );
+            })}
+          </Select>
+
+          <Input
+            type="number"
+            {...register(`ingredients.${index}.quantity`, {
+              valueAsNumber: true,
+              min: 0,
+              validate: quantity => {
+                if (quantity) return validateIsNumber(quantity);
+              },
+            })}
+            placeholder={'Quantity'}
+          />
+        </Grid>
+      </GridItem>
+
+      <GridItem
+        textAlign={{ sm: 'end' }}
+        alignSelf={'center'}
+        gridRow={{ base: '2', sm: '1' }}
+        gridColumn={{ base: '1', sm: '3' }}
+      >
+        {price ? <Text>{currencyFormatter.format(price)}</Text> : null}
+      </GridItem>
+
+      <GridItem
+        textAlign={'end'}
+        gridRow={{ base: '2', sm: '1' }}
+        gridColumn={{ base: '1', sm: '4' }}
+      >
+        <IconButton
+          aria-label="Remove ingredient"
+          icon={<DeleteIcon />}
+          onClick={() => removeIngredient(index)}
+        />
+      </GridItem>
+    </Grid>
   );
 };
 
