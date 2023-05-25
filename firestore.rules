@@ -4,55 +4,7 @@ service cloud.firestore {
     match /{document=**} {
       // *NOTE* this rule should always be at the top
       // first disallow read (get/list) and write (create/update/delete) globally
-      allow read, write: if false;
-    }
-
-    // Determine if the value of the field "key" is the same before and after the request.
-    // credit: https://github.com/firebase/friendlyeats-web
-    function unchanged(key) {
-      return (key in resource.data)
-        && (key in request.resource.data)
-        && (resource.data[key] == request.resource.data[key]);
-    }
-
-    function getRole() {
-      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
-    }
-
-    function isAdmin() {
-      return getRole() == 'admin';
-    }
-
-    function isStandard() {
-      return getRole() == 'standard';
-    }
-
-    match /users/{userId} {
-      // allow read by all authenticated users
-      allow read: if request.auth != null && ( userId == request.auth.uid );
-    }
-
-
-
-    match /ingredients/{ingredientId} {
-      // Allow read/write access on all documents to any user signed in to the application
-      allow read: if request.auth != null;
-      allow write: if isAdmin();
-      allow create: if isChef() && 'chef' in request.resource.data && request.resource.data.chef.id == request.auth.uid;
-      allow update: if isChef() &&
-        'chef' in resource.data && resource.data.chef.id == request.auth.uid &&
-        'chef' in request.resource.data && request.resource.data.chef.id == request.auth.uid;
-      allow delete: if isChef() &&
-        'chef' in resource.data && resource.data.chef.id == request.auth.uid;
-    }
-
-    match /interventions/{interventionId} {
-      allow read: if true;
-      allow read, write, create: if isAdmin() || isStandard();
-    }
-
-    match /groceryList/{groceryListId} {
-      allow read, write, create, delete: if isAdmin() || isStandard();
+      allow read, write, create, delete: if request.auth != null
     }
   }
 }

@@ -91,7 +91,7 @@ sudo kill -9 $(sudo lsof -t -i:8080)
 
 - In VSCode, install the extention Prettier
 - Go to your VSCode JSON settings:
-    - Command Palette -> Preferences: Open Settings (JSON)
+  - Command Palette -> Preferences: Open Settings (JSON)
 - Add the following code to the JSON object
 - Whenever you save a file, it'll run automatic formatting based on rules defined in `/.prettierrc.json`
 
@@ -175,21 +175,21 @@ top-level `state` data that is also being passed down to other neighbouring chil
 ### /components
 
 - For React components, structured as
-    - DirectoryName
-        - CropAlgorithm.tsx
-        - styles.tsx
+  - DirectoryName
+    - CropAlgorithm.tsx
+    - styles.tsx
 - Template files:
-    - /components/Template: index/styles.tsx
-    - /pages/template: CropAlgorithm.tsx
+  - /components/Template: index/styles.tsx
+  - /pages/template: CropAlgorithm.tsx
 
 ### /pages:
 
 - Files in this directory are treated as API routes instead of React pages
-    - RouteName
-        - CropAlgorithm.tsx: localhost:3000/RouteName
-        - SubRouteName
-            - CropAlgorithm.tsx: localhost:3000/RouteName/SubRouteName
-            - [templateIndex].tsx: localhost:3000/RouteName/SubRouteName/templateIndex
+  - RouteName
+    - CropAlgorithm.tsx: localhost:3000/RouteName
+    - SubRouteName
+      - CropAlgorithm.tsx: localhost:3000/RouteName/SubRouteName
+      - [templateIndex].tsx: localhost:3000/RouteName/SubRouteName/templateIndex
 - CropAlgorithm.tsx files are the displayed components, so `/pages/CropAlgorithm.tsx` will be the base `localhost:3000/`
   file
 
@@ -197,13 +197,13 @@ top-level `state` data that is also being passed down to other neighbouring chil
 
 - Project information, node module dependencies, etc...
 - Scripts: commands and aliases to run commands
-    - Ex: type-check runs the TS compiler script `tsc` when you call it with `yarn type-check`
+  - Ex: type-check runs the TS compiler script `tsc` when you call it with `yarn type-check`
 - Dependencies: `yarn add <packageName>`
-    - Required for end user/host to install when building app
-    - Ex: NextJS/React, Emotion (styling)
+  - Required for end user/host to install when building app
+  - Ex: NextJS/React, Emotion (styling)
 - Dev Dependencies: `yarn add <packageName> -D`
-    - Required for devs to install when building app
-    - Ex: linters, formatters
+  - Required for devs to install when building app
+  - Ex: linters, formatters
 
 ## Basic Emotion styled components
 
